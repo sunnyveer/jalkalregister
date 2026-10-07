@@ -1,0 +1,3256 @@
+﻿﻿<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAL KAL VIBHAG NAGER NIGAM VARANASI - Register</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<style>
+:root {
+    --base-font: 15px;
+    --input-font: 17px;
+    --dev-font: 'Nirmala UI', 'Mangal', 'Noto Sans Devanagari', 'Noto Serif Devanagari', 'Devanagari Sangam MN', 'Arial Unicode MS', Arial, sans-serif;
+}
+
+html, body, * {
+    font-kerning: normal !important;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--dev-font);
+    background-color: #f1f5f9;
+    color: #000;
+    font-size: var(--base-font);
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+* { font-family: inherit; }
+p, span, div, h1, h2, h3, h4, h5, h6, label, a, button, input, select, option, textarea, td, th, li {
+    letter-spacing: normal !important;
+    font-family: var(--dev-font) !important;
+}
+.header-with-logos .title-block h1,
+.login-title h1 {
+    font-family: 'Times New Roman', 'Liberation Serif', serif !important;
+}
+
+.topbar {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.register-sheet table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+.register-sheet th, .register-sheet td {
+    border: 1.5px solid #000 !important;
+    padding: 6px 4px;
+    font-size: var(--base-font);
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    line-height: 1.5;
+    font-family: var(--dev-font);
+    background: #fff;
+    color: #000;
+}
+.register-sheet th { font-weight: 700; background-color: #fff; }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+.grid-input {
+    width: 100%; height: 100%; border: none; outline: none;
+    background: transparent; text-align: center;
+    font-family: var(--dev-font);
+    font-size: var(--input-font); font-weight: 700; padding: 8px 2px;
+    border-radius: 3px; transition: all 0.15s ease;
+    color: #000;
+}
+.grid-input:focus { background-color: #dbeafe; box-shadow: inset 0 0 0 2px #3b82f6; }
+.grid-input:disabled { background: transparent !important; cursor: not-allowed; color: #000; }
+.register-sheet tr.active-row td { background-color: #fef3c7 !important; }
+.font-badge { font-size: 12px; font-weight: 700; min-width: 42px; text-align: center; color: #334155; }
+
+.header-row-1 {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: nowrap; gap: 12px; min-width: 0;
+    border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 12px;
+}
+.header-row-1 .left-part {
+    flex: 1 1 auto; min-width: 0;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: nowrap; overflow: hidden;
+}
+.header-row-1 .left-part .header-title {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 14px !important; font-weight: 700; min-width: 0;
+    color: #0f172a;
+}
+.header-row-1 .right-part {
+    flex: 0 0 auto; display: flex; align-items: center;
+    gap: 8px; flex-wrap: nowrap;
+}
+.header-row-1 .right-part > div { flex-shrink: 0; }
+
+.header-row-2 {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+}
+.header-row-2 .left-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.header-row-2 .right-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.header-row-2 .right-actions button,
+.header-row-2 .left-filters button { font-size: 12px !important; white-space: nowrap; }
+.header-row-2 .left-filters > span { font-size: 12px !important; }
+
+.font-controls {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #f1f5f9; padding: 4px 6px; border-radius: 6px;
+    border: 1px solid #cbd5e1; flex-shrink: 0;
+}
+.font-controls .font-label { font-size: 10px; color: #475569; font-weight: 700; }
+.font-controls .font-btn {
+    background: #e2e8f0; color: #0f172a; border: none;
+    width: 26px; height: 26px; border-radius: 4px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    flex-shrink: 0;
+}
+.font-controls .font-btn:hover { background: #cbd5e1; }
+
+.month-block {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f1f5f9; padding: 4px 8px; border-radius: 6px;
+    border: 1px solid #cbd5e1; flex-shrink: 0;
+}
+.month-block label { font-size: 11px; color: #334155; font-weight: 700; white-space: nowrap; }
+.month-block input[type="month"] {
+    background: #ffffff; color: #0f172a;
+    border: 1px solid #cbd5e1; border-radius: 4px;
+    padding: 3px 6px; font-size: 11px; cursor: pointer;
+}
+.month-block button {
+    background: #2563eb; color: #fff; border: none;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; cursor: pointer;
+    white-space: nowrap;
+}
+
+.header-with-logos {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; border: 2px solid #000; padding: 8px 10px;
+    margin-bottom: 4px; min-height: 90px; overflow: hidden;
+    background: #fff;
+}
+.header-with-logos .title-block { flex: 1; text-align: center; padding: 0 100px; }
+.header-with-logos .title-block h1 {
+    font-size: 18px; font-weight: bold; letter-spacing: 1px;
+    text-transform: uppercase; margin: 0; line-height: 1.2;
+    color: #000;
+}
+.header-with-logos .title-block p {
+    font-size: 12px; font-weight: 700; margin: 4px 0 0; line-height: 1.5;
+    color: #000;
+}
+
+#logoMovable {
+    position: absolute; top: 8px; left: 10px;
+    width: 90px; height: 70px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px dashed #cbd5e1; border-radius: 4px;
+    background: #f8fafc; cursor: grab; user-select: none;
+    touch-action: none;
+    z-index: 5;
+}
+#logoMovable.has-logo { border-style: solid; border-color: #000; background: #fff; }
+#logoMovable.disabled { cursor: not-allowed; opacity: 0.6; }
+#logoMovable img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
+#logoMovable .placeholder {
+    font-size: 10px; color: #94a3b8; text-align: center;
+    font-weight: 600; line-height: 1.3; padding: 2px; pointer-events: none;
+}
+#logoMovable.has-logo .placeholder { display: none; }
+#logoMovable .remove-btn {
+    position: absolute; top: -6px; right: -6px; background: #dc2626;
+    color: white; border: none; border-radius: 50%; width: 18px; height: 18px;
+    font-size: 10px; cursor: pointer; display: none;
+    align-items: center; justify-content: center; z-index: 7;
+}
+#logoMovable.has-logo .remove-btn { display: flex; }
+#logoMovable .resize-handle {
+    position: absolute; bottom: -5px; right: -5px;
+    width: 16px; height: 16px; background: #3b82f6;
+    border: 2px solid #fff; border-radius: 3px;
+    cursor: nwse-resize; display: none; z-index: 8;
+}
+#logoMovable.has-logo .resize-handle { display: block; }
+
+.modal-backdrop {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 12px; overflow-y: auto;
+}
+.modal-backdrop.show { display: flex; }
+.modal-box {
+    background: white; border-radius: 12px; max-width: 1000px; width: 100%;
+    max-height: 92vh; overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+.modal-header {
+    background: #f1f5f9; color: #0f172a; padding: 12px 18px;
+    display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    border-bottom: 1px solid #cbd5e1;
+}
+.modal-header h2 { color: #0f172a; }
+.modal-body { padding: 14px 18px; overflow-y: auto; background: #fff; }
+
+.search-result-row {
+    border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;
+    margin-bottom: 8px; background: #f8fafc;
+}
+.search-result-row .date-badge {
+    font-weight: 700; font-size: 15px; color: #6d28d9;
+    background: #ede9fe; padding: 4px 12px; border-radius: 20px;
+}
+.zone-pill {
+    display: inline-block; background: #e0f2fe; color: #075985;
+    padding: 2px 8px; border-radius: 12px; font-size: 12px;
+    font-weight: 600; margin: 2px;
+}
+.toast {
+    position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
+    border-radius: 8px; color: white; font-weight: 600; font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(100px);
+    opacity: 0; transition: all 0.3s ease; z-index: 9999; max-width: 90vw;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: #059669; }
+.toast.info { background: #2563eb; }
+.toast.warning { background: #d97706; }
+.toast.danger { background: #dc2626; }
+.edit-input {
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 6px;
+    padding: 8px 10px; font-size: 15px; font-weight: 600; text-align: center;
+    background: #fff; color: #0f172a;
+}
+.edit-input:focus { outline: none; border-color: #3b82f6; background: #eff6ff; }
+
+#loginScreen {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #f0f9ff 100%);
+    z-index: 10000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+#loginScreen.hidden { display: none; }
+.login-card {
+    background: white; border-radius: 16px; padding: 32px;
+    max-width: 440px; width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2); position: relative;
+    border: 1px solid #cbd5e1;
+}
+.login-title { text-align: center; margin-bottom: 24px; }
+.login-title h1 {
+    font-family: 'Times New Roman', serif;
+    font-size: 20px; font-weight: bold;
+    color: #0f172a; letter-spacing: 1px;
+    margin: 0 0 6px; text-transform: uppercase;
+}
+.login-title p { font-size: 12px; color: #64748b; margin: 0; font-weight: 600; }
+.login-input {
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 8px;
+    padding: 11px 14px; font-size: 15px; font-weight: 600;
+    transition: all 0.15s; color: #0f172a;
+    background: #fff;
+}
+.login-input:focus { outline: none; border-color: #3b82f6; background: #eff6ff; }
+.login-label {
+    display: block; font-size: 12px;
+    font-weight: 700; color: #475569; margin-bottom: 6px;
+}
+
+.user-menu-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155; padding: 4px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.user-menu-badge.admin { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+.user-menu-badge.user { background: #dcfce7; border-color: #86efac; color: #166534; }
+
+#userDropdown {
+    display: none; position: absolute; top: 50px; right: 20px;
+    background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 500;
+    min-width: 260px; overflow: hidden; color: #1e293b;
+}
+#userDropdown .dd-header { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+#userDropdown .dd-header .dd-label { font-size: 11px; color: #64748b; font-weight: 700; }
+#userDropdown .dd-header .dd-user { font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 3px; }
+#userDropdown button {
+    width: 100%; text-align: left; padding: 12px 16px;
+    font-size: 14px; font-weight: 600; color: #1e293b;
+    background: #ffffff; border: none;
+    border-bottom: 1px solid #f1f5f9; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+}
+#userDropdown button:hover { background: #f1f5f9; }
+#userDropdown button.logout-btn { color: #dc2626; border-bottom: none; }
+
+.otp-input-box { letter-spacing: 8px !important; font-size: 20px; text-align: center; font-weight: 700; }
+
+#printArea { display: none; }
+
+/* ============================================================
+   DATE PICKER — with calendar icon (VISIBLE)
+   ============================================================ */
+.date-picker-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 2px solid #93c5fd;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+    transition: all 0.15s;
+}
+.date-picker-wrap:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+.date-picker-display {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    background: transparent;
+    color: #0f172a;
+    text-align: center;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+}
+.date-picker-hidden {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+}
+.date-picker-cal-icon {
+    padding: 0 12px;
+    color: #2563eb;
+    font-size: 16px;
+    pointer-events: none;
+    border-left: 1px solid #e0e7ff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #f0f9ff;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+/* Small variant for top bar */
+.date-picker-wrap.small { border-width: 1px; border-color: #cbd5e1; border-radius: 6px; }
+.date-picker-wrap.small .date-picker-display { font-size: 12px; padding: 5px 8px; letter-spacing: 1px; }
+.date-picker-wrap.small .date-picker-cal-icon { 
+    padding: 0 8px; 
+    font-size: 14px; 
+    padding-top: 5px; 
+    padding-bottom: 5px;
+    min-width: 32px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-left: 1px solid #bfdbfe;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ============================================================
+   VIEW TOGGLE
+   ============================================================ */
+.view-toggle-bar { display: flex; justify-content: center; margin-bottom: 10px; }
+.view-toggle {
+    display: inline-flex; background: #ffffff; border-radius: 25px; padding: 4px;
+    border: 1px solid #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.view-toggle button {
+    background: transparent; color: #64748b; border: none;
+    padding: 8px 18px; font-size: 13px; font-weight: 800; cursor: pointer;
+    border-radius: 20px; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+}
+.view-toggle button.active { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+.view-toggle button:not(.active):hover { background: #f1f5f9; color: #334155; }
+
+/* ============================================================
+   ENTRY VIEW
+   ============================================================ */
+#entryView {
+    background: #fff; border-radius: 12px; padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+}
+.entry-form-card {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 2px solid #3b82f6; border-radius: 12px;
+    padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+.entry-form-title {
+    font-size: 15px; font-weight: 800; color: #1e40af;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.entry-form-grid {
+    display: grid; grid-template-columns: 1fr 1.5fr 1fr auto;
+    gap: 12px; align-items: end;
+}
+@media (max-width: 768px) { .entry-form-grid { grid-template-columns: 1fr; } }
+.entry-field { display: flex; flex-direction: column; gap: 4px; }
+.entry-field label {
+    font-size: 11px; font-weight: 700; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.entry-field input,
+.entry-field select {
+    border: 2px solid #93c5fd; border-radius: 8px;
+    padding: 10px 12px; font-size: 14px; font-weight: 700;
+    background: #fff; color: #0f172a; outline: none; width: 100%;
+    box-sizing: border-box;
+}
+.entry-field input:focus,
+.entry-field select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+.add-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; border: none; border-radius: 8px;
+    padding: 10px 24px; font-size: 14px; font-weight: 800;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    height: 44px; box-shadow: 0 3px 8px rgba(16,185,129,0.3);
+    transition: all 0.15s; white-space: nowrap;
+}
+.add-btn:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
+
+/* DASHBOARD */
+.dashboard-card {
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+}
+.dashboard-header {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #1e40af;
+    padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
+    border-bottom: 2px solid #3b82f6;
+}
+.dashboard-header h3 {
+    font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px; color: #1e40af;
+}
+.dashboard-updated { font-size: 10px; color: #64748b; font-weight: 700; }
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; padding: 14px;
+}
+.dash-stat {
+    display: flex; align-items: center; gap: 10px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 10px 12px;
+    transition: all 0.15s;
+}
+.dash-stat:hover { border-color: #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.dash-stat-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; flex-shrink: 0;
+}
+.dash-stat-info { flex: 1; min-width: 0; }
+.dash-stat-label {
+    font-size: 10px; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px;
+}
+.dash-stat-value { font-size: 18px; font-weight: 900; color: #0f172a; }
+
+.dash-firms {
+    padding: 0 14px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.dash-firm-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.3fr) 2fr minmax(90px, auto);
+    gap: 10px; align-items: center;
+}
+@media (max-width: 640px) { .dash-firm-row { grid-template-columns: 1fr; gap: 4px; } }
+.dash-firm-name {
+    font-size: 12px; font-weight: 700; color: #1e293b;
+    display: flex; align-items: center; gap: 6px;
+}
+.dash-firm-name small { color: #64748b; font-weight: 600; font-size: 10px; }
+.dash-firm-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dash-firm-bar-wrap {
+    background: #f1f5f9; height: 8px;
+    border-radius: 4px; overflow: hidden;
+}
+.dash-firm-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.dash-firm-val {
+    font-size: 13px; font-weight: 800; color: #0f172a;
+    text-align: right; white-space: nowrap;
+}
+
+.recent-card {
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+}
+.recent-header {
+    background: #f8fafc; padding: 10px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 6px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.recent-header h3 {
+    font-size: 12px; font-weight: 800; color: #475569;
+    display: flex; align-items: center; gap: 6px;
+}
+.recent-note { font-size: 10px; color: #94a3b8; font-weight: 600; }
+.recent-list { padding: 4px 0; }
+.recent-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; border-bottom: 1px solid #f8fafc;
+    gap: 10px; flex-wrap: wrap;
+}
+.recent-row:last-child { border-bottom: none; }
+.recent-row .rdate {
+    font-size: 12px; font-weight: 800; color: #6d28d9;
+    background: #ede9fe; padding: 3px 10px; border-radius: 6px;
+    white-space: nowrap; min-width: 82px; text-align: center;
+    letter-spacing: 1px; font-family: 'Courier New', monospace;
+}
+.recent-row .rfirm { font-size: 12px; font-weight: 700; color: #1e293b; flex: 1; min-width: 0; }
+.recent-row .rqty { font-size: 13px; font-weight: 900; color: #166534; }
+.recent-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 12px; }
+
+#registerSheetWrapper { display: none; }
+
+/* ============================================================
+   SIGNATURE — "केमिस्ट" right-bottom only
+   ============================================================ */
+.register-sig-block {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 60px;
+    padding: 0 40px 0 0;
+    font-size: 15px;
+    font-weight: 800;
+}
+.register-sig-block > div {
+    text-align: right;
+    border-top: 1px solid #000;
+    padding: 6px 20px 0;
+    min-width: 120px;
+}
+
+/* LAYOUT EDITOR */
+.layout-editor { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 12px; color: #0f172a; }
+.layout-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.layout-editor-header h3 { font-size: 14px; font-weight: 800; color: #1e40af; display: flex; align-items: center; gap: 6px; }
+.layout-editor-header .fit-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.layout-editor-header .reset-btn { background: #cbd5e1; color: #0f172a; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.orient-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+.orient-btn-group { display: inline-flex; background: #e2e8f0; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; }
+.orient-btn-group button { background: transparent; color: #475569; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.orient-btn-group button.active { background: #3b82f6; color: #fff; }
+.psize-select { background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.slider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.slider-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; }
+.slider-item label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; }
+.slider-item .val { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 4px; padding: 1px 8px; color: #1e40af; font-weight: 800; font-size: 11px; min-width: 44px; text-align: center; }
+.slider-item input[type="range"] { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; outline: none; -webkit-appearance: none; cursor: pointer; }
+.slider-item input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.page-count-badge { background: #eff6ff; border: 1px solid #3b82f6; color: #1e40af; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+.page-count-badge.ok { background: #dcfce7; border-color: #16a34a; color: #166534; }
+
+#reportPreviewContainer {
+    border: 1px solid #cbd5e1; border-radius: 8px;
+    max-height: 620px; overflow: auto; background: #f1f5f9;
+    padding: 16px; display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+}
+
+#undoBar {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(140px);
+    background: #ffffff;
+    color: #0f172a; border-radius: 14px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    z-index: 99999; opacity: 0; pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    max-width: 92vw; border: 2px solid #f59e0b;
+}
+#undoBar.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+#undoBar .undo-msg { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: #78350f; }
+#undoBar .undo-msg i { color: #f59e0b; font-size: 18px; }
+#undoBar .undo-timer { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 900; color: #78350f; min-width: 60px; text-align: center; }
+#undoBar .undo-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: 14px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+#undoBar .undo-close { background: transparent; color: #64748b; border: none; font-size: 18px; cursor: pointer; padding: 4px 8px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-title">
+            <i class="fa-solid fa-droplet text-blue-600 text-3xl mb-2"></i>
+            <h1>JAL KAL VIBHAG</h1>
+            <p>नगर निगम वाराणसी — रजिस्टर सिस्टम</p>
+        </div>
+
+        <div id="loginForm">
+            <div class="mb-4">
+                <label class="login-label">उपयोगकर्ता नाम</label>
+                <input type="text" id="loginUsername" class="login-input" placeholder="admin या user" autocomplete="username">
+            </div>
+            <div class="mb-4">
+                <label class="login-label">पासवर्ड</label>
+                <input type="password" id="loginPassword" class="login-input" placeholder="पासवर्ड" autocomplete="current-password">
+            </div>
+            <button onclick="attemptLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+                <i class="fa-solid fa-right-to-bracket mr-1"></i> लॉगिन
+            </button>
+            <div class="text-center mt-4">
+                <button onclick="showForgotPassword()" class="text-blue-600 hover:text-blue-800 text-xs font-bold">
+                    <i class="fa-solid fa-key mr-1"></i> पासवर्ड भूल गए? (OTP से रीसेट)
+                </button>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-500 text-center">
+                <p class="mb-1"><strong>डिफ़ॉल्ट लॉगिन:</strong></p>
+                <p>Admin → <code class="bg-slate-100 px-1.5 py-0.5 rounded">admin / jalkal@admin</code></p>
+                <p>User → <code class="bg-slate-100 px-1.5 py-0.5 rounded">user / jalkal@user</code></p>
+            </div>
+        </div>
+
+        <div id="forgotPasswordForm" style="display:none;">
+            <div class="mb-4">
+                <label class="login-label">उपयोगकर्ता नाम</label>
+                <input type="text" id="resetUsername" class="login-input" placeholder="admin / user">
+            </div>
+            <div class="mb-4">
+                <label class="login-label">रजिस्टर्ड ईमेल</label>
+                <input type="email" id="resetEmail" class="login-input" placeholder="OTP कहाँ भेजना है">
+            </div>
+            <button onclick="requestOTP()" id="sendOtpBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition mb-3">
+                <i class="fa-solid fa-paper-plane mr-1"></i> OTP भेजें
+            </button>
+            <div id="otpSection" style="display:none;">
+                <div class="mb-4">
+                    <label class="login-label">ईमेल पर मिला OTP</label>
+                    <input type="text" id="otpInput" class="login-input otp-input-box" placeholder="000000" maxlength="6">
+                </div>
+                <div class="mb-4">
+                    <label class="login-label">नया पासवर्ड</label>
+                    <input type="password" id="newPassword" class="login-input" placeholder="कम से कम 6 अक्षर">
+                </div>
+                <div class="mb-4">
+                    <label class="login-label">नया पासवर्ड दोबारा</label>
+                    <input type="password" id="newPassword2" class="login-input">
+                </div>
+                <button onclick="verifyOTPAndReset()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">
+                    <i class="fa-solid fa-check mr-1"></i> पासवर्ड रीसेट करें
+                </button>
+            </div>
+            <div class="text-center mt-4">
+                <button onclick="backToLogin()" class="text-slate-600 hover:text-slate-800 text-xs font-bold">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> लॉगिन पर वापस
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appContainer" style="display:none;">
+
+<div class="no-print topbar max-w-6xl mx-auto p-4 mb-2">
+    <div class="header-row-1">
+        <div class="left-part">
+            <i class="fa-solid fa-keyboard text-xl text-blue-600" style="flex-shrink:0;"></i>
+            <span class="header-title">रजिस्टर सिस्टम - जलकल विभाग वाराणसी</span>
+            <span id="dbStatus" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300" style="flex-shrink:0;">
+                <i class="fa-solid fa-database mr-1"></i> DB: तैयार
+            </span>
+        </div>
+        <div class="right-part">
+            <div class="font-controls">
+                <span class="font-label"><i class="fa-solid fa-font"></i></span>
+                <button class="font-btn" onclick="changeFontSize(-1)">A−</button>
+                <span id="fontSizeBadge" class="font-badge text-emerald-700">100%</span>
+                <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+            </div>
+            <div class="month-block">
+                <label for="monthPicker">माह:</label>
+                <input type="month" id="monthPicker">
+                <button onclick="goToToday()"><i class="fa-solid fa-calendar-day"></i> आज</button>
+            </div>
+            <div id="userMenu" class="user-menu-badge admin" onclick="toggleUserDropdown(event)">
+                <i class="fa-solid fa-user-shield"></i>
+                <span id="currentUserName">Admin</span>
+                <i class="fa-solid fa-chevron-down text-[8px]"></i>
+            </div>
+            <div id="userDropdown">
+                <div class="dd-header">
+                    <div class="dd-label">लॉगिन किया:</div>
+                    <div id="userInfoLine" class="dd-user">--</div>
+                </div>
+                <button onclick="resetLogoPosition()" id="resetLogoBtn">
+                    <i class="fa-solid fa-arrows-up-down-left-right" style="color:#059669;"></i>
+                    <span>लोगो पोज़िशन रीसेट</span>
+                </button>
+                <button onclick="openChangePassword()">
+                    <i class="fa-solid fa-lock" style="color:#2563eb;"></i>
+                    <span>पासवर्ड बदलें</span>
+                </button>
+                <button onclick="openEmailSettings()" id="emailSettingsBtn">
+                    <i class="fa-solid fa-envelope" style="color:#d97706;"></i>
+                    <span>ईमेल सेटिंग (OTP)</span>
+                </button>
+                <button onclick="openAuditLog()" id="auditLogBtn">
+                    <i class="fa-solid fa-history" style="color:#9333ea;"></i>
+                    <span>गतिविधि लॉग</span>
+                </button>
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>लॉगआउट</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-row-2">
+        <div class="left-filters">
+            <span class="font-bold text-slate-700"><i class="fa-solid fa-filter mr-1"></i>तारीख रेंज:</span>
+            <div class="date-picker-wrap small" style="width:170px;">
+                <input type="text" id="fromDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly>
+                <input type="date" id="fromDate" class="date-picker-hidden">
+                <i class="fa-solid fa-calendar-days date-picker-cal-icon"></i>
+            </div>
+            <span class="text-slate-700">से</span>
+            <div class="date-picker-wrap small" style="width:170px;">
+                <input type="text" id="toDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly>
+                <input type="date" id="toDate" class="date-picker-hidden">
+                <i class="fa-solid fa-calendar-days date-picker-cal-icon"></i>
+            </div>
+            <span class="text-slate-700">तक</span>
+            <button onclick="applyDateFilter()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded">फ़िल्टर</button>
+            <button onclick="resetDateFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded">पूरा महीना</button>
+        </div>
+        <div class="right-actions">
+            <button onclick="openSearch()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-magnifying-glass"></i> सर्च
+            </button>
+            <button onclick="openReportModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-file-lines"></i> रिपोर्ट
+            </button>
+            <button onclick="saveData()" id="saveBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-floppy-disk"></i> सेव
+            </button>
+            <button onclick="exportToExcel()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </button>
+            <button onclick="printPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+            </button>
+            <button onclick="openBackupModal()" id="backupBtn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+                <i class="fa-solid fa-shield-halved"></i> बैकअप
+            </button>
+        </div>
+    </div>
+
+    <div id="viewOnlyBanner" class="mt-3 bg-emerald-100 border border-emerald-300 rounded px-3 py-2 text-[11px] text-emerald-800" style="display:none;">
+        <i class="fa-solid fa-eye text-emerald-600 mr-1"></i>
+        <strong>View-Only Mode:</strong> आप केवल डेटा देख सकते हैं।
+    </div>
+</div>
+
+<!-- VIEW TOGGLE -->
+<div class="max-w-6xl mx-auto mt-4">
+    <div class="view-toggle-bar no-print">
+        <div class="view-toggle">
+            <button id="toggleEntryBtn" class="active" onclick="switchView('entry')">
+                <i class="fa-solid fa-pen-to-square"></i> एंट्री व्यू
+            </button>
+            <button id="toggleRegisterBtn" onclick="switchView('register')">
+                <i class="fa-solid fa-table"></i> रजिस्टर व्यू
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ENTRY VIEW -->
+<div id="entryView" class="max-w-6xl mx-auto mb-6" style="display:none;">
+    <div class="entry-form-card">
+        <div class="entry-form-title">
+            <i class="fa-solid fa-plus-circle"></i> नई एंट्री जोड़ें
+        </div>
+        <div class="entry-form-grid">
+            <div class="entry-field">
+                <label>तारीख (DD/MM/YYYY)</label>
+                <div class="date-picker-wrap">
+                    <input type="text" id="entryDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly>
+                    <input type="date" id="entryDate" class="date-picker-hidden">
+                    <i class="fa-solid fa-calendar-days date-picker-cal-icon"></i>
+                </div>
+            </div>
+            <div class="entry-field">
+                <label>फर्म चुनें</label>
+                <select id="entryFirm">
+                    <option value="col1">मे० ओम साँई (वरूणा/सारनाथ जोन)</option>
+                    <option value="col2">मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)</option>
+                    <option value="col3">मे० अनन्त कुमार (भेलूपुर/दशाश्वमेध)</option>
+                    <option value="col4">मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषी माण्डवी)</option>
+                </select>
+            </div>
+            <div class="entry-field">
+                <label>मात्रा (ली०)</label>
+                <input type="number" id="entryQty" min="0" step="any" placeholder="0" inputmode="decimal">
+            </div>
+            <button class="add-btn" id="addEntryBtn" onclick="addNewEntry()">
+                <i class="fa-solid fa-plus"></i> जोड़ें
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="dashboard-header">
+            <h3><i class="fa-solid fa-gauge-high"></i> डैशबोर्ड — इस महीने की स्थिति</h3>
+            <span class="dashboard-updated" id="dashboardUpdated">--</span>
+        </div>
+        <div class="dashboard-grid">
+            <div class="dash-stat">
+                <div class="dash-stat-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="dash-stat-info">
+                    <div class="dash-stat-label">कुल दिन (एंट्री सहित)</div>
+                    <div class="dash-stat-value" id="dashDaysCount">0</div>
+                </div>
+            </div>
+            <div class="dash-stat">
+                <div class="dash-stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div class="dash-stat-info">
+                    <div class="dash-stat-label">कुल एंट्री</div>
+                    <div class="dash-stat-value" id="dashEntriesCount">0</div>
+                </div>
+            </div>
+            <div class="dash-stat">
+                <div class="dash-stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div class="dash-stat-info">
+                    <div class="dash-stat-label">कुल मात्रा (ली०)</div>
+                    <div class="dash-stat-value" id="dashTotalQty">0</div>
+                </div>
+            </div>
+            <div class="dash-stat">
+                <div class="dash-stat-icon" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+                <div class="dash-stat-info">
+                    <div class="dash-stat-label">आज की एंट्री</div>
+                    <div class="dash-stat-value" id="dashTodayQty">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-firms">
+            <div class="dash-firm-row">
+                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#3b82f6;"></span> मे० ओम साँई <small>(वरूणा/सारनाथ)</small></div>
+                <div class="dash-firm-bar-wrap"><div class="dash-firm-bar" id="dashBar_col1" style="background:#3b82f6; width:0%"></div></div>
+                <div class="dash-firm-val" id="dashFirm_col1">0 ली०</div>
+            </div>
+            <div class="dash-firm-row">
+                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#10b981;"></span> मे० संकेत कन्स्ट्रक्शन <small>(रामनगर/आदमपुर)</small></div>
+                <div class="dash-firm-bar-wrap"><div class="dash-firm-bar" id="dashBar_col2" style="background:#10b981; width:0%"></div></div>
+                <div class="dash-firm-val" id="dashFirm_col2">0 ली०</div>
+            </div>
+            <div class="dash-firm-row">
+                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#f59e0b;"></span> मे० अनन्त कुमार <small>(भेलूपुर/दशाश्वमेध)</small></div>
+                <div class="dash-firm-bar-wrap"><div class="dash-firm-bar" id="dashBar_col3" style="background:#f59e0b; width:0%"></div></div>
+                <div class="dash-firm-val" id="dashFirm_col3">0 ली०</div>
+            </div>
+            <div class="dash-firm-row">
+                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#a855f7;"></span> मे० अनूप इण्टरप्राइजेज <small>(कोतवाली/ऋषी माण्डवी)</small></div>
+                <div class="dash-firm-bar-wrap"><div class="dash-firm-bar" id="dashBar_col4" style="background:#a855f7; width:0%"></div></div>
+                <div class="dash-firm-val" id="dashFirm_col4">0 ली०</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="recent-card">
+        <div class="recent-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> हाल की 5 एंट्री</h3>
+            <span class="recent-note">पूरा डेटा देखने के लिए रजिस्टर व्यू खोलें</span>
+        </div>
+        <div id="recentEntriesList" class="recent-list"></div>
+    </div>
+</div>
+
+<!-- REGISTER VIEW -->
+<div id="registerSheetWrapper" class="max-w-6xl mx-auto">
+    <div id="registerSheet" class="register-card register-sheet bg-white p-4 sm:p-6 shadow-xl border border-slate-400 rounded-xl">
+        <div class="header-with-logos" id="registerHeaderBox">
+            <div class="logo-slot" id="logoMovable" onmousedown="startLogoDrag(event)" ontouchstart="startLogoDrag(event)" onclick="handleLogoClick(event)">
+                <span class="placeholder" id="logoPlaceholder"><i class="fa-solid fa-plus text-lg block mb-0.5"></i>Logo<br>जोड़ें</span>
+                <button class="remove-btn" onclick="removeLogo(event)"><i class="fa-solid fa-xmark"></i></button>
+                <div class="resize-handle" onmousedown="startLogoResize(event)" ontouchstart="startLogoResize(event)"></div>
+            </div>
+            <div class="title-block">
+                <h1>JAL KAL VIBHAG NAGER NIGAM VARANASI</h1>
+                <p>जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण <span id="sessionYear">--</span></p>
+                <div id="filterSubtitle" class="text-xs font-semibold mt-1"></div>
+            </div>
+        </div>
+        <input type="file" id="logoFileInput" accept="image/*" style="display:none;">
+        <div class="overflow-x-auto">
+            <table class="w-full text-black border-collapse">
+                <colgroup>
+                    <col style="width: 60px;">
+                    <col style="width: 110px;">
+                    <col style="width: 18%;">
+                    <col style="width: 18%;">
+                    <col style="width: 18%;">
+                    <col style="width: 18%;">
+                    <col style="width: 110px;">
+                </colgroup>
+                <thead id="registerThead"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="registerTfoot"></tfoot>
+            </table>
+        </div>
+
+        <!-- Signature - Sirf "केमिस्ट" right-bottom -->
+        <div class="register-sig-block">
+            <div>केमिस्ट</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- SEARCH MODAL -->
+<div id="searchModal" class="modal-backdrop no-print">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-purple-600"></i>
+                <h2 class="font-bold">उन्नत सर्च</h2>
+            </div>
+            <button onclick="closeSearch()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4 bg-slate-50 p-3 rounded border border-slate-200">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">तारीख (दिन)</label>
+                    <input type="number" id="searchDay" min="1" max="31" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">महीना</label>
+                    <select id="searchMonthOnly" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                        <option value="">सभी महीने</option>
+                        <option value="1">जनवरी</option><option value="2">फ़रवरी</option><option value="3">मार्च</option>
+                        <option value="4">अप्रैल</option><option value="5">मई</option><option value="6">जून</option>
+                        <option value="7">जुलाई</option><option value="8">अगस्त</option><option value="9">सितम्बर</option>
+                        <option value="10">अक्टूबर</option><option value="11">नवम्बर</option><option value="12">दिसम्बर</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">वर्ष</label>
+                    <input type="number" id="searchYearOnly" min="2000" max="2100" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">फर्म</label>
+                    <select id="searchFirm" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                        <option value="">सभी फर्म</option>
+                        <option value="col1">मे० ओम साँई</option>
+                        <option value="col2">मे० संकेत कन्स्ट्रक्शन</option>
+                        <option value="col3">मे० अनन्त कुमार</option>
+                        <option value="col4">मे० अनूप इण्टरप्राइजेज</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">न्यूनतम राशि</label>
+                    <input type="number" id="searchMinQty" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">अधिकतम राशि</label>
+                    <input type="number" id="searchMaxQty" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                </div>
+                <div class="sm:col-span-2 flex items-end gap-1">
+                    <button onclick="runSearch()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded text-sm">खोजें</button>
+                    <button onclick="clearSearch()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded text-sm">रीसेट</button>
+                </div>
+            </div>
+            <div id="searchInfo" class="text-sm text-slate-600 mb-3 font-semibold"></div>
+            <div id="searchResults"></div>
+        </div>
+    </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div id="reportModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 1000px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-file-lines text-indigo-600"></i>
+                <h2 class="font-bold">रिपोर्ट बनाएँ</h2>
+            </div>
+            <button onclick="closeReportModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">From Date (DD/MM/YYYY)</label>
+                    <div class="date-picker-wrap" style="border-color:#cbd5e1; border-width:1px;">
+                        <input type="text" id="reportFromDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly style="font-size:13px;padding:8px 10px;">
+                        <input type="date" id="reportFromDate" class="date-picker-hidden">
+                        <i class="fa-solid fa-calendar-days date-picker-cal-icon" style="font-size:13px;padding:0 8px;padding-top:8px;padding-bottom:8px;"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">To Date (DD/MM/YYYY)</label>
+                    <div class="date-picker-wrap" style="border-color:#cbd5e1; border-width:1px;">
+                        <input type="text" id="reportToDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly style="font-size:13px;padding:8px 10px;">
+                        <input type="date" id="reportToDate" class="date-picker-hidden">
+                        <i class="fa-solid fa-calendar-days date-picker-cal-icon" style="font-size:13px;padding:0 8px;padding-top:8px;padding-bottom:8px;"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">फर्म</label>
+                    <select id="reportFirm" class="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white">
+                        <option value="all">सभी फर्म</option>
+                        <option value="col1">मे० ओम साँई (वरूणा/सारनाथ)</option>
+                        <option value="col2">मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)</option>
+                        <option value="col3">मे० अनन्त कुमार (भेलूपुर/दशाश्वमेध)</option>
+                        <option value="col4">मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषी माण्डवी)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Format</label>
+                    <select id="reportFormat" class="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white">
+                        <option value="full">पूरा रजिस्टर</option>
+                        <option value="single">केवल चुनी फर्म</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layout-editor">
+                <div class="layout-editor-header">
+                    <h3><i class="fa-solid fa-sliders"></i> लेआउट एडिटर</h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="pageCountBadge" class="page-count-badge"><i class="fa-solid fa-file"></i> --</span>
+                        <button class="fit-btn" onclick="autoFitOnePage()"><i class="fa-solid fa-compress"></i> 1 Page</button>
+                        <button class="reset-btn" onclick="resetLayout()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                    </div>
+                </div>
+
+                <div class="orient-row">
+                    <span style="font-size:12px; font-weight:800; color:#475569;">
+                        <i class="fa-solid fa-rotate"></i> Orientation:
+                    </span>
+                    <div class="orient-btn-group">
+                        <button id="orientLandscape" class="active" onclick="setOrientation('landscape')">
+                            <i class="fa-solid fa-desktop"></i> Landscape
+                        </button>
+                        <button id="orientPortrait" onclick="setOrientation('portrait')">
+                            <i class="fa-solid fa-mobile-screen"></i> Portrait
+                        </button>
+                    </div>
+                    <span style="font-size:12px; font-weight:800; color:#475569; margin-left:8px;">
+                        <i class="fa-solid fa-file"></i> Size:
+                    </span>
+                    <select id="pageSizeSelect" class="psize-select" onchange="onPageSizeChange()">
+                        <option value="A4">A4</option>
+                        <option value="A3">A3</option>
+                        <option value="LGL">Legal</option>
+                        <option value="LTR">Letter</option>
+                    </select>
+                    <span id="pageDimBadge" style="margin-left:auto; font-size:11px; color:#1e40af; font-weight:800; padding:3px 10px; background:#eff6ff; border:1px solid #3b82f6; border-radius:20px;">
+                        --×-- mm
+                    </span>
+                </div>
+
+                <div class="slider-grid">
+                    <div class="slider-item"><label>Top Margin (mm) <span class="val" id="valTopMargin">10</span></label><input type="range" id="sliderTopMargin" min="0" max="30" step="1" value="10"></div>
+                    <div class="slider-item"><label>Bottom Margin (mm) <span class="val" id="valBottomMargin">10</span></label><input type="range" id="sliderBottomMargin" min="0" max="30" step="1" value="10"></div>
+                    <div class="slider-item"><label>Left Margin (mm) <span class="val" id="valLeftMargin">8</span></label><input type="range" id="sliderLeftMargin" min="0" max="30" step="1" value="8"></div>
+                    <div class="slider-item"><label>Right Margin (mm) <span class="val" id="valRightMargin">8</span></label><input type="range" id="sliderRightMargin" min="0" max="30" step="1" value="8"></div>
+                    <div class="slider-item"><label>Signature Top (px) <span class="val" id="valSigTop">70</span></label><input type="range" id="sliderSigTop" min="0" max="200" step="5" value="70"></div>
+                    <div class="slider-item"><label>Signature Height (px) <span class="val" id="valSigHeight">100</span></label><input type="range" id="sliderSigHeight" min="50" max="250" step="10" value="100"></div>
+                    <div class="slider-item"><label>Row Padding (px) <span class="val" id="valRowPad">4</span></label><input type="range" id="sliderRowPad" min="0" max="10" step="1" value="4"></div>
+                    <div class="slider-item"><label>Font Size (px) <span class="val" id="valFontSize">11</span></label><input type="range" id="sliderFontSize" min="8" max="14" step="0.5" value="11"></div>
+                    <div class="slider-item"><label>Header Height (px) <span class="val" id="valHeaderH">60</span></label><input type="range" id="sliderHeaderH" min="40" max="120" step="5" value="60"></div>
+                    <div class="slider-item"><label>Logo Size (px) <span class="val" id="valLogoSize">60</span></label><input type="range" id="sliderLogoSize" min="30" max="120" step="5" value="60"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-3">
+                <button onclick="previewReport()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded text-sm">
+                    <i class="fa-solid fa-eye mr-1"></i> Preview
+                </button>
+                <button onclick="clearReportForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded text-sm">Reset</button>
+            </div>
+
+            <div id="reportPreviewInfo" class="text-sm text-slate-600 mb-2 font-semibold"></div>
+            <div id="reportPreviewContainer"></div>
+
+            <div id="reportActions" class="mt-4 flex flex-wrap gap-2" style="display:none;">
+                <button onclick="exportReportExcel()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded text-sm">
+                    <i class="fa-solid fa-file-excel mr-1"></i> Excel
+                </button>
+                <button onclick="exportReportPDF()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded text-sm">
+                    <i class="fa-solid fa-file-pdf mr-1"></i> PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 620px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-emerald-600"></i>
+                <h2 class="font-bold">रिकॉर्ड संपादित करें</h2>
+            </div>
+            <button onclick="closeEdit()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="text-center mb-4">
+                <div class="inline-block bg-purple-100 text-purple-700 font-bold px-4 py-2 rounded-full text-lg" id="editDateLabel">--</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="text-xs font-bold text-slate-600 block mb-1">मे० ओम साँई</label><input type="number" step="any" min="0" id="editCol1" class="edit-input"></div>
+                <div><label class="text-xs font-bold text-slate-600 block mb-1">मे० संकेत कन्स्ट्रक्शन</label><input type="number" step="any" min="0" id="editCol2" class="edit-input"></div>
+                <div><label class="text-xs font-bold text-slate-600 block mb-1">मे० अनन्त कुमार</label><input type="number" step="any" min="0" id="editCol3" class="edit-input"></div>
+                <div><label class="text-xs font-bold text-slate-600 block mb-1">मे० अनूप इण्टरप्राइजेज</label><input type="number" step="any" min="0" id="editCol4" class="edit-input"></div>
+            </div>
+            <div class="mt-4 bg-emerald-50 border border-emerald-200 rounded p-3 text-center">
+                <span class="text-xs font-bold text-emerald-700">कुल योग:</span>
+                <span id="editRowTotal" class="text-xl font-extrabold text-emerald-800 ml-2">0</span>
+                <span class="text-xs font-bold text-emerald-700">ली०</span>
+            </div>
+            <div class="flex flex-wrap justify-end gap-2 mt-5" id="editButtonArea">
+                <button onclick="closeEdit()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded text-sm">बंद करें</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BACKUP MODAL -->
+<div id="backupModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 720px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-amber-600"></i>
+                <h2 class="font-bold">डेटा बैकअप एवं रीस्टोर</h2>
+            </div>
+            <button onclick="closeBackupModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <div class="text-center mb-3"><i class="fa-solid fa-download text-emerald-600 text-3xl"></i></div>
+                    <h3 class="font-bold text-slate-800 text-center mb-1">बैकअप डाउनलोड</h3>
+                    <div class="text-xs text-slate-700 mb-3 bg-white border border-slate-200 rounded p-2">
+                        <div>कुल रिकॉर्ड: <strong id="backupRecordCount">0</strong></div>
+                        <div>कुल महीने: <strong id="backupMonthCount">0</strong></div>
+                    </div>
+                    <button onclick="downloadBackup()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-sm">
+                        <i class="fa-solid fa-download mr-1"></i> डाउनलोड
+                    </button>
+                </div>
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <div class="text-center mb-3"><i class="fa-solid fa-upload text-blue-600 text-3xl"></i></div>
+                    <h3 class="font-bold text-slate-800 text-center mb-1">बैकअप से वापस लाएँ</h3>
+                    <div class="text-xs text-red-600 mb-3 bg-red-50 border border-red-200 rounded p-2 text-center">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> वर्तमान डेटा मिट जाएगा
+                    </div>
+                    <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="handleRestoreFile(event)">
+                    <button onclick="document.getElementById('restoreFileInput').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-sm">
+                        <i class="fa-solid fa-upload mr-1"></i> फ़ाइल चुनें
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 border-t border-slate-200 pt-4">
+                <button onclick="clearAllData()" class="w-full bg-white border-2 border-red-300 hover:bg-red-50 text-red-700 font-bold py-2 rounded text-sm">
+                    <i class="fa-solid fa-trash mr-1"></i> सारा डेटा मिटाएँ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div id="changePasswordModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 480px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-lock text-blue-600"></i><h2 class="font-bold">पासवर्ड बदलें</h2></div>
+            <button onclick="closeChangePassword()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3"><label class="login-label">पुराना पासवर्ड</label><input type="password" id="oldPass" class="login-input"></div>
+            <div class="mb-3"><label class="login-label">नया पासवर्ड</label><input type="password" id="newPass" class="login-input"></div>
+            <div class="mb-3"><label class="login-label">नया पासवर्ड दोबारा</label><input type="password" id="newPass2" class="login-input"></div>
+            <button onclick="changePassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded text-sm mt-3">
+                <i class="fa-solid fa-check mr-1"></i> बदलें
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- EMAIL SETTINGS MODAL -->
+<div id="emailSettingsModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 620px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-envelope text-amber-600"></i><h2 class="font-bold">ईमेल सेटिंग (OTP के लिए)</h2></div>
+            <button onclick="closeEmailSettings()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4 text-xs text-blue-900">
+                <i class="fa-solid fa-info-circle mr-1"></i> EmailJS की IDs यहाँ डालें।
+            </div>
+            <div class="mb-3"><label class="login-label">Public Key</label><input type="text" id="ejsPublicKey" class="login-input"></div>
+            <div class="mb-3"><label class="login-label">Service ID</label><input type="text" id="ejsServiceId" class="login-input"></div>
+            <div class="mb-3"><label class="login-label">Template ID</label><input type="text" id="ejsTemplateId" class="login-input"></div>
+            <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-4 text-xs">
+                <div class="font-bold text-slate-700 mb-2">प्रत्येक उपयोगकर्ता का ईमेल:</div>
+                <div class="mb-2">
+                    <label class="text-slate-600 block mb-1">Admin का ईमेल</label>
+                    <input type="email" id="ejsAdminEmail" class="login-input" placeholder="admin@example.com">
+                </div>
+                <div>
+                    <label class="text-slate-600 block mb-1">User का ईमेल</label>
+                    <input type="email" id="ejsUserEmail" class="login-input" placeholder="user@example.com">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="saveEmailSettings()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded text-sm">
+                    <i class="fa-solid fa-save mr-1"></i> सेव करें
+                </button>
+                <button onclick="testEmailSettings()" id="testEmailBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded text-sm">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> टेस्ट OTP
+                </button>
+            </div>
+            <div id="testEmailResult" class="mt-3 text-xs"></div>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIT LOG MODAL -->
+<div id="auditModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 900px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग</h2></div>
+            <button onclick="closeAuditLog()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="flex justify-between items-center mb-3">
+                <div class="text-xs text-slate-600">अंतिम 200 गतिविधियाँ</div>
+                <button onclick="clearAuditLog()" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-1.5 rounded">
+                    <i class="fa-solid fa-trash mr-1"></i> साफ़ करें
+                </button>
+            </div>
+            <div id="auditList" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- RESTORE CONFIRM -->
+<div id="restoreConfirmModal" class="modal-backdrop no-print" style="z-index: 200;">
+    <div class="modal-box" style="max-width: 500px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i><h2 class="font-bold">रीस्टोर की पुष्टि</h2></div>
+        </div>
+        <div class="modal-body">
+            <p class="text-sm text-slate-700 mb-3">बैकअप फ़ाइल में:</p>
+            <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-3 text-xs">
+                <div>कुल रिकॉर्ड: <strong id="restoreRecordCount">0</strong></div>
+                <div>कुल महीने: <strong id="restoreMonthCount">0</strong></div>
+                <div>बैकअप तारीख: <strong id="restoreDate">--</strong></div>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded p-3 text-xs text-red-700 mb-4">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> वर्तमान सारा डेटा मिट जाएगा।
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="cancelRestore()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded text-sm">रद्द</button>
+                <button onclick="confirmRestore()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded text-sm">
+                    <i class="fa-solid fa-check mr-1"></i> रीस्टोर
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast"></div>
+
+<!-- UNDO BAR -->
+<div id="undoBar" class="no-print">
+    <span class="undo-msg"><i class="fa-solid fa-rotate-left"></i> <span id="undoMsgText">बदलाव किया गया</span></span>
+    <span class="undo-timer" id="undoTimer">15s</span>
+    <button class="undo-btn" onclick="performUndo()"><i class="fa-solid fa-rotate-left"></i> अनडू</button>
+    <button class="undo-close" onclick="dismissUndo()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+<script>
+/* FIRM LABELS */
+const FIRM_LABELS = {
+    col1: { short: 'मे० ओम साँई', zone: 'वरूणा/सारनाथ', full: 'मे० ओम साँई (वरूणा/सारनाथ जोन)' },
+    col2: { short: 'मे० संकेत कन्स्ट्रक्शन', zone: 'रामनगर/आदमपुर', full: 'मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)' },
+    col3: { short: 'मे० अनन्त कुमार', zone: 'भेलूपुर/दशाश्वमेध', full: 'मे० अनन्त कुमार (भेलूपुर/दशाश्वमेध)' },
+    col4: { short: 'मे० अनूप इण्टरप्राइजेज', zone: 'कोतवाली/ऋषी माण्डवी', full: 'मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषी माण्डवी)' }
+};
+
+/* DATE HELPERS */
+function formatDateDDMMYYYY(isoDate) {
+    if (!isoDate) return '';
+    const parts = isoDate.split('-');
+    if (parts.length !== 3) return '';
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+function formatDateShortDDMMYY(y, m, d) {
+    const dd = String(d).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    const yy = String(y).slice(-2);
+    return `${dd}/${mm}/${yy}`;
+}
+function formatDateLongDDMMYYYY(y, m, d) {
+    const dd = String(d).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    return `${dd}/${mm}/${y}`;
+}
+function syncDateDisplay(hiddenId, displayId) {
+    const h = document.getElementById(hiddenId);
+    const d = document.getElementById(displayId);
+    if (h && d) d.value = formatDateDDMMYYYY(h.value);
+}
+
+/* INDEXEDDB */
+const DB_NAME = 'jalkal_register_db';
+const DB_VERSION = 2;
+const STORE_RECORDS = 'records';
+const STORE_SETTINGS = 'settings';
+const STORE_AUDIT = 'audit';
+let db = null, dbReady = false;
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        if (!window.indexedDB) return reject(new Error('No IndexedDB'));
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onerror = () => reject(req.error);
+        req.onsuccess = () => { db = req.result; resolve(db); };
+        req.onupgradeneeded = (e) => {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains(STORE_RECORDS)) {
+                const store = d.createObjectStore(STORE_RECORDS, { keyPath: 'id' });
+                store.createIndex('year', 'year');
+                store.createIndex('month', 'month');
+                store.createIndex('yearMonth', ['year', 'month']);
+            }
+            if (!d.objectStoreNames.contains(STORE_SETTINGS)) d.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+            if (!d.objectStoreNames.contains(STORE_AUDIT)) {
+                const aud = d.createObjectStore(STORE_AUDIT, { keyPath: 'id', autoIncrement: true });
+                aud.createIndex('timestamp', 'timestamp');
+            }
+        };
+    });
+}
+function recordId(y, m, d) { return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+function dbGetMonthRecords(year, month) {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_RECORDS, 'readonly').objectStore(STORE_RECORDS).index('yearMonth').getAll([year, month]);
+        req.onsuccess = () => {
+            const r = {};
+            req.result.forEach(rec => { r[rec.day] = { col1: rec.col1, col2: rec.col2, col3: rec.col3, col4: rec.col4 }; });
+            resolve(r);
+        };
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbPutRecord(y, m, d, data) {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_RECORDS, 'readwrite').objectStore(STORE_RECORDS).put({
+            id: recordId(y,m,d), year: y, month: m, day: d,
+            col1: data.col1||'', col2: data.col2||'', col3: data.col3||'', col4: data.col4||''
+        });
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbDeleteRecord(y, m, d) {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_RECORDS, 'readwrite').objectStore(STORE_RECORDS).delete(recordId(y,m,d));
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbGetAllRecords() {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_RECORDS, 'readonly').objectStore(STORE_RECORDS).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbClearRecords() {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_RECORDS, 'readwrite').objectStore(STORE_RECORDS).clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbGetSetting(key) {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_SETTINGS, 'readonly').objectStore(STORE_SETTINGS).get(key);
+        req.onsuccess = () => resolve(req.result ? req.result.value : null);
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbSetSetting(key, value) {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_SETTINGS, 'readwrite').objectStore(STORE_SETTINGS).put({ key, value });
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbGetAllSettings() {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_SETTINGS, 'readonly').objectStore(STORE_SETTINGS).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbClearSettings() {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_SETTINGS, 'readwrite').objectStore(STORE_SETTINGS).clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbAddAudit(action, details) {
+    return new Promise((resolve) => {
+        try {
+            const rec = { timestamp: Date.now(), user: session ? session.username : 'unknown', role: session ? session.role : 'unknown', action, details: details || '' };
+            db.transaction(STORE_AUDIT, 'readwrite').objectStore(STORE_AUDIT).add(rec);
+            resolve();
+        } catch (e) { resolve(); }
+    });
+}
+function dbGetAuditLog(limit = 200) {
+    return new Promise((resolve, reject) => {
+        const out = [];
+        const req = db.transaction(STORE_AUDIT, 'readonly').objectStore(STORE_AUDIT).index('timestamp').openCursor(null, 'prev');
+        req.onsuccess = (e) => {
+            const c = e.target.result;
+            if (c && out.length < limit) { out.push(c.value); c.continue(); }
+            else resolve(out);
+        };
+        req.onerror = () => reject(req.error);
+    });
+}
+function dbClearAudit() {
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_AUDIT, 'readwrite').objectStore(STORE_AUDIT).clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+/* PASSWORD */
+async function hashPassword(password, salt) {
+    const data = new TextEncoder().encode(password + '::' + salt);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function ensureDefaultUsers() {
+    if (!await dbGetSetting('user_admin_hash')) {
+        const salt = 'admin_salt_' + Math.random().toString(36).slice(2);
+        await dbSetSetting('user_admin_hash', await hashPassword('jalkal@admin', salt));
+        await dbSetSetting('user_admin_salt', salt);
+    }
+    if (!await dbGetSetting('user_user_hash')) {
+        const salt = 'user_salt_' + Math.random().toString(36).slice(2);
+        await dbSetSetting('user_user_hash', await hashPassword('jalkal@user', salt));
+        await dbSetSetting('user_user_salt', salt);
+    }
+}
+async function verifyPassword(username, password) {
+    const h = await dbGetSetting(`user_${username}_hash`);
+    const s = await dbGetSetting(`user_${username}_salt`);
+    if (!h || !s) return false;
+    return (await hashPassword(password, s)) === h;
+}
+async function setUserPassword(username, newPassword) {
+    const s = (await dbGetSetting(`user_${username}_salt`)) || ('salt_' + Math.random().toString(36).slice(2));
+    await dbSetSetting(`user_${username}_salt`, s);
+    await dbSetSetting(`user_${username}_hash`, await hashPassword(newPassword, s));
+}
+
+/* EMAIL */
+async function getEmailConfig() {
+    return {
+        publicKey: (await dbGetSetting('ejs_publicKey')) || '',
+        serviceId: (await dbGetSetting('ejs_serviceId')) || '',
+        templateId: (await dbGetSetting('ejs_templateId')) || '',
+        adminEmail: (await dbGetSetting('ejs_adminEmail')) || '',
+        userEmail: (await dbGetSetting('ejs_userEmail')) || ''
+    };
+}
+function sendOTPEmail(toEmail, toName, otpCode, cfg) {
+    return new Promise((resolve, reject) => {
+        try {
+            emailjs.init(cfg.publicKey);
+            emailjs.send(cfg.serviceId, cfg.templateId, {
+                to_email: toEmail, password: otpCode, time: "15 minutes",
+                to_name: toName, otp: otpCode, otp_code: otpCode, code: otpCode, email: toEmail
+            }).then(resolve).catch(reject);
+        } catch (err) { reject(err); }
+    });
+}
+
+/* SESSION */
+let session = null;
+let autoLockTimer = null;
+const AUTO_LOCK_MS = 15 * 60 * 1000;
+
+function resetAutoLock() {
+    if (autoLockTimer) clearTimeout(autoLockTimer);
+    autoLockTimer = setTimeout(() => {
+        if (session) {
+            dbAddAudit('AUTO_LOCK', 'Auto-lock');
+            showToast('सुरक्षा: 15 मिनट बाद ऑटो-लॉक', "warning");
+            logout(true);
+        }
+    }, AUTO_LOCK_MS);
+}
+["mousemove","keydown","click","scroll","touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetAutoLock, { passive: true });
+});
+
+/* UNDO SYSTEM */
+const UNDO_TIMEOUT_MS = 15000;
+let undoStack = null;
+let undoTimerInterval = null;
+let undoTimerEnd = 0;
+
+function pushUndo(type, snapshot, labelKey) {
+    clearUndoTimer();
+    undoStack = { type, snapshot: JSON.parse(JSON.stringify(snapshot)), labelKey: labelKey || 'बदलाव वापस लाएँ?', timestamp: Date.now() };
+    const bar = document.getElementById("undoBar");
+    const msgEl = document.getElementById("undoMsgText");
+    if (msgEl) msgEl.innerText = undoStack.labelKey;
+    if (bar) bar.classList.add("show");
+    startUndoTimer();
+}
+function startUndoTimer() {
+    undoTimerEnd = Date.now() + UNDO_TIMEOUT_MS;
+    updateUndoTimerText();
+    undoTimerInterval = setInterval(() => {
+        const left = undoTimerEnd - Date.now();
+        if (left <= 0) { clearUndoTimer(); dismissUndo(true); return; }
+        updateUndoTimerText();
+    }, 200);
+}
+function updateUndoTimerText() {
+    const left = Math.max(0, undoTimerEnd - Date.now());
+    const sec = Math.ceil(left / 1000);
+    const el = document.getElementById("undoTimer");
+    if (el) el.innerText = sec + "s";
+}
+function clearUndoTimer() {
+    if (undoTimerInterval) { clearInterval(undoTimerInterval); undoTimerInterval = null; }
+}
+function dismissUndo(expired) {
+    clearUndoTimer();
+    const bar = document.getElementById("undoBar");
+    if (bar) bar.classList.remove("show");
+    undoStack = null;
+}
+async function performUndo() {
+    if (!undoStack) { showToast('अनडू समय खत्म', "warning"); dismissUndo(); return; }
+    const snap = undoStack;
+    clearUndoTimer();
+    document.getElementById("undoBar").classList.remove("show");
+    undoStack = null;
+    try {
+        if (snap.type === 'edit' || snap.type === 'delete' || snap.type === 'entryAdd') {
+            const { year, month, day, data } = snap.snapshot;
+            if (data) await dbPutRecord(year, month, day, data);
+            else await dbDeleteRecord(year, month, day);
+        } else if (snap.type === 'month') {
+            const { year, month, records } = snap.snapshot;
+            const allRecs = await dbGetAllRecords();
+            for (const r of allRecs) {
+                if (r.year === year && r.month === month) await dbDeleteRecord(r.year, r.month, r.day);
+            }
+            for (const day in records) {
+                const d = records[day];
+                if (d && (d.col1 || d.col2 || d.col3 || d.col4)) await dbPutRecord(year, month, parseInt(day), d);
+            }
+        } else if (snap.type === 'restore') {
+            await dbClearRecords();
+            const tx = db.transaction(STORE_RECORDS, 'readwrite');
+            const st = tx.objectStore(STORE_RECORDS);
+            snap.snapshot.records.forEach(r => st.put(r));
+            await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+        } else if (snap.type === 'clearall') {
+            const tx = db.transaction(STORE_RECORDS, 'readwrite');
+            const st = tx.objectStore(STORE_RECORDS);
+            snap.snapshot.records.forEach(r => st.put(r));
+            await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+        } else if (snap.type === 'logopos') {
+            const p = snap.snapshot.position;
+            logoPosition = { x: p.x, y: p.y, width: p.width, height: p.height };
+            applyLogoPosition();
+            await saveLogoPosition();
+        }
+        if (document.getElementById("searchModal").classList.contains("show")) runSearch();
+        await renderTable();
+        await renderEntryView();
+        showToast('✓ बदलाव वापस हो गया', "success");
+    } catch (e) { showToast("Undo error", "danger"); }
+}
+
+function updateUserNameBadge() {
+    if (!session) return;
+    const el = document.getElementById("currentUserName");
+    if (el) el.innerText = session.username === 'admin' ? 'Admin' : 'User';
+}
+function renderRegisterTableHeaders() {
+    const thead = document.getElementById("registerThead");
+    if (!thead) return;
+    thead.innerHTML = `
+        <tr>
+            <th class="font-bold bg-white" colspan="2" style="padding:6px 4px;">Month</th>
+            <th class="font-bold bg-white" colspan="4" style="padding:6px 4px;">फर्म का नाम सम्बन्धित क्षेत्र एवं सोडियम हाईपों वितरण की मात्रा</th>
+            <th class="bg-white"></th>
+        </tr>
+        <tr class="font-bold">
+            <th rowspan="2" style="padding:6px 4px;">SL.NO.</th>
+            <th rowspan="2" style="padding:6px 4px;">DATE (DD/MM/YY)</th>
+            <th style="padding:6px 4px;">वरूणा /<br>सारनाथ</th>
+            <th style="padding:6px 4px;">रामनगर /<br>आदमपुर</th>
+            <th style="padding:6px 4px;">भेलूपुर /<br>दशाश्वमेध</th>
+            <th style="padding:6px 4px;">कोतवाली /<br>ऋषी माण्डवी</th>
+            <th rowspan="2" class="bg-slate-50" style="padding:6px 4px;">कुल योग (ली०)</th>
+        </tr>
+        <tr class="font-bold">
+            <th style="padding:6px 4px;">मे० ओम साँई<br>(ली०)</th>
+            <th style="padding:6px 4px;">मे० संकेत कन्स्ट्रक्शन<br>(ली०)</th>
+            <th style="padding:6px 4px;">मे० अनन्त कुमार<br>(ली०)</th>
+            <th style="padding:6px 4px;">मे० अनूप इण्टरप्राइजेज<br>(ली०)</th>
+        </tr>
+    `;
+    const tfoot = document.getElementById("registerTfoot");
+    if (tfoot) {
+        tfoot.innerHTML = `
+            <tr class="font-bold bg-slate-50">
+                <td colspan="2" style="padding:8px 4px;" class="text-center">कुल योग</td>
+                <td id="totalCol1" style="padding:8px 4px;" class="text-center">0</td>
+                <td id="totalCol2" style="padding:8px 4px;" class="text-center">0</td>
+                <td id="totalCol3" style="padding:8px 4px;" class="text-center">0</td>
+                <td id="totalCol4" style="padding:8px 4px;" class="text-center">0</td>
+                <td id="grandTotal" style="padding:8px 4px;" class="text-center font-extrabold text-blue-900">0</td>
+            </tr>
+        `;
+    }
+}
+
+/* LOGIN */
+function showForgotPassword() {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("forgotPasswordForm").style.display = "block";
+    document.getElementById("otpSection").style.display = "none";
+    ["resetUsername","resetEmail","otpInput","newPassword","newPassword2"].forEach(id => document.getElementById(id).value = "");
+}
+function backToLogin() {
+    document.getElementById("loginForm").style.display = "block";
+    document.getElementById("forgotPasswordForm").style.display = "none";
+    document.getElementById("otpSection").style.display = "none";
+}
+let activeOTP = null, activeOTPUser = null, activeOTPExpiry = 0;
+
+async function requestOTP() {
+    const username = document.getElementById("resetUsername").value.trim().toLowerCase();
+    const enteredEmail = document.getElementById("resetEmail").value.trim().toLowerCase();
+    if (!username || !enteredEmail) { showToast('दोनों फ़ील्ड भरें', "warning"); return; }
+    if (username !== 'admin' && username !== 'user') { showToast('यह username मौजूद नहीं', "danger"); return; }
+    const cfg = await getEmailConfig();
+    const registeredEmail = username === 'admin' ? cfg.adminEmail : cfg.userEmail;
+    if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) { showToast('पहले Admin panel से EmailJS IDs सेट करें', "warning"); return; }
+    if (!registeredEmail) { showToast(username + " का ईमेल सेट नहीं है", "warning"); return; }
+    if (enteredEmail !== registeredEmail.toLowerCase()) { showToast('यह ईमेल रजिस्टर्ड ईमेल से मेल नहीं', "danger"); return; }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    activeOTP = otp; activeOTPUser = username;
+    activeOTPExpiry = Date.now() + 10 * 60 * 1000;
+    try {
+        await sendOTPEmail(registeredEmail, username, otp, cfg);
+        showToast('✓ OTP भेज दिया गया (OTP: ' + otp + ')', "success");
+        document.getElementById("otpSection").style.display = "block";
+    } catch (err) { showToast("OTP Error", "danger"); }
+}
+async function verifyOTPAndReset() {
+    const entered = document.getElementById("otpInput").value.trim();
+    const np = document.getElementById("newPassword").value;
+    const np2 = document.getElementById("newPassword2").value;
+    if (!entered) { showToast('OTP डालें', "warning"); return; }
+    if (Date.now() > activeOTPExpiry) { showToast('OTP की अवधि खत्म', "warning"); return; }
+    if (entered !== activeOTP) { showToast('गलत OTP', "danger"); return; }
+    if (!np || np.length < 6) { showToast('पासवर्ड कम से कम 6 अक्षर', "warning"); return; }
+    if (np !== np2) { showToast('दोनों पासवर्ड मेल नहीं', "warning"); return; }
+    await setUserPassword(activeOTPUser, np);
+    activeOTP = null; activeOTPUser = null;
+    showToast('✓ पासवर्ड रीसेट हो गया!', "success");
+    backToLogin();
+}
+async function attemptLogin() {
+    const username = document.getElementById("loginUsername").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+    if (!username || !password) { showToast('दोनों फ़ील्ड भरें', "warning"); return; }
+    if (username !== 'admin' && username !== 'user') { showToast('गलत username या password', "danger"); return; }
+    const ok = await verifyPassword(username, password);
+    if (!ok) { showToast('गलत username या password', "danger"); return; }
+    session = { username, role: username === 'admin' ? 'admin' : 'user', loginTime: Date.now() };
+    try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
+    enterApp();
+}
+function logout(silent) {
+    session = null;
+    try { localStorage.removeItem('jalkal_session'); } catch (e) {}
+    if (autoLockTimer) clearTimeout(autoLockTimer);
+    document.getElementById("appContainer").style.display = "none";
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("loginUsername").value = "";
+    if (!silent) showToast('लॉगआउट हो गया', "info");
+}
+function enterApp() {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appContainer").style.display = "block";
+    const badge = document.getElementById("userMenu");
+    badge.className = 'user-menu-badge ' + session.role;
+    updateUserNameBadge();
+    badge.querySelector('i').className = session.role === 'admin' ? 'fa-solid fa-user-shield' : 'fa-solid fa-user';
+    const isAdmin = session.role === 'admin';
+    document.getElementById("saveBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("backupBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("auditLogBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("emailSettingsBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("resetLogoBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("viewOnlyBanner").style.display = isAdmin ? 'none' : 'block';
+    const logoEl = document.getElementById('logoMovable');
+    if (isAdmin) logoEl.classList.remove('disabled');
+    else logoEl.classList.add('disabled');
+    document.getElementById("userInfoLine").innerText = `${session.username} (${session.role}) • ${new Date(session.loginTime).toLocaleTimeString('hi-IN')}`;
+    initAppContent();
+    resetAutoLock();
+}
+
+/* APP INIT */
+let appInitialized = false;
+const __todayInit = new Date();
+let currentYear = __todayInit.getFullYear();
+let currentMonth = __todayInit.getMonth() + 1;
+let currentView = 'entry';
+let activeFilter = null, autoSaveTimer = null, fontScale = 100;
+let editContext = { year: null, month: null, day: null };
+let cachedLogo = null;
+let currentReportData = null;
+
+const printLayout = {
+    topMargin: 10, bottomMargin: 10, leftMargin: 8, rightMargin: 8,
+    sigTop: 70, sigHeight: 100, rowPad: 4, fontSize: 11, headerH: 60, logoSize: 60,
+    orientation: 'landscape', pageSize: 'A4'
+};
+
+async function initAppContent() {
+    if (appInitialized) return;
+    appInitialized = true;
+
+    const savedScale = await dbGetSetting('font_scale');
+    if (savedScale) fontScale = parseInt(savedScale) || 100;
+    cachedLogo = await dbGetSetting('logo_main');
+    applyFontScale();
+    await loadLogoPosition();
+    if (cachedLogo) applyLogo(cachedLogo);
+
+    const savedLayout = await dbGetSetting('print_layout');
+    if (savedLayout) {
+        try {
+            const s = typeof savedLayout === 'string' ? JSON.parse(savedLayout) : savedLayout;
+            Object.assign(printLayout, s);
+        } catch(e) {}
+    }
+
+    const monthInput = document.getElementById("monthPicker");
+    monthInput.value = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+    monthInput.addEventListener("change", async (e) => {
+        if (e.target.value) {
+            const [y, m] = e.target.value.split("-");
+            currentYear = parseInt(y); currentMonth = parseInt(m);
+            activeFilter = null;
+            setupDateInputConstraints();
+            updateSessionYear();
+            await renderTable();
+            await renderEntryView();
+        }
+    });
+
+    setupDateInputConstraints();
+    updateSessionYear();
+    renderRegisterTableHeaders();
+
+    const today = new Date();
+    const todayISO = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const entryDateInput = document.getElementById('entryDate');
+    if (entryDateInput) {
+        entryDateInput.value = todayISO;
+        syncDateDisplay('entryDate', 'entryDateDisplay');
+        entryDateInput.addEventListener('change', () => syncDateDisplay('entryDate', 'entryDateDisplay'));
+        entryDateInput.addEventListener('input', () => syncDateDisplay('entryDate', 'entryDateDisplay'));
+    }
+
+    ['fromDate','toDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => syncDateDisplay(id, id+'Display'));
+            el.addEventListener('input', () => syncDateDisplay(id, id+'Display'));
+        }
+    });
+    ['reportFromDate','reportToDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => syncDateDisplay(id, id+'Display'));
+            el.addEventListener('input', () => syncDateDisplay(id, id+'Display'));
+        }
+    });
+
+    const savedView = await dbGetSetting('view_mode');
+    currentView = savedView || 'entry';
+
+    await renderTable();
+    await renderEntryView();
+    switchView(currentView);
+
+    setupKeyboardNavigation();
+
+    ['sliderTopMargin','sliderBottomMargin','sliderLeftMargin','sliderRightMargin',
+     'sliderSigTop','sliderSigHeight','sliderRowPad','sliderFontSize',
+     'sliderHeaderH','sliderLogoSize'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', onLayoutSliderChange);
+    });
+
+    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("click", (e) => { if (e.target.id === id) el.classList.remove("show"); });
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove("show");
+            });
+            cancelRestore();
+        }
+    });
+    ["searchDay","searchMinQty","searchMaxQty","searchYearOnly"].forEach(id => {
+        document.getElementById(id)?.addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+    });
+    ["editCol1","editCol2","editCol3","editCol4"].forEach(id => {
+        document.getElementById(id)?.addEventListener("input", () => {
+            const sum = ["editCol1","editCol2","editCol3","editCol4"].reduce((s, i) => s + (parseFloat(document.getElementById(i).value) || 0), 0);
+            document.getElementById("editRowTotal").innerText = sum;
+        });
+    });
+    document.getElementById("logoFileInput").addEventListener("change", handleLogoFile);
+
+    document.getElementById('entryQty')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); addNewEntry(); }
+    });
+    document.getElementById('entryFirm')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('entryQty').focus(); }
+    });
+
+    applyLayoutToUI();
+}
+
+function applyLayoutToUI() {
+    const map = {
+        sliderTopMargin: 'topMargin', sliderBottomMargin: 'bottomMargin',
+        sliderLeftMargin: 'leftMargin', sliderRightMargin: 'rightMargin',
+        sliderSigTop: 'sigTop', sliderSigHeight: 'sigHeight',
+        sliderRowPad: 'rowPad', sliderFontSize: 'fontSize',
+        sliderHeaderH: 'headerH', sliderLogoSize: 'logoSize'
+    };
+    for (const id in map) {
+        const el = document.getElementById(id);
+        if (el) el.value = printLayout[map[id]];
+    }
+    document.getElementById('orientLandscape')?.classList.toggle('active', printLayout.orientation === 'landscape');
+    document.getElementById('orientPortrait')?.classList.toggle('active', printLayout.orientation === 'portrait');
+    const ps = document.getElementById('pageSizeSelect');
+    if (ps) ps.value = printLayout.pageSize;
+    updateLayoutValueLabels();
+    updatePageDimBadge();
+}
+
+function switchView(view) {
+    currentView = view;
+    dbSetSetting('view_mode', view);
+    const entryView = document.getElementById('entryView');
+    const registerView = document.getElementById('registerSheetWrapper');
+    const btnEntry = document.getElementById('toggleEntryBtn');
+    const btnReg = document.getElementById('toggleRegisterBtn');
+    if (view === 'entry') {
+        entryView.style.display = 'block';
+        registerView.style.display = 'none';
+        btnEntry.classList.add('active');
+        btnReg.classList.remove('active');
+        renderEntryView();
+    } else {
+        entryView.style.display = 'none';
+        registerView.style.display = 'block';
+        btnEntry.classList.remove('active');
+        btnReg.classList.add('active');
+        renderTable();
+    }
+}
+
+/* DASHBOARD + RECENT */
+async function renderEntryView() {
+    const data = await dbGetMonthRecords(currentYear, currentMonth);
+    let c1=0, c2=0, c3=0, c4=0;
+    let entryCount = 0;
+    const daySet = new Set();
+    const allEntries = [];
+
+    for (const day in data) {
+        const rec = data[day];
+        let dayHasData = false;
+        for (const firm of ['col1','col2','col3','col4']) {
+            const qty = parseFloat(rec[firm]) || 0;
+            if (qty > 0) {
+                entryCount++;
+                dayHasData = true;
+                allEntries.push({ day: parseInt(day), firm, qty });
+            }
+        }
+        if (dayHasData) daySet.add(parseInt(day));
+        c1 += parseFloat(rec.col1) || 0;
+        c2 += parseFloat(rec.col2) || 0;
+        c3 += parseFloat(rec.col3) || 0;
+        c4 += parseFloat(rec.col4) || 0;
+    }
+    const grandTotal = c1 + c2 + c3 + c4;
+
+    const dd = document.getElementById('dashDaysCount'); if (dd) dd.innerText = daySet.size;
+    const de = document.getElementById('dashEntriesCount'); if (de) de.innerText = entryCount;
+    const dt = document.getElementById('dashTotalQty'); if (dt) dt.innerText = grandTotal.toLocaleString('hi-IN') + ' ली०';
+
+    const todayDay = new Date().getDate();
+    const todayTotal = (currentMonth === new Date().getMonth()+1 && currentYear === new Date().getFullYear() && data[todayDay])
+        ? (parseFloat(data[todayDay].col1)||0) + (parseFloat(data[todayDay].col2)||0) + (parseFloat(data[todayDay].col3)||0) + (parseFloat(data[todayDay].col4)||0)
+        : 0;
+    const dtd = document.getElementById('dashTodayQty'); if (dtd) dtd.innerText = todayTotal.toLocaleString('hi-IN') + ' ली०';
+
+    const maxVal = Math.max(c1, c2, c3, c4, 1);
+    ['col1','col2','col3','col4'].forEach((firm, idx) => {
+        const val = [c1, c2, c3, c4][idx];
+        const pct = (val / maxVal) * 100;
+        const barEl = document.getElementById('dashBar_' + firm);
+        const valEl = document.getElementById('dashFirm_' + firm);
+        if (barEl) barEl.style.width = pct + '%';
+        if (valEl) valEl.innerText = val.toLocaleString('hi-IN') + ' ली०';
+    });
+
+    const recentList = document.getElementById('recentEntriesList');
+    if (recentList) {
+        allEntries.sort((a, b) => b.day - a.day || a.firm.localeCompare(b.firm));
+        const recent = allEntries.slice(0, 5);
+        if (recent.length === 0) {
+            recentList.innerHTML = `<div class="recent-empty"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-40"></i>अभी कोई एंट्री नहीं — ऊपर form से जोड़ें</div>`;
+        } else {
+            recentList.innerHTML = recent.map(e => {
+                const dateStr = formatDateShortDDMMYY(currentYear, currentMonth, e.day);
+                const firmInfo = FIRM_LABELS[e.firm];
+                return `<div class="recent-row">
+                    <span class="rdate">${dateStr}</span>
+                    <span class="rfirm">${firmInfo.short} <small style="color:#64748b;">(${firmInfo.zone})</small></span>
+                    <span class="rqty">${e.qty} ली०</span>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    const upd = document.getElementById('dashboardUpdated');
+    if (upd) upd.innerText = new Date().toLocaleTimeString('hi-IN');
+}
+
+async function addNewEntry() {
+    if (!session || session.role !== 'admin') {
+        showToast('केवल Admin ही एंट्री जोड़ सकता है', "warning");
+        return;
+    }
+    const dateStr = document.getElementById('entryDate').value;
+    const firm = document.getElementById('entryFirm').value;
+    const qty = parseFloat(document.getElementById('entryQty').value);
+    if (!dateStr) { showToast('तारीख चुनें', "warning"); return; }
+    if (!firm) { showToast('फर्म चुनें', "warning"); return; }
+    if (isNaN(qty) || qty <= 0) { showToast('मात्रा डालें', "warning"); return; }
+
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const allData = await dbGetMonthRecords(y, m);
+    const dayData = allData[d] || { col1: '', col2: '', col3: '', col4: '' };
+    const before = { ...dayData };
+    dayData[firm] = String(qty);
+    await dbPutRecord(y, m, d, dayData);
+    showToast('✓ एंट्री जोड़ दी!', "success");
+    pushUndo('entryAdd', { year: y, month: m, day: d, data: before }, 'एंट्री जोड़ी — वापस लाएँ?');
+    document.getElementById('entryQty').value = '';
+    document.getElementById('entryQty').focus();
+    if (y === currentYear && m === currentMonth) {
+        await renderEntryView();
+        await renderTable();
+    }
+}
+
+function goToToday() {
+    const today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth() + 1;
+    activeFilter = null;
+    document.getElementById("monthPicker").value = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+    setupDateInputConstraints();
+    updateSessionYear();
+    renderTable();
+    renderEntryView();
+    showToast('आज के महीने पर आ गए', "info");
+}
+
+/* LOGO */
+let logoDragState = null;
+let logoResizeState = null;
+let logoPosition = { x: 10, y: 8, width: 90, height: 70 };
+let logoPosBeforeDrag = null;
+
+async function loadLogoPosition() {
+    const saved = await dbGetSetting('logo_position');
+    if (saved) {
+        try {
+            const p = typeof saved === 'string' ? JSON.parse(saved) : saved;
+            if (typeof p.x === 'number') logoPosition.x = p.x;
+            if (typeof p.y === 'number') logoPosition.y = p.y;
+            if (typeof p.width === 'number') logoPosition.width = p.width;
+            if (typeof p.height === 'number') logoPosition.height = p.height;
+        } catch (e) {}
+    }
+    applyLogoPosition();
+}
+function applyLogoPosition() {
+    const el = document.getElementById('logoMovable');
+    if (!el) return;
+    el.style.left = logoPosition.x + 'px';
+    el.style.top = logoPosition.y + 'px';
+    el.style.width = logoPosition.width + 'px';
+    el.style.height = logoPosition.height + 'px';
+}
+async function saveLogoPosition() { await dbSetSetting('logo_position', logoPosition); }
+
+function startLogoDrag(e) {
+    if (!session || session.role !== 'admin') return;
+    if (e.target.classList.contains('resize-handle')) return;
+    if (e.target.closest('.remove-btn')) return;
+    e.preventDefault();
+    const el = document.getElementById('logoMovable');
+    if (!el) return;
+    logoPosBeforeDrag = { ...logoPosition };
+    const elRect = el.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    logoDragState = { offsetX: clientX - elRect.left, offsetY: clientY - elRect.top };
+    el.classList.add('dragging');
+    el.dataset.dragged = 'true';
+    document.addEventListener('mousemove', onLogoDragMove, { passive: false });
+    document.addEventListener('mouseup', onLogoDragEnd);
+    document.addEventListener('touchmove', onLogoDragMove, { passive: false });
+    document.addEventListener('touchend', onLogoDragEnd);
+}
+function onLogoDragMove(e) {
+    if (!logoDragState) return;
+    e.preventDefault();
+    const el = document.getElementById('logoMovable');
+    const header = document.getElementById('registerHeaderBox');
+    if (!el || !header) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const headerRect = header.getBoundingClientRect();
+    let newLeft = clientX - headerRect.left - logoDragState.offsetX;
+    let newTop = clientY - headerRect.top - logoDragState.offsetY;
+    newLeft = Math.max(0, Math.min(newLeft, headerRect.width - logoPosition.width));
+    newTop = Math.max(0, Math.min(newTop, headerRect.height - logoPosition.height));
+    logoPosition.x = Math.round(newLeft);
+    logoPosition.y = Math.round(newTop);
+    el.style.left = logoPosition.x + 'px';
+    el.style.top = logoPosition.y + 'px';
+}
+async function onLogoDragEnd() {
+    if (!logoDragState) return;
+    logoDragState = null;
+    const el = document.getElementById('logoMovable');
+    if (el) el.classList.remove('dragging');
+    document.removeEventListener('mousemove', onLogoDragMove);
+    document.removeEventListener('mouseup', onLogoDragEnd);
+    document.removeEventListener('touchmove', onLogoDragMove);
+    document.removeEventListener('touchend', onLogoDragEnd);
+    await saveLogoPosition();
+    logoPosBeforeDrag = null;
+}
+function startLogoResize(e) {
+    if (!session || session.role !== 'admin') return;
+    e.stopPropagation(); e.preventDefault();
+    const el = document.getElementById('logoMovable');
+    if (!el) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    logoResizeState = { startX: clientX, startY: clientY, startW: logoPosition.width, startH: logoPosition.height };
+    el.classList.add('resizing');
+    document.addEventListener('mousemove', onLogoResizeMove, { passive: false });
+    document.addEventListener('mouseup', onLogoResizeEnd);
+    document.addEventListener('touchmove', onLogoResizeMove, { passive: false });
+    document.addEventListener('touchend', onLogoResizeEnd);
+}
+function onLogoResizeMove(e) {
+    if (!logoResizeState) return;
+    e.preventDefault();
+    const el = document.getElementById('logoMovable');
+    const header = document.getElementById('registerHeaderBox');
+    if (!el || !header) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const dx = clientX - logoResizeState.startX;
+    const dy = clientY - logoResizeState.startY;
+    let newW = Math.max(50, logoResizeState.startW + dx);
+    let newH = Math.max(40, logoResizeState.startH + dy);
+    const headerRect = header.getBoundingClientRect();
+    newW = Math.min(newW, headerRect.width - logoPosition.x);
+    newH = Math.min(newH, headerRect.height - logoPosition.y);
+    logoPosition.width = Math.round(newW);
+    logoPosition.height = Math.round(newH);
+    el.style.width = logoPosition.width + 'px';
+    el.style.height = logoPosition.height + 'px';
+}
+async function onLogoResizeEnd() {
+    if (!logoResizeState) return;
+    logoResizeState = null;
+    const el = document.getElementById('logoMovable');
+    if (el) el.classList.remove('resizing');
+    document.removeEventListener('mousemove', onLogoResizeMove);
+    document.removeEventListener('mouseup', onLogoResizeEnd);
+    document.removeEventListener('touchmove', onLogoResizeMove);
+    document.removeEventListener('touchend', onLogoResizeEnd);
+    await saveLogoPosition();
+}
+async function resetLogoPosition() {
+    logoPosition = { x: 10, y: 8, width: 90, height: 70 };
+    applyLogoPosition();
+    await saveLogoPosition();
+    showToast('लोगो की जगह रीसेट हो गई', "info");
+}
+function handleLogoClick(e) {
+    if (!session || session.role !== 'admin') return;
+    const el = document.getElementById('logoMovable');
+    if (el.dataset.dragged === 'true') { el.dataset.dragged = 'false'; return; }
+    if (!cachedLogo) {
+        document.getElementById("logoFileInput").value = "";
+        document.getElementById("logoFileInput").click();
+    }
+}
+async function handleLogoFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { showToast("Image only", "warning"); return; }
+    if (file.size > 2 * 1024 * 1024) { showToast("Image < 2MB", "warning"); return; }
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+        const url = ev.target.result;
+        cachedLogo = url;
+        await dbSetSetting('logo_main', url);
+        applyLogo(url);
+        showToast('✓ लोगो लगा दिया', "success");
+    };
+    reader.readAsDataURL(file);
+}
+function applyLogo(url) {
+    const el = document.getElementById('logoMovable');
+    if (!el || !url) return;
+    const old = el.querySelector('img'); if (old) old.remove();
+    const img = document.createElement('img'); img.src = url; img.alt = "Logo";
+    img.draggable = false;
+    el.insertBefore(img, el.firstChild);
+    el.classList.add('has-logo');
+}
+async function removeLogo(event) {
+    if (event) event.stopPropagation();
+    if (!session || session.role !== 'admin') return;
+    if (!confirm("Logo remove?")) return;
+    cachedLogo = null;
+    await dbSetSetting('logo_main', null);
+    const el = document.getElementById('logoMovable');
+    if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
+    showToast('लोगो हटा दिया', "info");
+}
+function getLogoData() { return cachedLogo; }
+
+/* FONT SCALE */
+function applyFontScale() {
+    const scale = fontScale / 100;
+    document.documentElement.style.setProperty('--base-font', (15 * scale) + 'px');
+    document.documentElement.style.setProperty('--input-font', (17 * scale) + 'px');
+    document.body.style.fontSize = (15 * scale) + 'px';
+    document.querySelectorAll('.register-sheet th, .register-sheet td').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    document.querySelectorAll('.grid-input').forEach(el => {
+        el.style.fontSize = (17 * scale) + 'px';
+    });
+    const headerMain = document.querySelector('.header-with-logos .title-block h1');
+    if (headerMain) headerMain.style.fontSize = (18 * scale) + 'px';
+    const headerSub = document.querySelector('.header-with-logos .title-block p');
+    if (headerSub) headerSub.style.fontSize = (12 * scale) + 'px';
+    const headerTitle = document.querySelector('.header-title');
+    if (headerTitle) headerTitle.style.fontSize = (14 * scale) + 'px';
+    document.querySelectorAll('.entry-form-title').forEach(el => el.style.fontSize = (15 * scale) + 'px');
+    document.querySelectorAll('.entry-field label').forEach(el => el.style.fontSize = (11 * scale) + 'px');
+    document.querySelectorAll('.entry-field input, .entry-field select').forEach(el => el.style.fontSize = (14 * scale) + 'px');
+    document.querySelectorAll('.add-btn').forEach(el => el.style.fontSize = (14 * scale) + 'px');
+    document.querySelectorAll('.dashboard-header h3').forEach(el => el.style.fontSize = (14 * scale) + 'px');
+    document.querySelectorAll('.dash-stat-value').forEach(el => el.style.fontSize = (18 * scale) + 'px');
+    document.querySelectorAll('.dash-stat-label').forEach(el => el.style.fontSize = (10 * scale) + 'px');
+    document.querySelectorAll('.dash-firm-name').forEach(el => el.style.fontSize = (12 * scale) + 'px');
+    document.querySelectorAll('.dash-firm-val').forEach(el => el.style.fontSize = (13 * scale) + 'px');
+    document.querySelectorAll('.recent-row .rdate').forEach(el => el.style.fontSize = (12 * scale) + 'px');
+    document.querySelectorAll('.recent-row .rfirm').forEach(el => el.style.fontSize = (12 * scale) + 'px');
+    document.querySelectorAll('.recent-row .rqty').forEach(el => el.style.fontSize = (13 * scale) + 'px');
+    document.querySelectorAll('.view-toggle button').forEach(el => el.style.fontSize = (13 * scale) + 'px');
+    const badge = document.getElementById("fontSizeBadge");
+    if (badge) badge.innerText = fontScale + "%";
+    setTimeout(() => {
+        document.querySelectorAll('.register-sheet th, .register-sheet td').forEach(el => {
+            el.style.fontSize = (15 * scale) + 'px';
+        });
+        document.querySelectorAll('.grid-input').forEach(el => {
+            el.style.fontSize = (17 * scale) + 'px';
+        });
+        document.querySelectorAll('.dash-stat-value').forEach(el => el.style.fontSize = (18 * scale) + 'px');
+        document.querySelectorAll('.recent-row .rdate').forEach(el => el.style.fontSize = (12 * scale) + 'px');
+        document.querySelectorAll('.recent-row .rfirm').forEach(el => el.style.fontSize = (12 * scale) + 'px');
+        document.querySelectorAll('.recent-row .rqty').forEach(el => el.style.fontSize = (13 * scale) + 'px');
+    }, 100);
+}
+function changeFontSize(dir) {
+    const ns = fontScale + (dir * 10);
+    if (ns < 70 || ns > 160) return;
+    fontScale = ns;
+    applyFontScale();
+    dbSetSetting('font_scale', fontScale);
+}
+
+/* DATE HELPERS */
+function setupDateInputConstraints() {
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const mm = String(currentMonth).padStart(2, '0');
+    const minDate = `${currentYear}-${mm}-01`;
+    const maxDate = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
+    const fromInput = document.getElementById("fromDate");
+    const toInput = document.getElementById("toDate");
+    // Remove min/max so user can pick ANY date across ANY month
+    fromInput.removeAttribute("min");
+    fromInput.removeAttribute("max");
+    toInput.removeAttribute("min");
+    toInput.removeAttribute("max");
+    if (!fromInput.value) fromInput.value = minDate;
+    if (!toInput.value) toInput.value = maxDate;
+    syncDateDisplay('fromDate', 'fromDateDisplay');
+    syncDateDisplay('toDate', 'toDateDisplay');
+}
+function updateSessionYear() {
+    const nextYr = (currentYear + 1).toString().slice(-2);
+    document.getElementById("sessionYear").innerText = `${currentYear}-${nextYr}`;
+}
+async function applyDateFilter() {
+    const fv = document.getElementById("fromDate").value;
+    const tv = document.getElementById("toDate").value;
+    if (!fv || !tv) { showToast('दोनों तारीख चुनें', "warning"); return; }
+    const fromD = new Date(fv);
+    const toD = new Date(tv);
+    if (fromD > toD) { showToast("'से' तारीख 'तक' से बाद नहीं!", "warning"); return; }
+
+    const fromY = fromD.getFullYear(), fromM = fromD.getMonth() + 1, fromDay = fromD.getDate();
+    const toY = toD.getFullYear(), toM = toD.getMonth() + 1, toDay = toD.getDate();
+
+    // Same month?
+    if (fromY === toY && fromM === toM) {
+        currentYear = fromY;
+        currentMonth = fromM;
+        document.getElementById("monthPicker").value = `${currentYear}-${String(currentMonth).padStart(2,'0')}`;
+        activeFilter = { startDay: fromDay, endDay: toDay };
+        document.getElementById("filterSubtitle").innerText = `फ़िल्टर: ${formatDateShortDDMMYY(fromY, fromM, fromDay)} - ${formatDateShortDDMMYY(toY, toM, toDay)}`;
+        renderTable();
+        renderEntryView();
+        showToast(`फ़िल्टर लागू: ${formatDateShortDDMMYY(fromY, fromM, fromDay)} - ${formatDateShortDDMMYY(toY, toM, toDay)}`, "info");
+    } else {
+        // Cross-month range — open Report modal with dates
+        document.getElementById("reportFromDate").value = fv;
+        document.getElementById("reportToDate").value = tv;
+        syncDateDisplay('reportFromDate', 'reportFromDateDisplay');
+        syncDateDisplay('reportToDate', 'reportToDateDisplay');
+        document.getElementById("reportFirm").value = "all";
+        document.getElementById("reportFormat").value = "full";
+        document.getElementById("reportModal").classList.add("show");
+        showToast('अलग-अलग महीनों की range — Report खोल दी', "info");
+        applyLayoutToUI();
+        setTimeout(() => previewReport(), 200);
+    }
+}
+function resetDateFilter() {
+    activeFilter = null;
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const mm = String(currentMonth).padStart(2, '0');
+    const minDate = `${currentYear}-${mm}-01`;
+    const maxDate = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
+    document.getElementById("fromDate").value = minDate;
+    document.getElementById("toDate").value = maxDate;
+    syncDateDisplay('fromDate', 'fromDateDisplay');
+    syncDateDisplay('toDate', 'toDateDisplay');
+    document.getElementById("filterSubtitle").innerText = "";
+    renderTable();
+    renderEntryView();
+    showToast('पूरा महीना', "info");
+}
+
+async function renderTable() {
+    if (!dbReady) return;
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const savedData = await dbGetMonthRecords(currentYear, currentMonth);
+    const tbody = document.getElementById("tableBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    const startDay = activeFilter ? activeFilter.startDay : 1;
+    const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
+    const isAdmin = session && session.role === 'admin';
+    const dis = isAdmin ? '' : 'disabled';
+    for (let day = startDay; day <= endDay; day++) {
+        const dateFormatted = formatDateShortDDMMYY(currentYear, currentMonth, day);
+        const rowData = savedData[day] || { col1: '', col2: '', col3: '', col4: '' };
+        const tr = document.createElement("tr");
+        tr.className = "data-row";
+        tr.dataset.day = day;
+        tr.innerHTML = `
+            <td class="font-bold text-center bg-slate-50">${day}</td>
+            <td class="font-bold text-center whitespace-nowrap bg-slate-50 tracking-wider">${dateFormatted}</td>
+            <td class="p-0"><input type="number" step="any" min="0" data-day="${day}" data-col="1" value="${rowData.col1 || ''}" oninput="onInputChange()" onfocus="highlightRow(${day})" class="grid-input" placeholder="-" ${dis}></td>
+            <td class="p-0"><input type="number" step="any" min="0" data-day="${day}" data-col="2" value="${rowData.col2 || ''}" oninput="onInputChange()" onfocus="highlightRow(${day})" class="grid-input" placeholder="-" ${dis}></td>
+            <td class="p-0"><input type="number" step="any" min="0" data-day="${day}" data-col="3" value="${rowData.col3 || ''}" oninput="onInputChange()" onfocus="highlightRow(${day})" class="grid-input" placeholder="-" ${dis}></td>
+            <td class="p-0"><input type="number" step="any" min="0" data-day="${day}" data-col="4" value="${rowData.col4 || ''}" oninput="onInputChange()" onfocus="highlightRow(${day})" class="grid-input" placeholder="-" ${dis}></td>
+            <td id="rowTotal_${day}" class="font-bold bg-slate-50 text-center">0</td>
+        `;
+        tbody.appendChild(tr);
+    }
+    calculateTotals();
+    applyFontScale();
+}
+function highlightRow(day) {
+    document.querySelectorAll('.data-row').forEach(r => r.classList.remove('active-row'));
+    document.querySelector(`.data-row[data-day="${day}"]`)?.classList.add('active-row');
+}
+function onInputChange() {
+    if (!session || session.role !== 'admin') return;
+    calculateTotals(); scheduleAutoSave();
+}
+function scheduleAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => saveData(true), 800);
+}
+function calculateTotals() {
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const startDay = activeFilter ? activeFilter.startDay : 1;
+    const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
+    let c1=0,c2=0,c3=0,c4=0;
+    for (let day = startDay; day <= endDay; day++) {
+        const v1 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="1"]`)?.value) || 0;
+        const v2 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value) || 0;
+        const v3 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value) || 0;
+        const v4 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value) || 0;
+        const sum = v1 + v2 + v3 + v4;
+        const rt = document.getElementById(`rowTotal_${day}`); if (rt) rt.innerText = sum || 0;
+        c1+=v1;c2+=v2;c3+=v3;c4+=v4;
+    }
+    const tc1 = document.getElementById("totalCol1"); if (tc1) tc1.innerText = c1;
+    const tc2 = document.getElementById("totalCol2"); if (tc2) tc2.innerText = c2;
+    const tc3 = document.getElementById("totalCol3"); if (tc3) tc3.innerText = c3;
+    const tc4 = document.getElementById("totalCol4"); if (tc4) tc4.innerText = c4;
+    const gt = document.getElementById("grandTotal"); if (gt) gt.innerText = c1+c2+c3+c4;
+}
+async function saveData(silent = false) {
+    if (!dbReady || !session || session.role !== 'admin') return;
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const startDay = activeFilter ? activeFilter.startDay : 1;
+    const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
+    try {
+        const beforeSave = await dbGetMonthRecords(currentYear, currentMonth);
+        for (let day = startDay; day <= endDay; day++) {
+            const c1 = document.querySelector(`input[data-day="${day}"][data-col="1"]`)?.value || '';
+            const c2 = document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value || '';
+            const c3 = document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value || '';
+            const c4 = document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value || '';
+            if (c1||c2||c3||c4) await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+            else await dbDeleteRecord(currentYear, currentMonth, day);
+        }
+        if (!silent) showToast('✓ डेटा सेव हो गया!', "success");
+        pushUndo('month', { year: currentYear, month: currentMonth, records: beforeSave }, 'ग्रिड में बदलाव वापस लाएँ?');
+        renderEntryView();
+    } catch (err) { showToast("Save error", "danger"); }
+}
+function setupKeyboardNavigation() {
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            if (undoStack) { e.preventDefault(); performUndo(); }
+            return;
+        }
+        const a = document.activeElement;
+        if (!a || !a.classList.contains('grid-input') || a.disabled) return;
+        const day = parseInt(a.dataset.day), col = parseInt(a.dataset.col);
+        if (e.key === 'Enter') { e.preventDefault(); if (col < 4) focusInput(day, col+1); else focusInput(day+1, 1); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); focusInput(day+1, col); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); focusInput(day-1, col); }
+    });
+}
+function focusInput(day, col) {
+    const i = document.querySelector(`input[data-day="${day}"][data-col="${col}"]`);
+    if (i && !i.disabled) { i.focus(); i.select(); highlightRow(day); }
+}
+function showToast(msg, type = "success") {
+    const tEl = document.getElementById("toast");
+    tEl.className = `toast ${type}`;
+    const icons = { success: 'fa-check-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle', danger: 'fa-trash-alt' };
+    tEl.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-info-circle'} mr-2"></i>${msg}`;
+    tEl.classList.add("show");
+    setTimeout(() => tEl.classList.remove("show"), 5000);
+}
+
+/* SEARCH */
+function openSearch() { document.getElementById("searchModal").classList.add("show"); }
+function closeSearch() { document.getElementById("searchModal").classList.remove("show"); }
+function clearSearch() {
+    ["searchDay","searchYearOnly","searchMinQty","searchMaxQty"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("searchMonthOnly").value = "";
+    document.getElementById("searchFirm").value = "";
+    document.getElementById("searchResults").innerHTML = "";
+    document.getElementById("searchInfo").innerText = "";
+}
+async function runSearch() {
+    if (!dbReady) return;
+    const dayF = parseInt(document.getElementById("searchDay").value) || null;
+    const monthF = parseInt(document.getElementById("searchMonthOnly").value) || null;
+    const yearF = parseInt(document.getElementById("searchYearOnly").value) || null;
+    const firmF = document.getElementById("searchFirm").value || null;
+    const minQ = parseFloat(document.getElementById("searchMinQty").value);
+    const maxQ = parseFloat(document.getElementById("searchMaxQty").value);
+    const minQty = isNaN(minQ) ? null : minQ;
+    const maxQty = isNaN(maxQ) ? null : maxQ;
+    const all = await dbGetAllRecords();
+    const results = [];
+    let grandSum = 0;
+    all.forEach(r => {
+        if (dayF && r.day !== dayF) return;
+        if (monthF && r.month !== monthF) return;
+        if (yearF && r.year !== yearF) return;
+        const c1 = parseFloat(r.col1)||0, c2 = parseFloat(r.col2)||0, c3 = parseFloat(r.col3)||0, c4 = parseFloat(r.col4)||0;
+        const rowSum = c1+c2+c3+c4;
+        if (firmF) {
+            const fv = parseFloat(r[firmF]) || 0;
+            if (fv === 0) return;
+            if (minQty !== null && fv < minQty) return;
+            if (maxQty !== null && fv > maxQty) return;
+            results.push({ year: r.year, month: r.month, day: r.day, c1, c2, c3, c4, rowTotal: rowSum, firmF, firmValue: fv });
+            grandSum += fv;
+        } else {
+            if (minQty !== null && rowSum < minQty) return;
+            if (maxQty !== null && rowSum > maxQty) return;
+            results.push({ year: r.year, month: r.month, day: r.day, c1, c2, c3, c4, rowTotal: rowSum, firmF: null, firmValue: null });
+            grandSum += rowSum;
+        }
+    });
+    results.sort((a,b) => (a.year-b.year)||(a.month-b.month)||(a.day-b.day));
+    const div = document.getElementById("searchResults");
+    const info = document.getElementById("searchInfo");
+    if (results.length === 0) {
+        div.innerHTML = `<div class="text-center py-10 text-slate-400"><i class="fa-solid fa-inbox text-4xl mb-2"></i><p>कोई रिकॉर्ड नहीं</p></div>`;
+        info.innerText = ""; return;
+    }
+    info.innerHTML = `<strong>${results.length}</strong> रिकॉर्ड — कुल <strong class="text-purple-700">${grandSum} ली०</strong>`;
+    const isAdmin = session && session.role === 'admin';
+    div.innerHTML = results.map(r => {
+        const dateStr = formatDateShortDDMMYY(r.year, r.month, r.day);
+        let dataHtml = '';
+        if (r.firmF) {
+            dataHtml = `<span class="zone-pill" style="background:#fef3c7;color:#92400e;font-size:14px;padding:6px 16px;font-weight:700;">${FIRM_LABELS[r.firmF].short}: ${r.firmValue} ली०</span>`;
+        } else {
+            dataHtml = `<span class="zone-pill">${FIRM_LABELS.col1.short}: ${r.c1}</span><span class="zone-pill">${FIRM_LABELS.col2.short}: ${r.c2}</span><span class="zone-pill">${FIRM_LABELS.col3.short}: ${r.c3}</span><span class="zone-pill">${FIRM_LABELS.col4.short}: ${r.c4}</span><span class="zone-pill" style="background:#dcfce7;color:#166534;"><b>कुल: ${r.rowTotal}</b></span>`;
+        }
+        return `<div class="search-result-row">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div><span class="date-badge">${dateStr}</span></div>
+                <div class="flex flex-wrap gap-1">${dataHtml}</div>
+                <div class="flex gap-1">
+                    <button onclick="openEdit(${r.year}, ${r.month}, ${r.day})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded"><i class="fa-solid fa-eye"></i></button>
+                    ${isAdmin ? `<button onclick="deleteRecord(${r.year}, ${r.month}, ${r.day})" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>
+            </div>
+        </div>`;
+    }).join("");
+}
+async function deleteRecord(y, m, d) {
+    if (!session || session.role !== 'admin') return;
+    if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
+    const oldRec3 = (await dbGetMonthRecords(y, m))[d] || null;
+    await dbDeleteRecord(y, m, d);
+    showToast('✓ रिकॉर्ड डिलीट!', "danger");
+    pushUndo('delete', { year: y, month: m, day: d, data: oldRec3 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
+    runSearch();
+    if (y === currentYear && m === currentMonth) { renderTable(); renderEntryView(); }
+}
+
+/* EDIT */
+async function openEdit(year, month, day) {
+    const data = await dbGetMonthRecords(year, month);
+    const row = data[day] || { col1: '', col2: '', col3: '', col4: '' };
+    editContext = { year, month, day };
+    document.getElementById("editDateLabel").innerText = formatDateLongDDMMYYYY(year, month, day);
+    document.getElementById("editCol1").value = row.col1 || '';
+    document.getElementById("editCol2").value = row.col2 || '';
+    document.getElementById("editCol3").value = row.col3 || '';
+    document.getElementById("editCol4").value = row.col4 || '';
+    document.getElementById("editRowTotal").innerText = [row.col1,row.col2,row.col3,row.col4].reduce((s,v)=>s+(parseFloat(v)||0),0);
+    const isAdmin = session && session.role === 'admin';
+    ["editCol1","editCol2","editCol3","editCol4"].forEach(id => document.getElementById(id).disabled = !isAdmin);
+    const btnArea = document.getElementById("editButtonArea");
+    if (isAdmin) {
+        btnArea.innerHTML = `
+            <button onclick="closeEdit()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded text-sm">बंद</button>
+            <button onclick="deleteFromEdit()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded text-sm"><i class="fa-solid fa-trash mr-1"></i> हटाएँ</button>
+            <button onclick="saveFromEdit()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> सेव</button>`;
+    } else {
+        btnArea.innerHTML = `<button onclick="closeEdit()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded text-sm">बंद</button>`;
+    }
+    document.getElementById("editModal").classList.add("show");
+}
+function closeEdit() { document.getElementById("editModal").classList.remove("show"); }
+async function saveFromEdit() {
+    if (!session || session.role !== 'admin') return;
+    const { year, month, day } = editContext;
+    if (!day) return;
+    const oldRec = (await dbGetMonthRecords(year, month))[day] || null;
+    const c1 = document.getElementById("editCol1").value;
+    const c2 = document.getElementById("editCol2").value;
+    const c3 = document.getElementById("editCol3").value;
+    const c4 = document.getElementById("editCol4").value;
+    if (c1||c2||c3||c4) await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+    else await dbDeleteRecord(year, month, day);
+    showToast('✓ रिकॉर्ड अपडेट!', "success");
+    pushUndo('edit', { year, month, day, data: oldRec }, 'रिकॉर्ड संपादित — वापस लाएँ?');
+    closeEdit(); runSearch();
+    if (year === currentYear && month === currentMonth) { renderTable(); renderEntryView(); }
+}
+async function deleteFromEdit() {
+    if (!session || session.role !== 'admin') return;
+    const { year, month, day } = editContext;
+    if (!day) return;
+    if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
+    const oldRec2 = (await dbGetMonthRecords(year, month))[day] || null;
+    await dbDeleteRecord(year, month, day);
+    showToast('✓ रिकॉर्ड डिलीट!', "danger");
+    pushUndo('delete', { year, month, day, data: oldRec2 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
+    closeEdit(); runSearch();
+    if (year === currentYear && month === currentMonth) { renderTable(); renderEntryView(); }
+}
+
+/* EXCEL */
+function exportToExcel() {
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const startDay = activeFilter ? activeFilter.startDay : 1;
+    const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
+    const data = [
+        ['JAL KAL VIBHAG NAGER NIGAM VARANASI'],
+        ['जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण ' + currentYear + '-' + (currentYear+1).toString().slice(-2)],[],
+        ['Month','','फर्म का नाम सम्बन्धित क्षेत्र एवं सोडियम हाईपों वितरण की मात्रा','','','',''],
+        ['SL.NO.','DATE (DD/MM/YY)','वरूणा / सारनाथ','रामनगर / आदमपुर','भेलूपुर / दशाश्वमेध','कोतवाली / ऋषी माण्डवी','कुल योग (ली०)'],
+        ['','','मे० ओम साँई','मे० संकेत कन्स्ट्रक्शन','मे० अनन्त कुमार','मे० अनूप इण्टरप्राइजेज','']
+    ];
+    let s1=0,s2=0,s3=0,s4=0;
+    for (let day = startDay; day <= endDay; day++) {
+        const dateStr = formatDateShortDDMMYY(currentYear, currentMonth, day);
+        const c1 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="1"]`)?.value)||0;
+        const c2 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value)||0;
+        const c3 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value)||0;
+        const c4 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value)||0;
+        s1+=c1;s2+=c2;s3+=c3;s4+=c4;
+        data.push([day, dateStr, c1||0, c2||0, c3||0, c4||0, c1+c2+c3+c4]);
+    }
+    data.push(['कुल योग', '', s1, s2, s3, s4, s1+s2+s3+s4]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Register");
+    XLSX.writeFile(wb, `Jalkal_Register_${String(currentMonth).padStart(2,'0')}_${currentYear}.xlsx`);
+    showToast('Excel फ़ाइल डाउनलोड!', "success");
+}
+
+/* PRINT */
+function getPageSizeMM() {
+    const size = printLayout.pageSize || 'A4';
+    const orient = printLayout.orientation || 'landscape';
+    let w, h;
+    if (size === 'A4') { w = 210; h = 297; }
+    else if (size === 'A3') { w = 297; h = 420; }
+    else if (size === 'LGL') { w = 216; h = 356; }
+    else if (size === 'LTR') { w = 216; h = 279; }
+    else { w = 210; h = 297; }
+    if (orient === 'landscape') return { w: h, h: w };
+    return { w, h };
+}
+
+function printHtmlViaIframe(htmlContent, onDone) {
+    const old = document.getElementById('__printFrame');
+    if (old) old.remove();
+    const iframe = document.createElement('iframe');
+    iframe.id = '__printFrame';
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const L = printLayout;
+    const dim = getPageSizeMM();
+    const styles = `
+        @page { size: ${dim.w}mm ${dim.h}mm; margin: ${L.topMargin}mm ${L.rightMargin}mm ${L.bottomMargin}mm ${L.leftMargin}mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        html, body { margin: 0; padding: 0; font-family: 'Nirmala UI','Mangal','Noto Sans Devanagari',Arial,sans-serif; background:#fff; color:#000; font-size: ${L.fontSize}px; }
+        .print-page { page-break-after: always; page-break-inside: avoid; padding: 0; margin: 0; }
+        .print-page:last-child { page-break-after: auto; }
+        .header-with-logos { position:relative; border:1.5px solid #000; padding:6px 12px; margin:0 0 4px 0; min-height:${L.headerH}px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .header-with-logos .title-block { flex:1; text-align:center; padding:0 90px; }
+        .header-with-logos .title-block h1 { font-family:'Times New Roman',serif; font-size:${L.fontSize+4}px; font-weight:bold; letter-spacing:1px; margin:0; text-transform:uppercase; }
+        .header-with-logos .title-block p { font-size:${L.fontSize}px; font-weight:700; margin:3px 0 0; line-height:1.4; }
+        .header-with-logos .logo-slot img { max-width:100%; max-height:100%; object-fit:contain; }
+        table { width:100%; border-collapse:collapse; table-layout:fixed; }
+        th, td { border:1px solid #000; padding:${L.rowPad}px 4px; font-size:${L.fontSize}px; text-align:center; vertical-align:middle; line-height:1.3; color:#000; background:#fff; font-weight:600; word-wrap:break-word; }
+        thead th { font-weight:700; background:#f5f5f5; }
+        .grand-total-row td { background:#f0f0f0 !important; font-weight:800; }
+        /* Signature — sirf keemist right-bottom */
+        .signature-block { display:flex; justify-content:flex-end; margin-top:${L.sigTop}px; padding:0 40px 0 0; font-size:${L.fontSize}px; font-weight:700; page-break-inside:avoid; }
+        .signature-block > div { text-align:right; min-height:${L.sigHeight}px; display:flex; flex-direction:column; justify-content:flex-end; padding-top:${Math.max(0, L.sigHeight-30)}px; border-top:1px solid #000; padding-right:20px; padding-left:20px; }
+    `;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Print</title><style>${styles}</style></head><body>${htmlContent}</body></html>`);
+    doc.close();
+    const doPrint = () => {
+        try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch (e) {}
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); if (typeof onDone === 'function') onDone(); }, 1500);
+    };
+    const imgs = doc.querySelectorAll('img');
+    if (imgs.length === 0) setTimeout(doPrint, 200);
+    else {
+        let pending = imgs.length, fired = false;
+        const done = () => { if (!fired) { fired = true; setTimeout(doPrint, 200); } };
+        imgs.forEach(img => {
+            if (img.complete) { pending--; if (pending === 0) done(); }
+            else { img.onload = () => { pending--; if (pending===0) done(); }; img.onerror = () => { pending--; if (pending===0) done(); }; }
+        });
+        setTimeout(done, 1500);
+    }
+}
+
+function buildCloneHtml() {
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const startDay = activeFilter ? activeFilter.startDay : 1;
+    const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
+    let rows = '', t1=0,t2=0,t3=0,t4=0;
+    for (let day = startDay; day <= endDay; day++) {
+        const dateStr = formatDateShortDDMMYY(currentYear, currentMonth, day);
+        const c1 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="1"]`)?.value)||0;
+        const c2 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value)||0;
+        const c3 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value)||0;
+        const c4 = parseFloat(document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value)||0;
+        const sum = c1+c2+c3+c4;
+        t1+=c1;t2+=c2;t3+=c3;t4+=c4;
+        rows += `<tr><td style="font-weight:700;">${day}</td><td style="font-weight:700;">${dateStr}</td><td>${c1||0}</td><td>${c2||0}</td><td>${c3||0}</td><td>${c4||0}</td><td style="font-weight:700;">${sum}</td></tr>`;
+    }
+    const logoUrl = getLogoData();
+    const logoSz = printLayout.logoSize;
+    const logoHtml = logoUrl ? `<div class="logo-slot" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:${logoSz}px; height:${logoSz}px;"><img src="${logoUrl}" style="max-width:100%;max-height:100%;object-fit:contain;"></div>` : '';
+    const sessionYearText = `${currentYear}-${(currentYear+1).toString().slice(-2)}`;
+    return `
+        <div class="print-page">
+            <div class="header-with-logos" style="position:relative;">
+                ${logoHtml}
+                <div class="title-block">
+                    <h1>JAL KAL VIBHAG NAGER NIGAM VARANASI</h1>
+                    <p>जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण ${sessionYearText}</p>
+                </div>
+            </div>
+            <table>
+                <colgroup><col style="width:6%"><col style="width:12%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:18%"></colgroup>
+                <thead>
+                    <tr><th colspan="2">Month</th><th colspan="4">फर्म का नाम सम्बन्धित क्षेत्र एवं सोडियम हाईपों वितरण की मात्रा</th><th></th></tr>
+                    <tr><th rowspan="2">SL.NO.</th><th rowspan="2">DATE (DD/MM/YY)</th><th>वरूणा /<br>सारनाथ</th><th>रामनगर /<br>आदमपुर</th><th>भेलूपुर /<br>दशाश्वमेध</th><th>कोतवाली /<br>ऋषी माण्डवी</th><th rowspan="2">कुल योग (ली०)</th></tr>
+                    <tr><th>मे० ओम साँई</th><th>मे० संकेत कन्स्ट्रक्शन</th><th>मे० अनन्त कुमार</th><th>मे० अनूप इण्टरप्राइजेज</th></tr>
+                </thead>
+                <tbody>${rows}</tbody>
+                <tfoot><tr class="grand-total-row"><td colspan="2">कुल योग</td><td>${t1}</td><td>${t2}</td><td>${t3}</td><td>${t4}</td><td>${t1+t2+t3+t4}</td></tr></tfoot>
+            </table>
+            <div class="signature-block">
+                <div>केमिस्ट</div>
+            </div>
+        </div>`;
+}
+
+function printPDF() {
+    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    const htmlContent = buildCloneHtml();
+    printHtmlViaIframe(htmlContent);
+}
+
+/* LAYOUT */
+function onLayoutSliderChange() {
+    printLayout.topMargin = parseInt(document.getElementById('sliderTopMargin').value);
+    printLayout.bottomMargin = parseInt(document.getElementById('sliderBottomMargin').value);
+    printLayout.leftMargin = parseInt(document.getElementById('sliderLeftMargin').value);
+    printLayout.rightMargin = parseInt(document.getElementById('sliderRightMargin').value);
+    printLayout.sigTop = parseInt(document.getElementById('sliderSigTop').value);
+    printLayout.sigHeight = parseInt(document.getElementById('sliderSigHeight').value);
+    printLayout.rowPad = parseInt(document.getElementById('sliderRowPad').value);
+    printLayout.fontSize = parseFloat(document.getElementById('sliderFontSize').value);
+    printLayout.headerH = parseInt(document.getElementById('sliderHeaderH').value);
+    printLayout.logoSize = parseInt(document.getElementById('sliderLogoSize').value);
+    updateLayoutValueLabels();
+    updatePageDimBadge();
+    dbSetSetting('print_layout', printLayout);
+    if (currentReportData) previewReport();
+}
+function updateLayoutValueLabels() {
+    const map = { valTopMargin: printLayout.topMargin, valBottomMargin: printLayout.bottomMargin, valLeftMargin: printLayout.leftMargin, valRightMargin: printLayout.rightMargin, valSigTop: printLayout.sigTop, valSigHeight: printLayout.sigHeight, valRowPad: printLayout.rowPad, valFontSize: printLayout.fontSize, valHeaderH: printLayout.headerH, valLogoSize: printLayout.logoSize };
+    for (const id in map) { const el = document.getElementById(id); if (el) el.innerText = map[id]; }
+}
+function updatePageDimBadge() {
+    const dim = getPageSizeMM();
+    const el = document.getElementById('pageDimBadge');
+    if (el) el.innerText = `${dim.w} × ${dim.h} mm`;
+}
+function resetLayout() {
+    Object.assign(printLayout, { topMargin:10, bottomMargin:10, leftMargin:8, rightMargin:8, sigTop:70, sigHeight:100, rowPad:4, fontSize:11, headerH:60, logoSize:60, orientation:'landscape', pageSize:'A4' });
+    applyLayoutToUI();
+    dbSetSetting('print_layout', printLayout);
+    if (currentReportData) previewReport();
+    showToast('✓ लेआउट रीसेट', "info");
+}
+function setOrientation(o) {
+    printLayout.orientation = o;
+    applyLayoutToUI();
+    dbSetSetting('print_layout', printLayout);
+    if (currentReportData) previewReport();
+}
+function onPageSizeChange() {
+    printLayout.pageSize = document.getElementById('pageSizeSelect').value;
+    updatePageDimBadge();
+    dbSetSetting('print_layout', printLayout);
+    if (currentReportData) previewReport();
+}
+
+/* REPORT */
+function openReportModal() {
+    const today = new Date();
+    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    document.getElementById("reportFromDate").value = fmt(firstOfMonth);
+    document.getElementById("reportToDate").value = fmt(today);
+    syncDateDisplay('reportFromDate', 'reportFromDateDisplay');
+    syncDateDisplay('reportToDate', 'reportToDateDisplay');
+    document.getElementById("reportFirm").value = "all";
+    document.getElementById("reportFormat").value = "full";
+    document.getElementById("reportPreviewContainer").innerHTML = "";
+    document.getElementById("reportPreviewInfo").innerText = "";
+    document.getElementById("reportActions").style.display = "none";
+    currentReportData = null;
+    document.getElementById("reportModal").classList.add("show");
+    applyLayoutToUI();
+}
+function closeReportModal() { document.getElementById("reportModal").classList.remove("show"); }
+function clearReportForm() {
+    document.getElementById("reportPreviewContainer").innerHTML = "";
+    document.getElementById("reportPreviewInfo").innerText = "";
+    document.getElementById("reportActions").style.display = "none";
+    currentReportData = null;
+}
+function estimateRowsPerPage() {
+    const dim = getPageSizeMM();
+    const usable = dim.h * 3.78 - (printLayout.topMargin + printLayout.bottomMargin) * 3.78;
+    const headerH = printLayout.headerH + 20;
+    const sigBlock = printLayout.sigTop + printLayout.sigHeight + 30;
+    const rowH = printLayout.fontSize * 1.3 + printLayout.rowPad * 2 + 2;
+    const theadH = printLayout.fontSize * 3 + 10;
+    return Math.max(1, Math.floor((usable - headerH - sigBlock - theadH) / rowH));
+}
+function buildReportPages(filtered) {
+    const perPage = estimateRowsPerPage();
+    const total = filtered.length;
+    const pages = [];
+    for (let i = 0; i < total; i += perPage) {
+        pages.push({ rows: filtered.slice(i, i+perPage), pageNum: Math.floor(i/perPage)+1, totalPages: Math.ceil(total/perPage), startIndex: i });
+    }
+    return pages;
+}
+function buildTableHeader(format, firm) {
+    if (format === 'single' && firm !== 'all') {
+        return `<thead><tr><th>SL.NO.</th><th>DATE (DD/MM/YY)</th><th>${FIRM_LABELS[firm].full}</th></tr></thead>`;
+    }
+    return `<thead>
+        <tr><th colspan="2">Month</th><th colspan="4">फर्म का नाम सम्बन्धित क्षेत्र एवं सोडियम हाईपों वितरण की मात्रा</th><th></th></tr>
+        <tr><th rowspan="2">SL.NO.</th><th rowspan="2">DATE (DD/MM/YY)</th><th>वरूणा / सारनाथ</th><th>रामनगर / आदमपुर</th><th>भेलूपुर / दशाश्वमेध</th><th>कोतवाली / ऋषी माण्डवी</th><th rowspan="2">कुल योग (ली०)</th></tr>
+        <tr><th>मे० ओम साँई</th><th>मे० संकेत कन्स्ट्रक्शन</th><th>मे० अनन्त कुमार</th><th>मे० अनूप इण्टरप्राइजेज</th></tr>
+    </thead>`;
+}
+function buildReportHeader(firm, dateRangeText) {
+    const logoUrl = getLogoData();
+    const logoSz = printLayout.logoSize;
+    const logoHtml = logoUrl ? `<div class="logo-slot" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:${logoSz}px;height:${logoSz}px;"><img src="${logoUrl}" style="max-width:100%;max-height:100%;object-fit:contain;"></div>` : '';
+    const firmName = firm === 'all' ? 'सभी फर्म' : FIRM_LABELS[firm].full;
+    return `<div class="header-with-logos" style="position:relative;border:1.5px solid #000;padding:6px 12px;margin:0 0 4px 0;min-height:${printLayout.headerH}px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        ${logoHtml}
+        <div class="title-block" style="flex:1;text-align:center;padding:0 90px;">
+            <h1 style="font-family:'Times New Roman',serif;font-size:${printLayout.fontSize+4}px;font-weight:bold;letter-spacing:1px;margin:0;text-transform:uppercase;">JAL KAL VIBHAG NAGER NIGAM VARANASI</h1>
+            <p style="font-size:${printLayout.fontSize}px;font-weight:700;margin:3px 0 0;">जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण</p>
+        </div>
+    </div>
+    <div style="border:1.5px solid #000;padding:5px 10px;margin:0 0 4px 0;text-align:center;background:#f8f8f8;">
+        <div style="font-weight:700;font-size:${printLayout.fontSize+1}px;">${firmName}</div>
+        <div style="font-weight:700;font-size:${printLayout.fontSize}px;">अवधि: ${dateRangeText}</div>
+    </div>`;
+}
+
+async function previewReport() {
+    const fromStr = document.getElementById("reportFromDate").value;
+    const toStr = document.getElementById("reportToDate").value;
+    const firm = document.getElementById("reportFirm").value;
+    const format = document.getElementById("reportFormat").value;
+    if (!fromStr || !toStr) { showToast('दोनों तारीख चुनें', "warning"); return; }
+    const fromDate = new Date(fromStr);
+    const toDate = new Date(toStr);
+    if (fromDate > toDate) { showToast("'से' तारीख 'तक' से बाद नहीं!", "warning"); return; }
+
+    const all = await dbGetAllRecords();
+    const filtered = all.filter(r => {
+        const dt = new Date(r.year, r.month - 1, r.day);
+        return dt >= fromDate && dt <= toDate;
+    });
+    filtered.sort((a,b) => (a.year-b.year)||(a.month-b.month)||(a.day-b.day));
+
+    if (filtered.length === 0) {
+        document.getElementById("reportPreviewContainer").innerHTML = `<div class="text-center py-10 text-slate-400"><i class="fa-solid fa-inbox text-4xl mb-2"></i><p>इस अवधि में कोई डेटा नहीं</p></div>`;
+        document.getElementById("reportPreviewInfo").innerText = "";
+        document.getElementById("reportActions").style.display = "none";
+        currentReportData = null;
+        return;
+    }
+
+    const dateRangeText = `${formatDateLongDDMMYYYY(fromDate.getFullYear(), fromDate.getMonth()+1, fromDate.getDate())} - ${formatDateLongDDMMYYYY(toDate.getFullYear(), toDate.getMonth()+1, toDate.getDate())}`;
+    const totals = { col1:0, col2:0, col3:0, col4:0 };
+    filtered.forEach(r => {
+        totals.col1 += parseFloat(r.col1)||0;
+        totals.col2 += parseFloat(r.col2)||0;
+        totals.col3 += parseFloat(r.col3)||0;
+        totals.col4 += parseFloat(r.col4)||0;
+    });
+
+    const pages = buildReportPages(filtered);
+    const dim = getPageSizeMM();
+    const PX = 3.7795;
+    const pageW = dim.w * PX;
+    const pageH = dim.h * PX;
+    const container = document.getElementById("reportPreviewContainer");
+    const cw = (container.clientWidth || 800) - 40;
+    const scale = Math.min(1, cw / pageW);
+
+    let previewHtml = '';
+    pages.forEach((pg, i) => {
+        const isLast = i === pages.length - 1;
+        let rowsHtml = '';
+        pg.rows.forEach((r, idx) => {
+            const dateStr = formatDateShortDDMMYY(r.year, r.month, r.day);
+            const c1 = parseFloat(r.col1)||0, c2 = parseFloat(r.col2)||0, c3 = parseFloat(r.col3)||0, c4 = parseFloat(r.col4)||0;
+            const sum = c1+c2+c3+c4;
+            const sl = (pg.startIndex||0) + idx + 1;
+            if (format === 'single' && firm !== 'all') {
+                const fv = parseFloat(r[firm])||0;
+                rowsHtml += `<tr><td style="font-weight:700;">${sl}</td><td style="font-weight:700;">${dateStr}</td><td>${fv}</td></tr>`;
+            } else {
+                rowsHtml += `<tr><td style="font-weight:700;">${sl}</td><td style="font-weight:700;">${dateStr}</td><td>${c1||0}</td><td>${c2||0}</td><td>${c3||0}</td><td>${c4||0}</td><td style="font-weight:700;">${sum}</td></tr>`;
+            }
+        });
+        let grandRow = '';
+        if (isLast) {
+            if (format === 'single' && firm !== 'all') {
+                const grand = filtered.reduce((s,r)=>s+(parseFloat(r[firm])||0),0);
+                grandRow = `<tr class="grand-total-row"><td colspan="2">कुल योग</td><td>${grand}</td></tr>`;
+            } else {
+                grandRow = `<tr class="grand-total-row"><td colspan="2">कुल योग</td><td>${totals.col1}</td><td>${totals.col2}</td><td>${totals.col3}</td><td>${totals.col4}</td><td>${totals.col1+totals.col2+totals.col3+totals.col4}</td></tr>`;
+            }
+        }
+        const thead = buildTableHeader(format, firm);
+        const headerBar = buildReportHeader(firm, dateRangeText);
+        const pageLabel = pages.length > 1 ? `<div style="text-align:right;font-size:${printLayout.fontSize-1}px;font-weight:700;color:#666;margin-bottom:3px;">Page ${pg.pageNum} / ${pg.totalPages}</div>` : '';
+        const sigBlock = isLast ? `<div class="signature-block" style="display:flex;justify-content:flex-end;margin-top:${printLayout.sigTop}px;padding:0 40px 0 0;font-size:${printLayout.fontSize}px;font-weight:700;">
+            <div style="text-align:right;min-height:${printLayout.sigHeight}px;display:flex;flex-direction:column;justify-content:flex-end;padding-top:${Math.max(0,printLayout.sigHeight-30)}px;border-top:1px solid #000;padding-right:20px;padding-left:20px;">केमिस्ट</div>
+        </div>` : '';
+        const colg = (format === 'single' && firm !== 'all') ? `<colgroup><col style="width:10%"><col style="width:20%"><col style="width:70%"></colgroup>` : `<colgroup><col style="width:6%"><col style="width:12%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:18%"></colgroup>`;
+
+        previewHtml += `
+            <div style="width:${pageW*scale}px;height:${pageH*scale}px;overflow:hidden;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,0.15);border-radius:2px;position:relative;border:1px solid #e2e8f0;">
+                <div style="width:${pageW}px;min-height:${pageH}px;padding:${printLayout.topMargin*PX}px ${printLayout.rightMargin*PX}px ${printLayout.bottomMargin*PX}px ${printLayout.leftMargin*PX}px;background:#fff;box-sizing:border-box;font-family:'Nirmala UI','Mangal',Arial,sans-serif;font-size:${printLayout.fontSize}px;color:#000;transform:scale(${scale});transform-origin:top left;">
+                    ${pageLabel}${headerBar}
+                    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">${colg}${thead}<tbody>${rowsHtml}</tbody><tfoot>${grandRow}</tfoot></table>
+                    ${sigBlock}
+                </div>
+            </div>`;
+    });
+
+    container.innerHTML = previewHtml;
+    const grandTotal = format === 'single' && firm !== 'all' ? filtered.reduce((s,r)=>s+(parseFloat(r[firm])||0),0) : (totals.col1+totals.col2+totals.col3+totals.col4);
+    document.getElementById("reportPreviewInfo").innerHTML = `<i class="fa-solid fa-file-lines text-indigo-500 mr-1"></i> <strong>${filtered.length}</strong> दिन — कुल <strong class="text-indigo-700">${grandTotal} ली०</strong> — <strong>${pages.length}</strong> pages`;
+    document.getElementById("pageCountBadge").innerHTML = `<i class="fa-solid fa-file"></i> ${pages.length} page${pages.length>1?'s':''}`;
+    document.getElementById("pageCountBadge").classList.toggle('ok', pages.length <= 1);
+
+    currentReportData = { fromDate: fromStr, toDate: toStr, firm, format, dateRangeText, filtered, totals };
+    document.getElementById("reportActions").style.display = "flex";
+}
+
+function autoFitOnePage() {
+    if (!currentReportData) { showToast('पहले Preview देखें', "warning"); return; }
+    let attempts = 0;
+    while (attempts < 15) {
+        attempts++;
+        const est = Math.ceil(currentReportData.filtered.length / estimateRowsPerPage());
+        if (est <= 1) break;
+        printLayout.rowPad = Math.max(0, printLayout.rowPad - 1);
+        printLayout.fontSize = Math.max(8, printLayout.fontSize - 0.5);
+        printLayout.sigTop = Math.max(20, printLayout.sigTop - 10);
+        printLayout.sigHeight = Math.max(50, printLayout.sigHeight - 10);
+        printLayout.headerH = Math.max(40, printLayout.headerH - 5);
+    }
+    applyLayoutToUI();
+    dbSetSetting('print_layout', printLayout);
+    previewReport();
+    showToast('✓ 1 page में fit हो गया', "success");
+}
+
+function exportReportExcel() {
+    if (!currentReportData) return;
+    const { fromDate, toDate, firm, format, dateRangeText, filtered, totals } = currentReportData;
+    const data = [['JAL KAL VIBHAG NAGER NIGAM VARANASI'],['जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण'],[],[dateRangeText],[]];
+    if (format === 'single' && firm !== 'all') {
+        data.push(['SL.NO.', 'DATE (DD/MM/YY)', 'मात्रा (ली०)']);
+        let total = 0;
+        filtered.forEach((r, idx) => {
+            const dateStr = formatDateShortDDMMYY(r.year, r.month, r.day);
+            const fv = parseFloat(r[firm]) || 0;
+            total += fv;
+            data.push([idx + 1, dateStr, fv]);
+        });
+        data.push(['', 'कुल योग', total]);
+    } else {
+        data.push(['SL.NO.', 'DATE (DD/MM/YY)', 'ओम साँई', 'संकेत कन्स्ट्रक्शन', 'अनन्त', 'अनूप इण्टरप्राइजेज', 'कुल']);
+        filtered.forEach((r, idx) => {
+            const dateStr = formatDateShortDDMMYY(r.year, r.month, r.day);
+            const c1 = parseFloat(r.col1)||0, c2 = parseFloat(r.col2)||0, c3 = parseFloat(r.col3)||0, c4 = parseFloat(r.col4)||0;
+            data.push([idx + 1, dateStr, c1, c2, c3, c4, c1+c2+c3+c4]);
+        });
+        data.push(['', 'कुल योग', totals.col1, totals.col2, totals.col3, totals.col4, totals.col1+totals.col2+totals.col3+totals.col4]);
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Report");
+    XLSX.writeFile(wb, `Report_${firm}_${fromDate}_to_${toDate}.xlsx`);
+    showToast('✓ रिपोर्ट Excel में सेव', "success");
+}
+
+function exportReportPDF() {
+    if (!currentReportData) return;
+    const { firm, format, dateRangeText, filtered, totals } = currentReportData;
+    const pages = buildReportPages(filtered);
+    let pagesHtml = '';
+    pages.forEach((pg, i) => {
+        const isLast = i === pages.length - 1;
+        let rowsHtml = '';
+        pg.rows.forEach((r, idx) => {
+            const dateStr = formatDateShortDDMMYY(r.year, r.month, r.day);
+            const c1 = parseFloat(r.col1)||0, c2 = parseFloat(r.col2)||0, c3 = parseFloat(r.col3)||0, c4 = parseFloat(r.col4)||0;
+            const sum = c1+c2+c3+c4;
+            const sl = (pg.startIndex||0) + idx + 1;
+            if (format === 'single' && firm !== 'all') {
+                const fv = parseFloat(r[firm])||0;
+                rowsHtml += `<tr><td style="font-weight:700;">${sl}</td><td style="font-weight:700;">${dateStr}</td><td>${fv}</td></tr>`;
+            } else {
+                rowsHtml += `<tr><td style="font-weight:700;">${sl}</td><td style="font-weight:700;">${dateStr}</td><td>${c1||0}</td><td>${c2||0}</td><td>${c3||0}</td><td>${c4||0}</td><td style="font-weight:700;">${sum}</td></tr>`;
+            }
+        });
+        let grandRow = '';
+        if (isLast) {
+            if (format === 'single' && firm !== 'all') {
+                const grand = filtered.reduce((s,r)=>s+(parseFloat(r[firm])||0),0);
+                grandRow = `<tr class="grand-total-row"><td colspan="2">कुल योग</td><td>${grand}</td></tr>`;
+            } else {
+                grandRow = `<tr class="grand-total-row"><td colspan="2">कुल योग</td><td>${totals.col1}</td><td>${totals.col2}</td><td>${totals.col3}</td><td>${totals.col4}</td><td>${totals.col1+totals.col2+totals.col3+totals.col4}</td></tr>`;
+            }
+        }
+        const thead = buildTableHeader(format, firm);
+        const headerBar = buildReportHeader(firm, dateRangeText);
+        const pageLabel = pages.length > 1 ? `<div style="text-align:right;font-size:${printLayout.fontSize-1}px;font-weight:700;color:#666;margin-bottom:3px;">Page ${pg.pageNum} / ${pg.totalPages}</div>` : '';
+        const sigBlock = isLast ? `<div class="signature-block"><div>केमिस्ट</div></div>` : '';
+        const colg = (format === 'single' && firm !== 'all') ? `<colgroup><col style="width:10%"><col style="width:20%"><col style="width:70%"></colgroup>` : `<colgroup><col style="width:6%"><col style="width:12%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:18%"></colgroup>`;
+        pagesHtml += `<div class="print-page">${pageLabel}${headerBar}<table>${colg}${thead}<tbody>${rowsHtml}</tbody><tfoot>${grandRow}</tfoot></table>${sigBlock}</div>`;
+    });
+    closeReportModal();
+    printHtmlViaIframe(pagesHtml);
+}
+
+/* BACKUP */
+async function openBackupModal() {
+    if (!session || session.role !== 'admin') return;
+    const recs = await dbGetAllRecords();
+    const months = new Set(recs.map(r => `${r.year}-${r.month}`));
+    document.getElementById("backupRecordCount").innerText = recs.length;
+    document.getElementById("backupMonthCount").innerText = months.size;
+    document.getElementById("backupModal").classList.add("show");
+}
+function closeBackupModal() { document.getElementById("backupModal").classList.remove("show"); }
+async function downloadBackup() {
+    try {
+        const records = await dbGetAllRecords();
+        const settings = await dbGetAllSettings();
+        const backup = { version: 1, exportedAt: new Date().toISOString(), exportedBy: session.username, records, settings };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `jalkal_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`✓ बैकअप डाउनलोड: ${records.length}`, "success");
+    } catch (e) { showToast("Backup error", "danger"); }
+}
+let pendingRestore = null;
+async function handleRestoreFile(e) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+        const data = JSON.parse(await file.text());
+        if (!data.records || !Array.isArray(data.records)) { showToast("Invalid file", "danger"); return; }
+        pendingRestore = data;
+        const months = new Set(data.records.map(r => `${r.year}-${r.month}`));
+        document.getElementById("restoreRecordCount").innerText = data.records.length;
+        document.getElementById("restoreMonthCount").innerText = months.size;
+        document.getElementById("restoreDate").innerText = data.exportedAt ? new Date(data.exportedAt).toLocaleString('hi-IN') : '--';
+        document.getElementById("restoreConfirmModal").classList.add("show");
+    } catch (e) { showToast("File read error", "danger"); }
+}
+function cancelRestore() {
+    pendingRestore = null;
+    document.getElementById("restoreConfirmModal").classList.remove("show");
+    document.getElementById("restoreFileInput").value = "";
+}
+async function confirmRestore() {
+    if (!pendingRestore) return;
+    try {
+        const beforeRestoreRecords = await dbGetAllRecords();
+        await dbClearRecords(); await dbClearSettings();
+        const tx = db.transaction(STORE_RECORDS, 'readwrite');
+        const st = tx.objectStore(STORE_RECORDS);
+        pendingRestore.records.forEach(r => st.put(r));
+        await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+        if (pendingRestore.settings) {
+            const tx2 = db.transaction(STORE_SETTINGS, 'readwrite');
+            const s2 = tx2.objectStore(STORE_SETTINGS);
+            pendingRestore.settings.forEach(s => { if (s.value != null) s2.put(s); });
+            await new Promise((res, rej) => { tx2.oncomplete = res; tx2.onerror = () => rej(tx2.error); });
+        }
+        cachedLogo = await dbGetSetting('logo_main');
+        await loadLogoPosition();
+        if (cachedLogo) applyLogo(cachedLogo);
+        pushUndo('restore', { records: beforeRestoreRecords }, 'रीस्टोर — वापस लाएँ?');
+        cancelRestore(); closeBackupModal();
+        await renderTable(); await renderEntryView();
+        showToast(`✓ रिकॉर्ड रीस्टोर: ${pendingRestore.records.length}`, "success");
+    } catch (e) { showToast("Restore error", "danger"); }
+}
+async function clearAllData() {
+    if (!session || session.role !== 'admin') return;
+    if (!confirm("सारा डेटा मिटाएँ?")) return;
+    if (!confirm("पक्का?")) return;
+    const beforeRecs = await dbGetAllRecords();
+    const beforeSettings = await dbGetAllSettings();
+    await dbClearRecords(); await dbClearSettings();
+    cachedLogo = null;
+    const el = document.getElementById('logoMovable');
+    if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
+    fontScale = 100; applyFontScale();
+    pushUndo('clearall', { records: beforeRecs, settings: beforeSettings }, 'डेटा मिटाया — वापस लाएँ?');
+    await renderTable(); await renderEntryView(); closeBackupModal();
+    showToast('सारा डेटा मिटा', "danger");
+}
+
+/* CHANGE PASSWORD */
+function toggleUserDropdown(e) {
+    e.stopPropagation();
+    const dd = document.getElementById("userDropdown");
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener("click", () => {
+    const dd = document.getElementById("userDropdown");
+    if (dd) dd.style.display = 'none';
+});
+document.getElementById("userDropdown")?.addEventListener("click", (e) => e.stopPropagation());
+
+function openChangePassword() {
+    document.getElementById("userDropdown").style.display = 'none';
+    ["oldPass","newPass","newPass2"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("changePasswordModal").classList.add("show");
+}
+function closeChangePassword() { document.getElementById("changePasswordModal").classList.remove("show"); }
+async function changePassword() {
+    const op = document.getElementById("oldPass").value;
+    const np = document.getElementById("newPass").value;
+    const np2 = document.getElementById("newPass2").value;
+    if (!op || !np || !np2) { showToast('सभी फ़ील्ड भरें', "warning"); return; }
+    if (np.length < 6) { showToast('पासवर्ड कम से कम 6 अक्षर', "warning"); return; }
+    if (np !== np2) { showToast('दोनों पासवर्ड मेल नहीं', "warning"); return; }
+    if (!await verifyPassword(session.username, op)) { showToast('पुराना पासवर्ड गलत', "danger"); return; }
+    await setUserPassword(session.username, np);
+    closeChangePassword();
+    showToast('✓ पासवर्ड बदल दिया', "success");
+}
+
+/* EMAIL SETTINGS */
+async function openEmailSettings() {
+    if (!session || session.role !== 'admin') return;
+    document.getElementById("userDropdown").style.display = 'none';
+    const cfg = await getEmailConfig();
+    document.getElementById("ejsPublicKey").value = cfg.publicKey || "";
+    document.getElementById("ejsServiceId").value = cfg.serviceId || "";
+    document.getElementById("ejsTemplateId").value = cfg.templateId || "";
+    document.getElementById("ejsAdminEmail").value = cfg.adminEmail || "";
+    document.getElementById("ejsUserEmail").value = cfg.userEmail || "";
+    document.getElementById("testEmailResult").innerHTML = "";
+    document.getElementById("emailSettingsModal").classList.add("show");
+}
+function closeEmailSettings() { document.getElementById("emailSettingsModal").classList.remove("show"); }
+async function saveEmailSettings() {
+    await dbSetSetting('ejs_publicKey', document.getElementById("ejsPublicKey").value.trim());
+    await dbSetSetting('ejs_serviceId', document.getElementById("ejsServiceId").value.trim());
+    await dbSetSetting('ejs_templateId', document.getElementById("ejsTemplateId").value.trim());
+    await dbSetSetting('ejs_adminEmail', document.getElementById("ejsAdminEmail").value.trim());
+    await dbSetSetting('ejs_userEmail', document.getElementById("ejsUserEmail").value.trim());
+    showToast("✓ सेव", "success");
+}
+async function testEmailSettings() {
+    const resultDiv = document.getElementById("testEmailResult");
+    resultDiv.innerHTML = '<div class="text-blue-600"><i class="fa-solid fa-spinner fa-spin mr-1"></i>...</div>';
+    const cfg = await getEmailConfig();
+    if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.adminEmail) { resultDiv.innerHTML = '<div class="text-red-600">IDs missing</div>'; return; }
+    try {
+        const testOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        await sendOTPEmail(cfg.adminEmail, "Test Admin", testOTP, cfg);
+        resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — OTP: <strong>${testOTP}</strong></div>`;
+    } catch (err) {
+        resultDiv.innerHTML = `<div class="text-red-600">✗ ${err.text || err.message || 'Error'}</div>`;
+    }
+}
+
+/* AUDIT LOG */
+async function openAuditLog() {
+    if (!session || session.role !== 'admin') return;
+    document.getElementById("userDropdown").style.display = 'none';
+    const logs = await dbGetAuditLog(200);
+    const list = document.getElementById("auditList");
+    if (logs.length === 0) list.innerHTML = `<div class="text-center py-10 text-slate-400">कोई गतिविधि नहीं</div>`;
+    else {
+        list.innerHTML = logs.map(l => {
+            const dt = new Date(l.timestamp).toLocaleString('hi-IN');
+            const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+            return `<div class="flex items-start gap-3 p-2.5 border border-slate-200 rounded-lg bg-slate-50">
+                <i class="fa-solid fa-circle-info text-slate-500 mt-0.5"></i>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold">${l.action}</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${badge}">${l.user} (${l.role})</span>
+                    </div>
+                    <div class="text-xs text-slate-600 mt-0.5">${l.details || ''}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">${dt}</div>
+                </div>
+            </div>`;
+        }).join("");
+    }
+    document.getElementById("auditModal").classList.add("show");
+}
+function closeAuditLog() { document.getElementById("auditModal").classList.remove("show"); }
+async function clearAuditLog() {
+    if (!confirm("लॉग साफ़ करें?")) return;
+    await dbClearAudit();
+    openAuditLog();
+    showToast('लॉग साफ़', "success");
+}
+
+/* BOOT */
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await openDB();
+        dbReady = true;
+        await ensureDefaultUsers();
+    } catch (err) { console.error(err); return; }
+
+    let existing = null;
+    try { existing = JSON.parse(localStorage.getItem('jalkal_session') || 'null'); } catch (e) {}
+    if (existing && existing.username) { session = existing; enterApp(); }
+});
+</script>
+</body>
+</html>
