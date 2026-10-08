@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
@@ -249,6 +249,7 @@ input[type=number] { -moz-appearance: textfield; }
     background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #f0f9ff 100%);
     z-index: 10000;
     display: flex; align-items: center; justify-content: center; padding: 20px;
+    overflow-y: auto;
 }
 #loginScreen.hidden { display: none; }
 .login-card {
@@ -424,7 +425,6 @@ input[type=number] { -moz-appearance: textfield; }
     display: grid; grid-template-columns: 1fr 1.5fr 1fr auto;
     gap: 12px; align-items: end;
 }
-@media (max-width: 768px) { .entry-form-grid { grid-template-columns: 1fr; } }
 .entry-field { display: flex; flex-direction: column; gap: 4px; }
 .entry-field label {
     font-size: 11px; font-weight: 700; color: #475569;
@@ -501,7 +501,6 @@ input[type=number] { -moz-appearance: textfield; }
     grid-template-columns: minmax(200px, 1.3fr) 2fr minmax(90px, auto);
     gap: 10px; align-items: center;
 }
-@media (max-width: 640px) { .dash-firm-row { grid-template-columns: 1fr; gap: 4px; } }
 .dash-firm-name {
     font-size: 12px; font-weight: 700; color: #1e293b;
     display: flex; align-items: center; gap: 6px;
@@ -611,6 +610,189 @@ input[type=number] { -moz-appearance: textfield; }
 #undoBar .undo-timer { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 900; color: #78350f; min-width: 60px; text-align: center; }
 #undoBar .undo-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: 14px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 #undoBar .undo-close { background: transparent; color: #64748b; border: none; font-size: 18px; cursor: pointer; padding: 4px 8px; }
+
+/* ============================================================
+   RESPONSIVE — LANDSCAPE & PORTRAIT
+   ============================================================ */
+
+/* Small tablets & large phones */
+@media (max-width: 1024px) {
+    .header-row-1 { flex-wrap: wrap; gap: 8px; }
+    .header-row-1 .left-part { flex: 1 1 100%; justify-content: flex-start; }
+    .header-row-1 .right-part { flex: 1 1 100%; justify-content: flex-start; flex-wrap: wrap; }
+    .header-row-1 .left-part .header-title { white-space: normal; font-size: 13px !important; }
+    
+    .header-row-2 { flex-direction: column; align-items: stretch; }
+    .header-row-2 .left-filters,
+    .header-row-2 .right-actions { justify-content: flex-start; }
+    
+    .header-with-logos .title-block { padding: 0 60px; }
+    .header-with-logos .title-block h1 { font-size: 15px; }
+    .header-with-logos .title-block p { font-size: 10px; }
+    
+    #logoMovable { width: 70px; height: 55px; }
+    
+    .entry-form-grid { grid-template-columns: 1fr 1fr; }
+    .entry-form-grid .add-btn { grid-column: span 2; }
+}
+
+/* Portrait phones */
+@media (max-width: 768px) {
+    :root { --base-font: 13px; --input-font: 15px; }
+    
+    .topbar { padding: 10px; border-radius: 8px; }
+    
+    .header-row-1 .left-part { gap: 6px; }
+    .header-row-1 .left-part .header-title { font-size: 12px !important; }
+    
+    .font-controls { padding: 3px 4px; }
+    .font-controls .font-btn { width: 22px; height: 22px; font-size: 11px; }
+    
+    .month-block { padding: 3px 6px; flex-wrap: wrap; }
+    .month-block label { font-size: 10px; }
+    .month-block input[type="month"] { font-size: 10px; padding: 2px 4px; }
+    .month-block button { font-size: 9px; padding: 2px 6px; }
+    
+    .user-menu-badge { font-size: 10px; padding: 3px 8px; }
+    
+    .header-row-2 .left-filters,
+    .header-row-2 .right-actions { 
+        gap: 5px; 
+        width: 100%;
+    }
+    .header-row-2 .right-actions button { 
+        font-size: 10px !important; 
+        padding: 5px 8px; 
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    
+    .date-picker-wrap.small { width: 140px !important; }
+    .date-picker-wrap.small .date-picker-display { font-size: 11px; padding: 4px 6px; }
+    
+    .header-with-logos { min-height: 70px; padding: 6px; }
+    .header-with-logos .title-block { padding: 0 50px; }
+    .header-with-logos .title-block h1 { font-size: 13px; letter-spacing: 0.5px; }
+    .header-with-logos .title-block p { font-size: 9px; line-height: 1.3; }
+    
+    #logoMovable { width: 55px; height: 45px; top: 5px; left: 5px; }
+    #logoMovable .placeholder { font-size: 8px; }
+    
+    /* Register table — horizontal scroll */
+    .register-sheet { padding: 8px !important; }
+    .register-sheet .overflow-x-auto { 
+        overflow-x: auto; 
+        -webkit-overflow-scrolling: touch;
+    }
+    .register-sheet table { min-width: 700px; }
+    .register-sheet th, .register-sheet td { 
+        padding: 4px 2px; 
+        font-size: 11px !important; 
+    }
+    .grid-input { font-size: 13px !important; padding: 5px 1px; }
+    
+    .register-sig-block { margin-top: 40px; padding-right: 20px; font-size: 13px; }
+    
+    /* Entry view */
+    .entry-form-card { padding: 12px; }
+    .entry-form-grid { grid-template-columns: 1fr; gap: 8px; }
+    .entry-form-grid .add-btn { grid-column: span 1; width: 100%; }
+    .entry-field label { font-size: 10px; }
+    .entry-field input, .entry-field select { font-size: 13px; padding: 8px 10px; }
+    
+    .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+    .dash-stat { padding: 8px; }
+    .dash-stat-icon { width: 34px; height: 34px; font-size: 14px; }
+    .dash-stat-value { font-size: 15px; }
+    .dash-stat-label { font-size: 9px; }
+    
+    .dash-firm-row { grid-template-columns: 1fr; gap: 3px; }
+    .dash-firm-name { font-size: 11px; }
+    .dash-firm-val { text-align: left; font-size: 11px; }
+    
+    .recent-row { padding: 6px 10px; }
+    .recent-row .rdate { font-size: 11px; min-width: 70px; padding: 2px 8px; }
+    .recent-row .rfirm { font-size: 11px; }
+    .recent-row .rqty { font-size: 12px; }
+    
+    .view-toggle button { padding: 6px 12px; font-size: 11px; }
+    
+    /* Modals */
+    .modal-box { max-width: 100% !important; max-height: 95vh; border-radius: 8px; }
+    .modal-body { padding: 10px 12px; }
+    .modal-header { padding: 10px 12px; }
+    .modal-header h2 { font-size: 14px; }
+    
+    .search-result-row { padding: 8px 10px; }
+    .search-result-row .date-badge { font-size: 13px; padding: 3px 8px; }
+    .zone-pill { font-size: 10px; padding: 2px 6px; }
+    
+    .layout-editor { padding: 10px; }
+    .slider-grid { grid-template-columns: 1fr; gap: 6px; }
+    
+    #reportPreviewContainer { padding: 8px; }
+    
+    #undoBar { 
+        padding: 8px 10px; 
+        gap: 8px; 
+        border-radius: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    #undoBar .undo-msg { font-size: 12px; }
+    #undoBar .undo-btn { padding: 6px 12px; font-size: 12px; }
+    #undoBar .undo-timer { font-size: 11px; padding: 3px 8px; }
+    
+    .login-card { padding: 24px 20px; }
+    .login-title h1 { font-size: 17px; }
+}
+
+/* Landscape phones (short height) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .topbar { padding: 8px; }
+    .header-row-1 { padding-bottom: 6px; margin-bottom: 6px; }
+    .header-with-logos { min-height: 60px; padding: 4px 8px; }
+    .header-with-logos .title-block h1 { font-size: 13px; }
+    .header-with-logos .title-block p { font-size: 9px; margin-top: 2px; }
+    #logoMovable { width: 60px; height: 45px; }
+    .register-sheet { padding: 8px !important; }
+    .entry-form-card { padding: 10px; margin-bottom: 10px; }
+    .dashboard-grid { padding: 8px; gap: 6px; }
+    .dash-stat { padding: 6px 8px; }
+    .dash-stat-icon { width: 32px; height: 32px; font-size: 13px; }
+    .dash-stat-value { font-size: 14px; }
+    
+    #loginScreen { padding: 8px; align-items: flex-start; padding-top: 20px; }
+    .login-card { padding: 18px; }
+    .login-title { margin-bottom: 14px; }
+    .login-title h1 { font-size: 15px; }
+    .login-input { padding: 8px 10px; font-size: 13px; }
+    
+    .modal-box { max-height: 96vh; }
+    .modal-body { padding: 8px 10px; }
+}
+
+/* Very small phones */
+@media (max-width: 400px) {
+    :root { --base-font: 12px; --input-font: 14px; }
+    
+    .header-row-1 .left-part .header-title { font-size: 11px !important; }
+    .header-with-logos .title-block { padding: 0 40px; }
+    .header-with-logos .title-block h1 { font-size: 11px; }
+    .header-with-logos .title-block p { font-size: 8px; }
+    
+    #logoMovable { width: 45px; height: 38px; }
+    
+    .dashboard-grid { grid-template-columns: 1fr; }
+    
+    .header-row-2 .right-actions button { font-size: 9px !important; padding: 4px 6px; }
+    
+    .register-sheet table { min-width: 620px; }
+    .register-sheet th, .register-sheet td { font-size: 10px !important; }
+    .grid-input { font-size: 12px !important; }
+    
+    .user-menu-badge span { max-width: 50px; overflow: hidden; text-overflow: ellipsis; }
+}
 </style>
 </head>
 <body>
@@ -1273,13 +1455,16 @@ input[type=number] { -moz-appearance: textfield; }
             <button onclick="closeAuditLog()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
         </div>
         <div class="modal-body">
-            <div class="flex justify-between items-center mb-3">
-                <div class="text-xs text-slate-600">अंतिम 200 गतिविधियाँ</div>
+            <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+                <div class="text-xs text-slate-600">
+                    <i class="fa-solid fa-list mr-1"></i>
+                    अंतिम 200 गतिविधियाँ
+                </div>
                 <button onclick="clearAuditLog()" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-1.5 rounded">
                     <i class="fa-solid fa-trash mr-1"></i> साफ़ करें
                 </button>
             </div>
-            <div id="auditList" class="space-y-2"></div>
+            <div id="auditList" class="space-y-2 max-h-[60vh] overflow-y-auto"></div>
         </div>
     </div>
 </div>
@@ -1459,6 +1644,8 @@ function dbClearSettings() {
 function dbAddAudit(action, details) {
     return new Promise((resolve) => {
         try {
+            if (!db || !dbReady) { resolve(false); return; }
+            
             const rec = {
                 timestamp: Date.now(),
                 user: session ? session.username : 'unknown',
@@ -1466,11 +1653,20 @@ function dbAddAudit(action, details) {
                 action: action || 'UNKNOWN',
                 details: details || ''
             };
+            
             const tx = db.transaction(STORE_AUDIT, 'readwrite');
             const store = tx.objectStore(STORE_AUDIT);
             const req = store.add(rec);
+            
             req.onsuccess = () => resolve(true);
-            req.onerror = (e) => { console.error('Audit add failed:', e); resolve(false); };
+            req.onerror = (e) => { 
+                console.error('Audit add failed:', e.target.error); 
+                resolve(false); 
+            };
+            tx.onerror = (e) => {
+                console.error('Audit tx error:', e.target.error);
+                resolve(false);
+            };
         } catch (e) {
             console.error('Audit exception:', e);
             resolve(false);
@@ -1479,14 +1675,37 @@ function dbAddAudit(action, details) {
 }
 function dbGetAuditLog(limit = 200) {
     return new Promise((resolve, reject) => {
-        const out = [];
-        const req = db.transaction(STORE_AUDIT, 'readonly').objectStore(STORE_AUDIT).index('timestamp').openCursor(null, 'prev');
-        req.onsuccess = (e) => {
-            const c = e.target.result;
-            if (c && out.length < limit) { out.push(c.value); c.continue(); }
-            else resolve(out);
-        };
-        req.onerror = () => reject(req.error);
+        try {
+            if (!db || !dbReady) { resolve([]); return; }
+            
+            const out = [];
+            const tx = db.transaction(STORE_AUDIT, 'readonly');
+            const store = tx.objectStore(STORE_AUDIT);
+            
+            let req;
+            try {
+                req = store.index('timestamp').openCursor(null, 'prev');
+            } catch (e) {
+                req = store.openCursor(null, 'prev');
+            }
+            
+            req.onsuccess = (e) => {
+                const c = e.target.result;
+                if (c && out.length < limit) { 
+                    out.push(c.value); 
+                    c.continue(); 
+                } else {
+                    resolve(out);
+                }
+            };
+            req.onerror = () => {
+                console.error('Audit get error:', req.error);
+                resolve([]);
+            };
+        } catch (e) {
+            console.error('Audit get exception:', e);
+            resolve([]);
+        }
     });
 }
 function dbClearAudit() {
@@ -1769,11 +1988,11 @@ async function attemptLogin() {
     }
     session = { username, role: username === 'admin' ? 'admin' : 'user', loginTime: Date.now() };
     try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
-    await dbAddAudit('LOGIN_SUCCESS', `${username} logged in`);
+    await dbAddAudit('LOGIN_SUCCESS', `${username} (${username === 'admin' ? 'Admin' : 'User'}) ने लॉगिन किया`);
     enterApp();
 }
 async function logout(silent) {
-    if (session) await dbAddAudit('LOGOUT', `${session.username} logged out`);
+    if (session) await dbAddAudit('LOGOUT', `${session.username} ने लॉगआउट किया`);
     session = null;
     try { localStorage.removeItem('jalkal_session'); } catch (e) {}
     if (autoLockTimer) clearTimeout(autoLockTimer);
@@ -3244,13 +3463,22 @@ async function testEmailSettings() {
 async function openAuditLog() {
     if (!session || session.role !== 'admin') return;
     document.getElementById("userDropdown").style.display = 'none';
-    const logs = await dbGetAuditLog(200);
+    
+    let logs = [];
+    try {
+        logs = await dbGetAuditLog(200);
+    } catch (e) {
+        console.error('Audit fetch error:', e);
+        logs = [];
+    }
+    
     const list = document.getElementById("auditList");
     
-    if (logs.length === 0) {
+    if (!logs || logs.length === 0) {
         list.innerHTML = `<div class="text-center py-10 text-slate-400">
             <i class="fa-solid fa-inbox text-3xl mb-2 block opacity-40"></i>
-            अभी कोई गतिविधि नहीं है। कुछ actions करें (login, save, entry) तो यहाँ दिखेंगे।
+            <p class="text-sm">अभी कोई गतिविधि नहीं है।</p>
+            <p class="text-xs mt-2">कुछ actions करें (login, save, entry) तो यहाँ दिखेंगे।</p>
         </div>`;
     } else {
         const actionLabels = {
@@ -3280,19 +3508,37 @@ async function openAuditLog() {
             EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
             CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
         };
+        
         list.innerHTML = logs.map(l => {
-            const dt = new Date(l.timestamp).toLocaleString('hi-IN');
-            const info = actionLabels[l.action] || { label: l.action, icon: 'fa-circle-info', color: 'text-slate-500', bg: 'bg-slate-50' };
-            const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+            let dt = '--';
+            try {
+                dt = new Date(l.timestamp).toLocaleString('hi-IN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+            } catch (e) {}
+            
+            const info = actionLabels[l.action] || { 
+                label: l.action || 'Unknown', 
+                icon: 'fa-circle-info', 
+                color: 'text-slate-500', 
+                bg: 'bg-slate-50' 
+            };
+            const badge = l.role === 'admin' 
+                ? 'bg-red-100 text-red-800' 
+                : 'bg-green-100 text-green-800';
+            
             return `
                 <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
-                    <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg"></i>
+                    <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg flex-shrink-0"></i>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-bold ${info.color}">${info.label}</span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">${l.user} (${l.role})</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">
+                                ${l.user || '?'} (${l.role || '?'})
+                            </span>
                         </div>
-                        ${l.details ? `<div class="text-xs text-slate-600 mt-1">${l.details}</div>` : ''}
+                        ${l.details ? `<div class="text-xs text-slate-600 mt-1 break-words">${l.details}</div>` : ''}
                         <div class="text-[10px] text-slate-400 mt-1">
                             <i class="fa-solid fa-clock mr-1"></i>${dt}
                         </div>
