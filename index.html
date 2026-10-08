@@ -9,6 +9,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, deleteDoc, writeBatch, serverTimestamp, addDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJx1Gv5KYHzJrz95svVLhfdr0Eax_Ig8o",
+    authDomain: "jalkalregister.firebaseapp.com",
+    projectId: "jalkalregister",
+    storageBucket: "jalkalregister.firebasestorage.app",
+    messagingSenderId: "716078078560",
+    appId: "1:716078078560:web:df35750578ea648b3d8105"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const fsdb = getFirestore(fbApp);
+
+  // Expose to global scope for non-module scripts
+  window.fsdb = fsdb;
+  window.fsFuncs = {
+    doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot,
+    deleteDoc, writeBatch, serverTimestamp, addDoc, orderBy, limit
+  };
+  window.firebaseReady = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 <style>
 :root {
     --base-font: 15px;
@@ -311,9 +338,6 @@ input[type=number] { -moz-appearance: textfield; }
 
 #printArea { display: none; }
 
-/* ============================================================
-   DATE PICKER — with calendar icon
-   ============================================================ */
 .date-picker-wrap {
     position: relative;
     display: flex;
@@ -386,9 +410,6 @@ input[type=number] { -moz-appearance: textfield; }
     opacity: 1 !important;
 }
 
-/* ============================================================
-   VIEW TOGGLE
-   ============================================================ */
 .view-toggle-bar { display: flex; justify-content: center; margin-bottom: 10px; }
 .view-toggle {
     display: inline-flex; background: #ffffff; border-radius: 25px; padding: 4px;
@@ -403,9 +424,6 @@ input[type=number] { -moz-appearance: textfield; }
 .view-toggle button.active { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
 .view-toggle button:not(.active):hover { background: #f1f5f9; color: #334155; }
 
-/* ============================================================
-   ENTRY VIEW
-   ============================================================ */
 #entryView {
     background: #fff; border-radius: 12px; padding: 16px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -450,7 +468,6 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .add-btn:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
 
-/* DASHBOARD */
 .dashboard-card {
     background: #fff; border: 1px solid #e2e8f0;
     border-radius: 12px; overflow: hidden; margin-bottom: 16px;
@@ -566,7 +583,6 @@ input[type=number] { -moz-appearance: textfield; }
     min-width: 120px;
 }
 
-/* LAYOUT EDITOR */
 .layout-editor { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 12px; color: #0f172a; }
 .layout-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .layout-editor-header h3 { font-size: 14px; font-weight: 800; color: #1e40af; display: flex; align-items: center; gap: 6px; }
@@ -611,143 +627,99 @@ input[type=number] { -moz-appearance: textfield; }
 #undoBar .undo-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: 14px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 #undoBar .undo-close { background: transparent; color: #64748b; border: none; font-size: 18px; cursor: pointer; padding: 4px 8px; }
 
-/* ============================================================
-   RESPONSIVE — LANDSCAPE & PORTRAIT
-   ============================================================ */
+/* Cloud sync indicator */
+.sync-indicator {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+    border: 1px solid;
+}
+.sync-indicator.online { background: #dcfce7; color: #166534; border-color: #86efac; }
+.sync-indicator.offline { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
+.sync-indicator.syncing { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
 
-/* Small tablets & large phones */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 1024px) {
     .header-row-1 { flex-wrap: wrap; gap: 8px; }
     .header-row-1 .left-part { flex: 1 1 100%; justify-content: flex-start; }
     .header-row-1 .right-part { flex: 1 1 100%; justify-content: flex-start; flex-wrap: wrap; }
     .header-row-1 .left-part .header-title { white-space: normal; font-size: 13px !important; }
-    
     .header-row-2 { flex-direction: column; align-items: stretch; }
     .header-row-2 .left-filters,
     .header-row-2 .right-actions { justify-content: flex-start; }
-    
     .header-with-logos .title-block { padding: 0 60px; }
     .header-with-logos .title-block h1 { font-size: 15px; }
     .header-with-logos .title-block p { font-size: 10px; }
-    
     #logoMovable { width: 70px; height: 55px; }
-    
     .entry-form-grid { grid-template-columns: 1fr 1fr; }
     .entry-form-grid .add-btn { grid-column: span 2; }
 }
-
-/* Portrait phones */
 @media (max-width: 768px) {
     :root { --base-font: 13px; --input-font: 15px; }
-    
     .topbar { padding: 10px; border-radius: 8px; }
-    
     .header-row-1 .left-part { gap: 6px; }
     .header-row-1 .left-part .header-title { font-size: 12px !important; }
-    
     .font-controls { padding: 3px 4px; }
     .font-controls .font-btn { width: 22px; height: 22px; font-size: 11px; }
-    
     .month-block { padding: 3px 6px; flex-wrap: wrap; }
     .month-block label { font-size: 10px; }
     .month-block input[type="month"] { font-size: 10px; padding: 2px 4px; }
     .month-block button { font-size: 9px; padding: 2px 6px; }
-    
     .user-menu-badge { font-size: 10px; padding: 3px 8px; }
-    
     .header-row-2 .left-filters,
-    .header-row-2 .right-actions { 
-        gap: 5px; 
-        width: 100%;
-    }
-    .header-row-2 .right-actions button { 
-        font-size: 10px !important; 
-        padding: 5px 8px; 
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-    
+    .header-row-2 .right-actions { gap: 5px; width: 100%; }
+    .header-row-2 .right-actions button { font-size: 10px !important; padding: 5px 8px; flex: 1 1 auto; min-width: 0; }
     .date-picker-wrap.small { width: 140px !important; }
     .date-picker-wrap.small .date-picker-display { font-size: 11px; padding: 4px 6px; }
-    
     .header-with-logos { min-height: 70px; padding: 6px; }
     .header-with-logos .title-block { padding: 0 50px; }
     .header-with-logos .title-block h1 { font-size: 13px; letter-spacing: 0.5px; }
     .header-with-logos .title-block p { font-size: 9px; line-height: 1.3; }
-    
     #logoMovable { width: 55px; height: 45px; top: 5px; left: 5px; }
     #logoMovable .placeholder { font-size: 8px; }
-    
-    /* Register table — horizontal scroll */
     .register-sheet { padding: 8px !important; }
-    .register-sheet .overflow-x-auto { 
-        overflow-x: auto; 
-        -webkit-overflow-scrolling: touch;
-    }
+    .register-sheet .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .register-sheet table { min-width: 700px; }
-    .register-sheet th, .register-sheet td { 
-        padding: 4px 2px; 
-        font-size: 11px !important; 
-    }
+    .register-sheet th, .register-sheet td { padding: 4px 2px; font-size: 11px !important; }
     .grid-input { font-size: 13px !important; padding: 5px 1px; }
-    
     .register-sig-block { margin-top: 40px; padding-right: 20px; font-size: 13px; }
-    
-    /* Entry view */
     .entry-form-card { padding: 12px; }
     .entry-form-grid { grid-template-columns: 1fr; gap: 8px; }
     .entry-form-grid .add-btn { grid-column: span 1; width: 100%; }
     .entry-field label { font-size: 10px; }
     .entry-field input, .entry-field select { font-size: 13px; padding: 8px 10px; }
-    
     .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
     .dash-stat { padding: 8px; }
     .dash-stat-icon { width: 34px; height: 34px; font-size: 14px; }
     .dash-stat-value { font-size: 15px; }
     .dash-stat-label { font-size: 9px; }
-    
     .dash-firm-row { grid-template-columns: 1fr; gap: 3px; }
     .dash-firm-name { font-size: 11px; }
     .dash-firm-val { text-align: left; font-size: 11px; }
-    
     .recent-row { padding: 6px 10px; }
     .recent-row .rdate { font-size: 11px; min-width: 70px; padding: 2px 8px; }
     .recent-row .rfirm { font-size: 11px; }
     .recent-row .rqty { font-size: 12px; }
-    
     .view-toggle button { padding: 6px 12px; font-size: 11px; }
-    
-    /* Modals */
     .modal-box { max-width: 100% !important; max-height: 95vh; border-radius: 8px; }
     .modal-body { padding: 10px 12px; }
     .modal-header { padding: 10px 12px; }
     .modal-header h2 { font-size: 14px; }
-    
     .search-result-row { padding: 8px 10px; }
     .search-result-row .date-badge { font-size: 13px; padding: 3px 8px; }
     .zone-pill { font-size: 10px; padding: 2px 6px; }
-    
     .layout-editor { padding: 10px; }
     .slider-grid { grid-template-columns: 1fr; gap: 6px; }
-    
     #reportPreviewContainer { padding: 8px; }
-    
-    #undoBar { 
-        padding: 8px 10px; 
-        gap: 8px; 
-        border-radius: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+    #undoBar { padding: 8px 10px; gap: 8px; border-radius: 10px; flex-wrap: wrap; justify-content: center; }
     #undoBar .undo-msg { font-size: 12px; }
     #undoBar .undo-btn { padding: 6px 12px; font-size: 12px; }
     #undoBar .undo-timer { font-size: 11px; padding: 3px 8px; }
-    
     .login-card { padding: 24px 20px; }
     .login-title h1 { font-size: 17px; }
 }
-
-/* Landscape phones (short height) */
 @media (max-height: 500px) and (orientation: landscape) {
     .topbar { padding: 8px; }
     .header-row-1 { padding-bottom: 6px; margin-bottom: 6px; }
@@ -761,36 +733,26 @@ input[type=number] { -moz-appearance: textfield; }
     .dash-stat { padding: 6px 8px; }
     .dash-stat-icon { width: 32px; height: 32px; font-size: 13px; }
     .dash-stat-value { font-size: 14px; }
-    
     #loginScreen { padding: 8px; align-items: flex-start; padding-top: 20px; }
     .login-card { padding: 18px; }
     .login-title { margin-bottom: 14px; }
     .login-title h1 { font-size: 15px; }
     .login-input { padding: 8px 10px; font-size: 13px; }
-    
     .modal-box { max-height: 96vh; }
     .modal-body { padding: 8px 10px; }
 }
-
-/* Very small phones */
 @media (max-width: 400px) {
     :root { --base-font: 12px; --input-font: 14px; }
-    
     .header-row-1 .left-part .header-title { font-size: 11px !important; }
     .header-with-logos .title-block { padding: 0 40px; }
     .header-with-logos .title-block h1 { font-size: 11px; }
     .header-with-logos .title-block p { font-size: 8px; }
-    
     #logoMovable { width: 45px; height: 38px; }
-    
     .dashboard-grid { grid-template-columns: 1fr; }
-    
     .header-row-2 .right-actions button { font-size: 9px !important; padding: 4px 6px; }
-    
     .register-sheet table { min-width: 620px; }
     .register-sheet th, .register-sheet td { font-size: 10px !important; }
     .grid-input { font-size: 12px !important; }
-    
     .user-menu-badge span { max-width: 50px; overflow: hidden; text-overflow: ellipsis; }
 }
 </style>
@@ -876,8 +838,8 @@ input[type=number] { -moz-appearance: textfield; }
         <div class="left-part">
             <i class="fa-solid fa-keyboard text-xl text-blue-600" style="flex-shrink:0;"></i>
             <span class="header-title">रजिस्टर सिस्टम - जलकल विभाग वाराणसी</span>
-            <span id="dbStatus" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300" style="flex-shrink:0;">
-                <i class="fa-solid fa-database mr-1"></i> DB: तैयार
+            <span id="cloudStatus" class="sync-indicator syncing" style="flex-shrink:0;">
+                <i class="fa-solid fa-cloud"></i> <span id="cloudStatusText">कनेक्ट हो रहा...</span>
             </span>
         </div>
         <div class="right-part">
@@ -917,6 +879,10 @@ input[type=number] { -moz-appearance: textfield; }
                 <button onclick="openAuditLog()" id="auditLogBtn">
                     <i class="fa-solid fa-history" style="color:#9333ea;"></i>
                     <span>गतिविधि लॉग</span>
+                </button>
+                <button onclick="openDevicesPanel()" id="devicesBtn">
+                    <i class="fa-solid fa-mobile-screen-button" style="color:#0891b2;"></i>
+                    <span>Devices & Login History</span>
                 </button>
                 <button onclick="logout()" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
@@ -972,7 +938,6 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 </div>
 
-<!-- VIEW TOGGLE -->
 <div class="max-w-6xl mx-auto mt-4">
     <div class="view-toggle-bar no-print">
         <div class="view-toggle">
@@ -986,7 +951,6 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 </div>
 
-<!-- ENTRY VIEW -->
 <div id="entryView" class="max-w-6xl mx-auto mb-6" style="display:none;">
     <div class="entry-form-card">
         <div class="entry-form-title">
@@ -1097,7 +1061,6 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 </div>
 
-<!-- REGISTER VIEW -->
 <div id="registerSheetWrapper" class="max-w-6xl mx-auto">
     <div id="registerSheet" class="register-card register-sheet bg-white p-4 sm:p-6 shadow-xl border border-slate-400 rounded-xl">
         <div class="header-with-logos" id="registerHeaderBox">
@@ -1136,6 +1099,76 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 </div>
 
+</div>
+
+<!-- DEVICES PANEL MODAL -->
+<div id="devicesModal" class="modal-backdrop no-print">
+    <div class="modal-box" style="max-width: 1100px;">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-mobile-screen-button text-cyan-600"></i>
+                <h2 class="font-bold">Devices & Login History</h2>
+            </div>
+            <button onclick="closeDevicesPanel()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
+        </div>
+        <div class="modal-body">
+            <div class="flex flex-wrap gap-2 mb-3 items-center">
+                <select id="deviceFilterUser" class="border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                    <option value="">सभी Users</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+                <select id="deviceFilterAction" class="border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                    <option value="">सभी Actions</option>
+                    <option value="LOGIN_SUCCESS">Login Success</option>
+                    <option value="LOGOUT">Logout</option>
+                    <option value="ENTRY_ADD">Entry Add</option>
+                    <option value="EDIT_RECORD">Edit</option>
+                    <option value="DELETE_RECORD">Delete</option>
+                    <option value="EXPORT_EXCEL">Excel Export</option>
+                    <option value="PRINT_PDF">PDF Print</option>
+                    <option value="REPORT_EXCEL">Report Excel</option>
+                    <option value="REPORT_PDF">Report PDF</option>
+                    <option value="BACKUP">Backup</option>
+                    <option value="RESTORE">Restore</option>
+                </select>
+                <input type="date" id="deviceFilterDate" class="border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
+                <button onclick="applyDeviceFilters()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-3 py-1.5 rounded text-sm">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+                <button onclick="clearDeviceFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded text-sm">Reset</button>
+                <button onclick="refreshDevicesPanel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded text-sm ml-auto">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                <div class="bg-blue-50 border border-blue-200 rounded p-2 text-center">
+                    <div class="text-[10px] font-bold text-blue-700 uppercase">Total Logins</div>
+                    <div id="statTotalLogins" class="text-lg font-black text-blue-900">0</div>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded p-2 text-center">
+                    <div class="text-[10px] font-bold text-emerald-700 uppercase">Unique Devices</div>
+                    <div id="statUniqueDevices" class="text-lg font-black text-emerald-900">0</div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded p-2 text-center">
+                    <div class="text-[10px] font-bold text-amber-700 uppercase">Active Users</div>
+                    <div id="statActiveUsers" class="text-lg font-black text-amber-900">0</div>
+                </div>
+                <div class="bg-purple-50 border border-purple-200 rounded p-2 text-center">
+                    <div class="text-[10px] font-bold text-purple-700 uppercase">Total Activities</div>
+                    <div id="statTotalActivities" class="text-lg font-black text-purple-900">0</div>
+                </div>
+            </div>
+
+            <div id="devicesList" class="space-y-2 max-h-[55vh] overflow-y-auto">
+                <div class="text-center py-8 text-slate-400">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+                    <p class="text-xs mt-2">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- SEARCH MODAL -->
@@ -1210,7 +1243,7 @@ input[type=number] { -moz-appearance: textfield; }
         <div class="modal-body">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">From Date (DD/MM/YYYY)</label>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">From Date</label>
                     <div class="date-picker-wrap" style="border-color:#cbd5e1; border-width:1px;">
                         <input type="text" id="reportFromDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly style="font-size:13px;padding:8px 10px;">
                         <input type="date" id="reportFromDate" class="date-picker-hidden">
@@ -1218,7 +1251,7 @@ input[type=number] { -moz-appearance: textfield; }
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">To Date (DD/MM/YYYY)</label>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">To Date</label>
                     <div class="date-picker-wrap" style="border-color:#cbd5e1; border-width:1px;">
                         <input type="text" id="reportToDateDisplay" class="date-picker-display" placeholder="DD/MM/YYYY" readonly style="font-size:13px;padding:8px 10px;">
                         <input type="date" id="reportToDate" class="date-picker-hidden">
@@ -1276,7 +1309,8 @@ input[type=number] { -moz-appearance: textfield; }
                         <option value="LTR">Letter</option>
                     </select>
                     <span id="pageDimBadge" style="margin-left:auto; font-size:11px; color:#1e40af; font-weight:800; padding:3px 10px; background:#eff6ff; border:1px solid #3b82f6; border-radius:20px;">
-                        --×-- mm                    </span>
+                        --×-- mm
+                    </span>
                 </div>
 
                 <div class="slider-grid">
@@ -1361,20 +1395,20 @@ input[type=number] { -moz-appearance: textfield; }
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
                     <div class="text-center mb-3"><i class="fa-solid fa-download text-emerald-600 text-3xl"></i></div>
-                    <h3 class="font-bold text-slate-800 text-center mb-1">बैकअप डाउनलोड</h3>
+                    <h3 class="font-bold text-slate-800 text-center mb-1">क्लाउड बैकअप</h3>
                     <div class="text-xs text-slate-700 mb-3 bg-white border border-slate-200 rounded p-2">
                         <div>कुल रिकॉर्ड: <strong id="backupRecordCount">0</strong></div>
                         <div>कुल महीने: <strong id="backupMonthCount">0</strong></div>
                     </div>
                     <button onclick="downloadBackup()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-sm">
-                        <i class="fa-solid fa-download mr-1"></i> डाउनलोड
+                        <i class="fa-solid fa-download mr-1"></i> JSON डाउनलोड
                     </button>
                 </div>
                 <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
                     <div class="text-center mb-3"><i class="fa-solid fa-upload text-blue-600 text-3xl"></i></div>
                     <h3 class="font-bold text-slate-800 text-center mb-1">बैकअप से वापस लाएँ</h3>
                     <div class="text-xs text-red-600 mb-3 bg-red-50 border border-red-200 rounded p-2 text-center">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> वर्तमान डेटा मिट जाएगा
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> सावधानी से
                     </div>
                     <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="handleRestoreFile(event)">
                     <button onclick="document.getElementById('restoreFileInput').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-sm">
@@ -1451,18 +1485,23 @@ input[type=number] { -moz-appearance: textfield; }
 <div id="auditModal" class="modal-backdrop no-print">
     <div class="modal-box" style="max-width: 900px;">
         <div class="modal-header">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग</h2></div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग (सभी Devices से)</h2></div>
             <button onclick="closeAuditLog()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
         </div>
         <div class="modal-body">
             <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
                 <div class="text-xs text-slate-600">
                     <i class="fa-solid fa-list mr-1"></i>
-                    अंतिम 200 गतिविधियाँ
+                    अंतिम 200 गतिविधियाँ (Cloud से)
                 </div>
-                <button onclick="clearAuditLog()" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-1.5 rounded">
-                    <i class="fa-solid fa-trash mr-1"></i> साफ़ करें
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="refreshAuditLog()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold px-3 py-1.5 rounded">
+                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                    </button>
+                    <button onclick="clearAuditLog()" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-1.5 rounded">
+                        <i class="fa-solid fa-trash mr-1"></i> साफ़ करें
+                    </button>
+                </div>
             </div>
             <div id="auditList" class="space-y-2 max-h-[60vh] overflow-y-auto"></div>
         </div>
@@ -1498,7 +1537,6 @@ input[type=number] { -moz-appearance: textfield; }
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
-<!-- UNDO BAR -->
 <div id="undoBar" class="no-print">
     <span class="undo-msg"><i class="fa-solid fa-rotate-left"></i> <span id="undoMsgText">बदलाव किया गया</span></span>
     <span class="undo-timer" id="undoTimer">15s</span>
@@ -1507,7 +1545,199 @@ input[type=number] { -moz-appearance: textfield; }
 </div>
 
 <script>
-/* FIRM LABELS */
+/* ============================================================
+   FIREBASE CLOUD SYNC WRAPPER
+   ============================================================ */
+let fsdb = null, fsFuncs = null, firebaseReady = false;
+window.addEventListener('firebase-ready', () => {
+    fsdb = window.fsdb;
+    fsFuncs = window.fsFuncs;
+    firebaseReady = true;
+    updateCloudStatus('online', 'Cloud: जुड़ गया');
+});
+
+function updateCloudStatus(status, text) {
+    const el = document.getElementById('cloudStatus');
+    const txt = document.getElementById('cloudStatusText');
+    if (!el || !txt) return;
+    el.className = 'sync-indicator ' + status;
+    txt.textContent = text;
+}
+
+/* ============================================================
+   DEVICE DETECTION
+   ============================================================ */
+function detectDevice() {
+    const ua = navigator.userAgent;
+    let deviceType = 'Desktop';
+    let os = 'Unknown';
+    let browser = 'Unknown';
+    
+    if (/Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+        if (/iPad|Tablet/i.test(ua)) deviceType = 'Tablet';
+        else deviceType = 'Mobile';
+    } else if (/Tablet|iPad/i.test(ua)) {
+        deviceType = 'Tablet';
+    } else {
+        deviceType = 'Desktop';
+    }
+    
+    if (/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+    else if (/Windows NT/.test(ua)) os = 'Windows';
+    else if (/Mac OS X/.test(ua)) os = 'macOS';
+    else if (/Android/.test(ua)) {
+        const m = ua.match(/Android\s([\d.]+)/);
+        os = 'Android ' + (m ? m[1] : '');
+    }
+    else if (/iPhone|iPad|iPod/.test(ua)) {
+        const m = ua.match(/OS\s(\d+_\d+)/);
+        os = 'iOS ' + (m ? m[1].replace('_', '.') : '');
+    }
+    else if (/Linux/.test(ua)) os = 'Linux';
+    
+    if (/Edg\//.test(ua)) browser = 'Edge';
+    else if (/OPR\/|Opera/.test(ua)) browser = 'Opera';
+    else if (/Chrome\//.test(ua)) browser = 'Chrome';
+    else if (/Safari\//.test(ua)) browser = 'Safari';
+    else if (/Firefox\//.test(ua)) browser = 'Firefox';
+    
+    return {
+        type: deviceType,
+        os: os,
+        browser: browser,
+        userAgent: ua.slice(0, 200),
+        screen: `${window.screen.width}x${window.screen.height}`,
+        language: navigator.language || 'unknown',
+        platform: navigator.platform || 'unknown',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'
+    };
+}
+
+/* ============================================================
+   FIRESTORE - RECORDS SYNC
+   ============================================================ */
+async function cloudPutRecord(y, m, d, data) {
+    if (!firebaseReady || !fsdb) return false;
+    try {
+        const { doc, setDoc } = fsFuncs;
+        const id = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        await setDoc(doc(fsdb, 'records', id), {
+            year: y, month: m, day: d,
+            col1: data.col1 || '', col2: data.col2 || '',
+            col3: data.col3 || '', col4: data.col4 || '',
+            updatedAt: Date.now(),
+            updatedBy: session ? session.username : 'unknown'
+        }, { merge: true });
+        return true;
+    } catch (e) { console.error('Cloud put error:', e); return false; }
+}
+async function cloudDeleteRecord(y, m, d) {
+    if (!firebaseReady || !fsdb) return false;
+    try {
+        const { doc, deleteDoc } = fsFuncs;
+        const id = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        await deleteDoc(doc(fsdb, 'records', id));
+        return true;
+    } catch (e) { console.error('Cloud delete error:', e); return false; }
+}
+async function cloudGetAllRecords() {
+    if (!firebaseReady || !fsdb) return [];
+    try {
+        const { collection, getDocs } = fsFuncs;
+        const snap = await getDocs(collection(fsdb, 'records'));
+        const out = [];
+        snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+        return out;
+    } catch (e) { console.error('Cloud get error:', e); return []; }
+}
+async function cloudGetMonthRecords(y, m) {
+    if (!firebaseReady || !fsdb) return {};
+    try {
+        const all = await cloudGetAllRecords();
+        const r = {};
+        all.forEach(rec => {
+            if (rec.year === y && rec.month === m) {
+                r[rec.day] = { col1: rec.col1, col2: rec.col2, col3: rec.col3, col4: rec.col4 };
+            }
+        });
+        return r;
+    } catch (e) { return {}; }
+}
+
+/* ============================================================
+   FIRESTORE - AUDIT LOG (with device info)
+   ============================================================ */
+async function dbAddAudit(action, details) {
+    const dev = detectDevice();
+    const rec = {
+        timestamp: Date.now(),
+        serverTime: new Date().toISOString(),
+        user: session ? session.username : 'unknown',
+        role: session ? session.role : 'unknown',
+        action: action || 'UNKNOWN',
+        details: details || '',
+        device: dev,
+        pageUrl: location.href,
+        sessionId: session ? session.sessionId : null
+    };
+    
+    // Local IndexedDB
+    try {
+        const tx = db.transaction(STORE_AUDIT, 'readwrite');
+        tx.objectStore(STORE_AUDIT).add(rec);
+    } catch (e) {}
+    
+    // Cloud Firestore
+    if (firebaseReady && fsdb) {
+        try {
+            const { addDoc, collection } = fsFuncs;
+            await addDoc(collection(fsdb, 'audit'), rec);
+            updateCloudStatus('online', 'Cloud: सिंक ✓');
+        } catch (e) {
+            console.error('Cloud audit error:', e);
+            updateCloudStatus('offline', 'Cloud: ऑफलाइन');
+        }
+    }
+    return true;
+}
+async function cloudGetAuditLog(limit = 200) {
+    if (!firebaseReady || !fsdb) return [];
+    try {
+        const { collection, query, orderBy, limit: lim, getDocs } = fsFuncs;
+        const q = query(collection(fsdb, 'audit'), orderBy('timestamp', 'desc'), lim(limit));
+        const snap = await getDocs(q);
+        const out = [];
+        snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+        return out;
+    } catch (e) { 
+        console.error('Cloud audit get error:', e);
+        return [];
+    }
+}
+
+/* ============================================================
+   FIRESTORE - USER PASSWORDS SYNC
+   ============================================================ */
+async function cloudGetSetting(key) {
+    if (!firebaseReady || !fsdb) return null;
+    try {
+        const { doc, getDoc } = fsFuncs;
+        const snap = await getDoc(doc(fsdb, 'settings', key));
+        return snap.exists() ? snap.data().value : null;
+    } catch (e) { return null; }
+}
+async function cloudSetSetting(key, value) {
+    if (!firebaseReady || !fsdb) return false;
+    try {
+        const { doc, setDoc } = fsFuncs;
+        await setDoc(doc(fsdb, 'settings', key), { value, updatedAt: Date.now() });
+        return true;
+    } catch (e) { return false; }
+}
+
+/* ============================================================
+   FIRM LABELS
+   ============================================================ */
 const FIRM_LABELS = {
     col1: { short: 'मे० ओम साँई', zone: 'वरूणा/सारनाथ', full: 'मे० ओम साँई (वरूणा/सारनाथ जोन)' },
     col2: { short: 'मे० संकेत कन्स्ट्रक्शन', zone: 'रामनगर/आदमपुर', full: 'मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)' },
@@ -1641,73 +1871,6 @@ function dbClearSettings() {
         req.onerror = () => reject(req.error);
     });
 }
-function dbAddAudit(action, details) {
-    return new Promise((resolve) => {
-        try {
-            if (!db || !dbReady) { resolve(false); return; }
-            
-            const rec = {
-                timestamp: Date.now(),
-                user: session ? session.username : 'unknown',
-                role: session ? session.role : 'unknown',
-                action: action || 'UNKNOWN',
-                details: details || ''
-            };
-            
-            const tx = db.transaction(STORE_AUDIT, 'readwrite');
-            const store = tx.objectStore(STORE_AUDIT);
-            const req = store.add(rec);
-            
-            req.onsuccess = () => resolve(true);
-            req.onerror = (e) => { 
-                console.error('Audit add failed:', e.target.error); 
-                resolve(false); 
-            };
-            tx.onerror = (e) => {
-                console.error('Audit tx error:', e.target.error);
-                resolve(false);
-            };
-        } catch (e) {
-            console.error('Audit exception:', e);
-            resolve(false);
-        }
-    });
-}
-function dbGetAuditLog(limit = 200) {
-    return new Promise((resolve, reject) => {
-        try {
-            if (!db || !dbReady) { resolve([]); return; }
-            
-            const out = [];
-            const tx = db.transaction(STORE_AUDIT, 'readonly');
-            const store = tx.objectStore(STORE_AUDIT);
-            
-            let req;
-            try {
-                req = store.index('timestamp').openCursor(null, 'prev');
-            } catch (e) {
-                req = store.openCursor(null, 'prev');
-            }
-            
-            req.onsuccess = (e) => {
-                const c = e.target.result;
-                if (c && out.length < limit) { 
-                    out.push(c.value); 
-                    c.continue(); 
-                } else {
-                    resolve(out);
-                }
-            };
-            req.onerror = () => {
-                console.error('Audit get error:', req.error);
-                resolve([]);
-            };
-        } catch (e) {
-            console.error('Audit get exception:', e);
-            resolve([]);
-        }
-    });
-}
 function dbClearAudit() {
     return new Promise((resolve, reject) => {
         const req = db.transaction(STORE_AUDIT, 'readwrite').objectStore(STORE_AUDIT).clear();
@@ -1723,27 +1886,52 @@ async function hashPassword(password, salt) {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 async function ensureDefaultUsers() {
-    if (!await dbGetSetting('user_admin_hash')) {
+    // Try cloud first
+    let adminHash = await cloudGetSetting('user_admin_hash');
+    let adminSalt = await cloudGetSetting('user_admin_salt');
+    if (!adminHash) {
         const salt = 'admin_salt_' + Math.random().toString(36).slice(2);
-        await dbSetSetting('user_admin_hash', await hashPassword('jalkal@admin', salt));
+        const hash = await hashPassword('jalkal@admin', salt);
+        await dbSetSetting('user_admin_hash', hash);
         await dbSetSetting('user_admin_salt', salt);
+        await cloudSetSetting('user_admin_hash', hash);
+        await cloudSetSetting('user_admin_salt', salt);
+    } else {
+        await dbSetSetting('user_admin_hash', adminHash);
+        await dbSetSetting('user_admin_salt', adminSalt);
     }
-    if (!await dbGetSetting('user_user_hash')) {
+    
+    let userHash = await cloudGetSetting('user_user_hash');
+    let userSalt = await cloudGetSetting('user_user_salt');
+    if (!userHash) {
         const salt = 'user_salt_' + Math.random().toString(36).slice(2);
-        await dbSetSetting('user_user_hash', await hashPassword('jalkal@user', salt));
+        const hash = await hashPassword('jalkal@user', salt);
+        await dbSetSetting('user_user_hash', hash);
         await dbSetSetting('user_user_salt', salt);
+        await cloudSetSetting('user_user_hash', hash);
+        await cloudSetSetting('user_user_salt', salt);
+    } else {
+        await dbSetSetting('user_user_hash', userHash);
+        await dbSetSetting('user_user_salt', userSalt);
     }
 }
 async function verifyPassword(username, password) {
-    const h = await dbGetSetting(`user_${username}_hash`);
-    const s = await dbGetSetting(`user_${username}_salt`);
+    let h = await cloudGetSetting(`user_${username}_hash`);
+    let s = await cloudGetSetting(`user_${username}_salt`);
+    if (!h) {
+        h = await dbGetSetting(`user_${username}_hash`);
+        s = await dbGetSetting(`user_${username}_salt`);
+    }
     if (!h || !s) return false;
     return (await hashPassword(password, s)) === h;
 }
 async function setUserPassword(username, newPassword) {
-    const s = (await dbGetSetting(`user_${username}_salt`)) || ('salt_' + Math.random().toString(36).slice(2));
+    const s = 'salt_' + Math.random().toString(36).slice(2);
+    const hash = await hashPassword(newPassword, s);
     await dbSetSetting(`user_${username}_salt`, s);
-    await dbSetSetting(`user_${username}_hash`, await hashPassword(newPassword, s));
+    await dbSetSetting(`user_${username}_hash`, hash);
+    await cloudSetSetting(`user_${username}_salt`, s);
+    await cloudSetSetting(`user_${username}_hash`, hash);
 }
 
 /* EMAIL */
@@ -1835,39 +2023,31 @@ async function performUndo() {
     try {
         if (snap.type === 'edit' || snap.type === 'delete' || snap.type === 'entryAdd') {
             const { year, month, day, data } = snap.snapshot;
-            if (data) await dbPutRecord(year, month, day, data);
-            else await dbDeleteRecord(year, month, day);
+            if (data) {
+                await dbPutRecord(year, month, day, data);
+                await cloudPutRecord(year, month, day, data);
+            } else {
+                await dbDeleteRecord(year, month, day);
+                await cloudDeleteRecord(year, month, day);
+            }
             await dbAddAudit('UNDO', `Undo ${snap.type} — ${formatDateLongDDMMYYYY(year,month,day)}`);
         } else if (snap.type === 'month') {
             const { year, month, records } = snap.snapshot;
             const allRecs = await dbGetAllRecords();
             for (const r of allRecs) {
-                if (r.year === year && r.month === month) await dbDeleteRecord(r.year, r.month, r.day);
+                if (r.year === year && r.month === month) {
+                    await dbDeleteRecord(r.year, r.month, r.day);
+                    await cloudDeleteRecord(r.year, r.month, r.day);
+                }
             }
             for (const day in records) {
                 const d = records[day];
-                if (d && (d.col1 || d.col2 || d.col3 || d.col4)) await dbPutRecord(year, month, parseInt(day), d);
+                if (d && (d.col1 || d.col2 || d.col3 || d.col4)) {
+                    await dbPutRecord(year, month, parseInt(day), d);
+                    await cloudPutRecord(year, month, parseInt(day), d);
+                }
             }
             await dbAddAudit('UNDO', `Undo month ${year}-${month}`);
-        } else if (snap.type === 'restore') {
-            await dbClearRecords();
-            const tx = db.transaction(STORE_RECORDS, 'readwrite');
-            const st = tx.objectStore(STORE_RECORDS);
-            snap.snapshot.records.forEach(r => st.put(r));
-            await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
-            await dbAddAudit('UNDO', 'Undo restore');
-        } else if (snap.type === 'clearall') {
-            const tx = db.transaction(STORE_RECORDS, 'readwrite');
-            const st = tx.objectStore(STORE_RECORDS);
-            snap.snapshot.records.forEach(r => st.put(r));
-            await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
-            await dbAddAudit('UNDO', 'Undo clear all');
-        } else if (snap.type === 'logopos') {
-            const p = snap.snapshot.position;
-            logoPosition = { x: p.x, y: p.y, width: p.width, height: p.height };
-            applyLogoPosition();
-            await saveLogoPosition();
-            await dbAddAudit('UNDO', 'Undo logo position');
         }
         if (document.getElementById("searchModal").classList.contains("show")) runSearch();
         await renderTable();
@@ -1986,7 +2166,13 @@ async function attemptLogin() {
         showToast('गलत username या password', "danger");
         return;
     }
-    session = { username, role: username === 'admin' ? 'admin' : 'user', loginTime: Date.now() };
+    session = { 
+        username, 
+        role: username === 'admin' ? 'admin' : 'user', 
+        loginTime: Date.now(),
+        sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9),
+        device: detectDevice()
+    };
     try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
     await dbAddAudit('LOGIN_SUCCESS', `${username} (${username === 'admin' ? 'Admin' : 'User'}) ने लॉगिन किया`);
     enterApp();
@@ -2013,6 +2199,7 @@ function enterApp() {
     document.getElementById("saveBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("backupBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("auditLogBtn").style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById("devicesBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("emailSettingsBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("resetLogoBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("viewOnlyBanner").style.display = isAdmin ? 'none' : 'block';
@@ -2048,6 +2235,10 @@ async function initAppContent() {
     const savedScale = await dbGetSetting('font_scale');
     if (savedScale) fontScale = parseInt(savedScale) || 100;
     cachedLogo = await dbGetSetting('logo_main');
+    if (!cachedLogo) {
+        cachedLogo = await cloudGetSetting('logo_main');
+        if (cachedLogo) await dbSetSetting('logo_main', cachedLogo);
+    }
     applyFontScale();
     await loadLogoPosition();
     if (cachedLogo) applyLogo(cachedLogo);
@@ -2119,13 +2310,13 @@ async function initAppContent() {
         if (el) el.addEventListener('input', onLayoutSliderChange);
     });
 
-    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => {
+    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener("click", (e) => { if (e.target.id === id) el.classList.remove("show"); });
     });
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-            ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => {
+            ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove("show");
             });
@@ -2283,6 +2474,7 @@ async function addNewEntry() {
     const before = { ...dayData };
     dayData[firm] = String(qty);
     await dbPutRecord(y, m, d, dayData);
+    await cloudPutRecord(y, m, d, dayData);
     await dbAddAudit('ENTRY_ADD', `${formatDateLongDDMMYYYY(y,m,d)} — ${FIRM_LABELS[firm].short} = ${qty} ली०`);
     showToast('✓ एंट्री जोड़ दी!', "success");
     pushUndo('entryAdd', { year: y, month: m, day: d, data: before }, 'एंट्री जोड़ी — वापस लाएँ?');
@@ -2311,7 +2503,6 @@ function goToToday() {
 let logoDragState = null;
 let logoResizeState = null;
 let logoPosition = { x: 10, y: 8, width: 90, height: 70 };
-let logoPosBeforeDrag = null;
 
 async function loadLogoPosition() {
     const saved = await dbGetSetting('logo_position');
@@ -2343,7 +2534,6 @@ function startLogoDrag(e) {
     e.preventDefault();
     const el = document.getElementById('logoMovable');
     if (!el) return;
-    logoPosBeforeDrag = { ...logoPosition };
     const elRect = el.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -2383,7 +2573,6 @@ async function onLogoDragEnd() {
     document.removeEventListener('touchmove', onLogoDragMove);
     document.removeEventListener('touchend', onLogoDragEnd);
     await saveLogoPosition();
-    logoPosBeforeDrag = null;
 }
 function startLogoResize(e) {
     if (!session || session.role !== 'admin') return;
@@ -2455,6 +2644,7 @@ async function handleLogoFile(e) {
         const url = ev.target.result;
         cachedLogo = url;
         await dbSetSetting('logo_main', url);
+        await cloudSetSetting('logo_main', url);
         applyLogo(url);
         await dbAddAudit('LOGO_UPLOAD', 'Logo uploaded');
         showToast('✓ लोगो लगा दिया', "success");
@@ -2476,6 +2666,7 @@ async function removeLogo(event) {
     if (!confirm("Logo remove?")) return;
     cachedLogo = null;
     await dbSetSetting('logo_main', null);
+    await cloudSetSetting('logo_main', null);
     const el = document.getElementById('logoMovable');
     if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
     await dbAddAudit('LOGO_REMOVE', 'Logo removed');
@@ -2495,35 +2686,8 @@ function applyFontScale() {
     document.querySelectorAll('.grid-input').forEach(el => {
         el.style.fontSize = (17 * scale) + 'px';
     });
-    const headerMain = document.querySelector('.header-with-logos .title-block h1');
-    if (headerMain) headerMain.style.fontSize = (18 * scale) + 'px';
-    const headerSub = document.querySelector('.header-with-logos .title-block p');
-    if (headerSub) headerSub.style.fontSize = (12 * scale) + 'px';
-    const headerTitle = document.querySelector('.header-title');
-    if (headerTitle) headerTitle.style.fontSize = (14 * scale) + 'px';
-    document.querySelectorAll('.entry-form-title').forEach(el => el.style.fontSize = (15 * scale) + 'px');
-    document.querySelectorAll('.entry-field label').forEach(el => el.style.fontSize = (11 * scale) + 'px');
-    document.querySelectorAll('.entry-field input, .entry-field select').forEach(el => el.style.fontSize = (14 * scale) + 'px');
-    document.querySelectorAll('.add-btn').forEach(el => el.style.fontSize = (14 * scale) + 'px');
-    document.querySelectorAll('.dashboard-header h3').forEach(el => el.style.fontSize = (14 * scale) + 'px');
-    document.querySelectorAll('.dash-stat-value').forEach(el => el.style.fontSize = (18 * scale) + 'px');
-    document.querySelectorAll('.dash-stat-label').forEach(el => el.style.fontSize = (10 * scale) + 'px');
-    document.querySelectorAll('.dash-firm-name').forEach(el => el.style.fontSize = (12 * scale) + 'px');
-    document.querySelectorAll('.dash-firm-val').forEach(el => el.style.fontSize = (13 * scale) + 'px');
-    document.querySelectorAll('.recent-row .rdate').forEach(el => el.style.fontSize = (12 * scale) + 'px');
-    document.querySelectorAll('.recent-row .rfirm').forEach(el => el.style.fontSize = (12 * scale) + 'px');
-    document.querySelectorAll('.recent-row .rqty').forEach(el => el.style.fontSize = (13 * scale) + 'px');
-    document.querySelectorAll('.view-toggle button').forEach(el => el.style.fontSize = (13 * scale) + 'px');
     const badge = document.getElementById("fontSizeBadge");
     if (badge) badge.innerText = fontScale + "%";
-    setTimeout(() => {
-        document.querySelectorAll('.register-sheet th, .register-sheet td').forEach(el => {
-            el.style.fontSize = (15 * scale) + 'px';
-        });
-        document.querySelectorAll('.grid-input').forEach(el => {
-            el.style.fontSize = (17 * scale) + 'px';
-        });
-    }, 100);
 }
 function changeFontSize(dir) {
     const ns = fontScale + (dir * 10);
@@ -2533,7 +2697,6 @@ function changeFontSize(dir) {
     dbSetSetting('font_scale', fontScale);
 }
 
-/* DATE HELPERS */
 function setupDateInputConstraints() {
     const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
     const mm = String(currentMonth).padStart(2, '0');
@@ -2541,10 +2704,6 @@ function setupDateInputConstraints() {
     const maxDate = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
     const fromInput = document.getElementById("fromDate");
     const toInput = document.getElementById("toDate");
-    fromInput.removeAttribute("min");
-    fromInput.removeAttribute("max");
-    toInput.removeAttribute("min");
-    toInput.removeAttribute("max");
     if (!fromInput.value) fromInput.value = minDate;
     if (!toInput.value) toInput.value = maxDate;
     syncDateDisplay('fromDate', 'fromDateDisplay');
@@ -2573,16 +2732,13 @@ async function applyDateFilter() {
         document.getElementById("filterSubtitle").innerText = `फ़िल्टर: ${formatDateShortDDMMYY(fromY, fromM, fromDay)} - ${formatDateShortDDMMYY(toY, toM, toDay)}`;
         renderTable();
         renderEntryView();
-        showToast(`फ़िल्टर लागू: ${formatDateShortDDMMYY(fromY, fromM, fromDay)} - ${formatDateShortDDMMYY(toY, toM, toDay)}`, "info");
+        showToast(`फ़िल्टर लागू`, "info");
     } else {
         document.getElementById("reportFromDate").value = fv;
         document.getElementById("reportToDate").value = tv;
         syncDateDisplay('reportFromDate', 'reportFromDateDisplay');
         syncDateDisplay('reportToDate', 'reportToDateDisplay');
-        document.getElementById("reportFirm").value = "all";
-        document.getElementById("reportFormat").value = "full";
         document.getElementById("reportModal").classList.add("show");
-        showToast('अलग-अलग महीनों की range — Report खोल दी', "info");
         applyLayoutToUI();
         setTimeout(() => previewReport(), 200);
     }
@@ -2591,10 +2747,8 @@ function resetDateFilter() {
     activeFilter = null;
     const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
     const mm = String(currentMonth).padStart(2, '0');
-    const minDate = `${currentYear}-${mm}-01`;
-    const maxDate = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
-    document.getElementById("fromDate").value = minDate;
-    document.getElementById("toDate").value = maxDate;
+    document.getElementById("fromDate").value = `${currentYear}-${mm}-01`;
+    document.getElementById("toDate").value = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
     syncDateDisplay('fromDate', 'fromDateDisplay');
     syncDateDisplay('toDate', 'toDateDisplay');
     document.getElementById("filterSubtitle").innerText = "";
@@ -2678,8 +2832,13 @@ async function saveData(silent = false) {
             const c2 = document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value || '';
             const c3 = document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value || '';
             const c4 = document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value || '';
-            if (c1||c2||c3||c4) await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
-            else await dbDeleteRecord(currentYear, currentMonth, day);
+            if (c1||c2||c3||c4) {
+                await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+                await cloudPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+            } else {
+                await dbDeleteRecord(currentYear, currentMonth, day);
+                await cloudDeleteRecord(currentYear, currentMonth, day);
+            }
         }
         if (!silent) {
             await dbAddAudit('SAVE_DATA', `${currentYear}-${currentMonth} month saved`);
@@ -2793,6 +2952,7 @@ async function deleteRecord(y, m, d) {
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec3 = (await dbGetMonthRecords(y, m))[d] || null;
     await dbDeleteRecord(y, m, d);
+    await cloudDeleteRecord(y, m, d);
     await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(y,m,d)} deleted`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year: y, month: m, day: d, data: oldRec3 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
@@ -2834,8 +2994,13 @@ async function saveFromEdit() {
     const c2 = document.getElementById("editCol2").value;
     const c3 = document.getElementById("editCol3").value;
     const c4 = document.getElementById("editCol4").value;
-    if (c1||c2||c3||c4) await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
-    else await dbDeleteRecord(year, month, day);
+    if (c1||c2||c3||c4) {
+        await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+        await cloudPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+    } else {
+        await dbDeleteRecord(year, month, day);
+        await cloudDeleteRecord(year, month, day);
+    }
     await dbAddAudit('EDIT_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} updated`);
     showToast('✓ रिकॉर्ड अपडेट!', "success");
     pushUndo('edit', { year, month, day, data: oldRec }, 'रिकॉर्ड संपादित — वापस लाएँ?');
@@ -2849,6 +3014,7 @@ async function deleteFromEdit() {
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec2 = (await dbGetMonthRecords(year, month))[day] || null;
     await dbDeleteRecord(year, month, day);
+    await cloudDeleteRecord(year, month, day);
     await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} deleted via edit`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year, month, day, data: oldRec2 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
@@ -2920,7 +3086,6 @@ function printHtmlViaIframe(htmlContent, onDone) {
         .header-with-logos .title-block { flex:1; text-align:center; padding:0 90px; }
         .header-with-logos .title-block h1 { font-family:'Times New Roman',serif; font-size:${L.fontSize+4}px; font-weight:bold; letter-spacing:1px; margin:0; text-transform:uppercase; }
         .header-with-logos .title-block p { font-size:${L.fontSize}px; font-weight:700; margin:3px 0 0; line-height:1.4; }
-        .header-with-logos .logo-slot img { max-width:100%; max-height:100%; object-fit:contain; }
         table { width:100%; border-collapse:collapse; table-layout:fixed; }
         th, td { border:1px solid #000; padding:${L.rowPad}px 4px; font-size:${L.fontSize}px; text-align:center; vertical-align:middle; line-height:1.3; color:#000; background:#fff; font-weight:600; word-wrap:break-word; }
         thead th { font-weight:700; background:#f5f5f5; }
@@ -2935,17 +3100,7 @@ function printHtmlViaIframe(htmlContent, onDone) {
         try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch (e) {}
         setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); if (typeof onDone === 'function') onDone(); }, 1500);
     };
-    const imgs = doc.querySelectorAll('img');
-    if (imgs.length === 0) setTimeout(doPrint, 200);
-    else {
-        let pending = imgs.length, fired = false;
-        const done = () => { if (!fired) { fired = true; setTimeout(doPrint, 200); } };
-        imgs.forEach(img => {
-            if (img.complete) { pending--; if (pending === 0) done(); }
-            else { img.onload = () => { pending--; if (pending===0) done(); }; img.onerror = () => { pending--; if (pending===0) done(); }; }
-        });
-        setTimeout(done, 1500);
-    }
+    setTimeout(doPrint, 500);
 }
 
 function buildCloneHtml() {
@@ -2993,7 +3148,7 @@ function buildCloneHtml() {
 }
 
 async function printPDF() {
-    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
+    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     const htmlContent = buildCloneHtml();
     await dbAddAudit('PRINT_PDF', `${currentYear}-${currentMonth} PDF`);
@@ -3350,23 +3505,23 @@ function cancelRestore() {
 async function confirmRestore() {
     if (!pendingRestore) return;
     try {
-        const beforeRestoreRecords = await dbGetAllRecords();
         await dbClearRecords(); await dbClearSettings();
-        const tx = db.transaction(STORE_RECORDS, 'readwrite');
-        const st = tx.objectStore(STORE_RECORDS);
-        pendingRestore.records.forEach(r => st.put(r));
-        await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+        for (const r of pendingRestore.records) {
+            await dbPutRecord(r.year, r.month, r.day, r);
+            await cloudPutRecord(r.year, r.month, r.day, r);
+        }
         if (pendingRestore.settings) {
-            const tx2 = db.transaction(STORE_SETTINGS, 'readwrite');
-            const s2 = tx2.objectStore(STORE_SETTINGS);
-            pendingRestore.settings.forEach(s => { if (s.value != null) s2.put(s); });
-            await new Promise((res, rej) => { tx2.oncomplete = res; tx2.onerror = () => rej(tx2.error); });
+            for (const s of pendingRestore.settings) {
+                if (s.value != null) {
+                    await dbSetSetting(s.key, s.value);
+                    await cloudSetSetting(s.key, s.value);
+                }
+            }
         }
         cachedLogo = await dbGetSetting('logo_main');
         await loadLogoPosition();
         if (cachedLogo) applyLogo(cachedLogo);
         await dbAddAudit('RESTORE', `${pendingRestore.records.length} records restored`);
-        pushUndo('restore', { records: beforeRestoreRecords }, 'रीस्टोर — वापस लाएँ?');
         cancelRestore(); closeBackupModal();
         await renderTable(); await renderEntryView();
         showToast(`✓ रिकॉर्ड रीस्टोर: ${pendingRestore.records.length}`, "success");
@@ -3376,15 +3531,17 @@ async function clearAllData() {
     if (!session || session.role !== 'admin') return;
     if (!confirm("सारा डेटा मिटाएँ?")) return;
     if (!confirm("पक्का?")) return;
-    const beforeRecs = await dbGetAllRecords();
-    const beforeSettings = await dbGetAllSettings();
-    await dbClearRecords(); await dbClearSettings();
+    const allRecs = await dbGetAllRecords();
+    for (const r of allRecs) {
+        await dbDeleteRecord(r.year, r.month, r.day);
+        await cloudDeleteRecord(r.year, r.month, r.day);
+    }
+    await dbClearSettings();
     cachedLogo = null;
     const el = document.getElementById('logoMovable');
     if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
     fontScale = 100; applyFontScale();
     await dbAddAudit('CLEAR_ALL', 'All data cleared');
-    pushUndo('clearall', { records: beforeRecs, settings: beforeSettings }, 'डेटा मिटाया — वापस लाएँ?');
     await renderTable(); await renderEntryView(); closeBackupModal();
     showToast('सारा डेटा मिटा', "danger");
 }
@@ -3459,94 +3616,104 @@ async function testEmailSettings() {
     }
 }
 
-/* AUDIT LOG */
+/* AUDIT LOG - from Cloud */
+async function refreshAuditLog() {
+    openAuditLog();
+}
 async function openAuditLog() {
     if (!session || session.role !== 'admin') return;
     document.getElementById("userDropdown").style.display = 'none';
-    
-    let logs = [];
-    try {
-        logs = await dbGetAuditLog(200);
-    } catch (e) {
-        console.error('Audit fetch error:', e);
-        logs = [];
-    }
-    
     const list = document.getElementById("auditList");
+    list.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="text-xs mt-2">Cloud से लोड हो रहा...</p></div>`;
+    document.getElementById("auditModal").classList.add("show");
+    
+    let logs = await cloudGetAuditLog(200);
+    
+    if (!logs || logs.length === 0) {
+        // fallback to local
+        logs = await new Promise((resolve) => {
+            const out = [];
+            const req = db.transaction(STORE_AUDIT, 'readonly').objectStore(STORE_AUDIT).index('timestamp').openCursor(null, 'prev');
+            req.onsuccess = (e) => {
+                const c = e.target.result;
+                if (c && out.length < 200) { out.push(c.value); c.continue(); }
+                else resolve(out);
+            };
+            req.onerror = () => resolve([]);
+        });
+    }
     
     if (!logs || logs.length === 0) {
         list.innerHTML = `<div class="text-center py-10 text-slate-400">
             <i class="fa-solid fa-inbox text-3xl mb-2 block opacity-40"></i>
             <p class="text-sm">अभी कोई गतिविधि नहीं है।</p>
-            <p class="text-xs mt-2">कुछ actions करें (login, save, entry) तो यहाँ दिखेंगे।</p>
         </div>`;
-    } else {
-        const actionLabels = {
-            LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
-            LOGIN_FAIL: { label: 'लॉगिन असफल', icon: 'fa-times-circle', color: 'text-red-600', bg: 'bg-red-50' },
-            LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
-            AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
-            SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
-            EDIT_RECORD: { label: 'रिकॉर्ड संपादित', icon: 'fa-pen', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            DELETE_RECORD: { label: 'रिकॉर्ड हटाया', icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-50' },
-            ENTRY_ADD: { label: 'नई एंट्री', icon: 'fa-plus-circle', color: 'text-emerald-700', bg: 'bg-emerald-50' },
-            EXPORT_EXCEL: { label: 'Excel निर्यात', icon: 'fa-file-excel', color: 'text-green-700', bg: 'bg-green-50' },
-            PRINT_PDF: { label: 'PDF बनाया', icon: 'fa-file-pdf', color: 'text-red-700', bg: 'bg-red-50' },
-            REPORT_EXCEL: { label: 'रिपोर्ट Excel', icon: 'fa-file-excel', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-            REPORT_PDF: { label: 'रिपोर्ट PDF', icon: 'fa-file-pdf', color: 'text-indigo-700', bg: 'bg-indigo-50' },
-            BACKUP: { label: 'बैकअप डाउनलोड', icon: 'fa-download', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            RESTORE: { label: 'रीस्टोर', icon: 'fa-upload', color: 'text-blue-600', bg: 'bg-blue-50' },
-            CLEAR_ALL: { label: 'सारा डेटा मिटाया', icon: 'fa-bomb', color: 'text-red-700', bg: 'bg-red-50' },
-            LOGO_UPLOAD: { label: 'लोगो अपलोड', icon: 'fa-image', color: 'text-blue-600', bg: 'bg-blue-50' },
-            LOGO_REMOVE: { label: 'लोगो हटाया', icon: 'fa-image', color: 'text-slate-500', bg: 'bg-slate-50' },
-            UNDO: { label: 'अनडू', icon: 'fa-rotate-left', color: 'text-amber-500', bg: 'bg-amber-50' },
-            PASSWORD_CHANGE: { label: 'पासवर्ड बदला', icon: 'fa-key', color: 'text-purple-600', bg: 'bg-purple-50' },
-            PASSWORD_RESET: { label: 'पासवर्ड रीसेट', icon: 'fa-key', color: 'text-purple-700', bg: 'bg-purple-50' },
-            OTP_SENT: { label: 'OTP भेजा', icon: 'fa-envelope-circle-check', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            OTP_FAIL: { label: 'OTP असफल', icon: 'fa-envelope', color: 'text-red-600', bg: 'bg-red-50' },
-            EMAIL_SETTINGS_SAVE: { label: 'ईमेल सेटिंग सेव', icon: 'fa-envelope', color: 'text-amber-600', bg: 'bg-amber-50' },
-            EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
-            CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
-        };
-        
-        list.innerHTML = logs.map(l => {
-            let dt = '--';
-            try {
-                dt = new Date(l.timestamp).toLocaleString('hi-IN', {
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit'
-                });
-            } catch (e) {}
-            
-            const info = actionLabels[l.action] || { 
-                label: l.action || 'Unknown', 
-                icon: 'fa-circle-info', 
-                color: 'text-slate-500', 
-                bg: 'bg-slate-50' 
-            };
-            const badge = l.role === 'admin' 
-                ? 'bg-red-100 text-red-800' 
-                : 'bg-green-100 text-green-800';
-            
-            return `
-                <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
-                    <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg flex-shrink-0"></i>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-sm font-bold ${info.color}">${info.label}</span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">
-                                ${l.user || '?'} (${l.role || '?'})
-                            </span>
-                        </div>
-                        ${l.details ? `<div class="text-xs text-slate-600 mt-1 break-words">${l.details}</div>` : ''}
-                        <div class="text-[10px] text-slate-400 mt-1">
-                            <i class="fa-solid fa-clock mr-1"></i>${dt}
-                        </div>
-                    </div>
-                </div>`;
-        }).join("");
+        return;
     }
-    document.getElementById("auditModal").classList.add("show");
+    
+    const actionLabels = getActionLabels();
+    list.innerHTML = logs.map(l => renderAuditRow(l, actionLabels)).join("");
+}
+function getActionLabels() {
+    return {
+        LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
+        LOGIN_FAIL: { label: 'लॉगिन असफल', icon: 'fa-times-circle', color: 'text-red-600', bg: 'bg-red-50' },
+        LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
+        AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
+        SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
+        EDIT_RECORD: { label: 'रिकॉर्ड संपादित', icon: 'fa-pen', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        DELETE_RECORD: { label: 'रिकॉर्ड हटाया', icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-50' },
+        ENTRY_ADD: { label: 'नई एंट्री', icon: 'fa-plus-circle', color: 'text-emerald-700', bg: 'bg-emerald-50' },
+        EXPORT_EXCEL: { label: 'Excel निर्यात', icon: 'fa-file-excel', color: 'text-green-700', bg: 'bg-green-50' },
+        PRINT_PDF: { label: 'PDF बनाया', icon: 'fa-file-pdf', color: 'text-red-700', bg: 'bg-red-50' },
+        REPORT_EXCEL: { label: 'रिपोर्ट Excel', icon: 'fa-file-excel', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+        REPORT_PDF: { label: 'रिपोर्ट PDF', icon: 'fa-file-pdf', color: 'text-indigo-700', bg: 'bg-indigo-50' },
+        BACKUP: { label: 'बैकअप डाउनलोड', icon: 'fa-download', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        RESTORE: { label: 'रीस्टोर', icon: 'fa-upload', color: 'text-blue-600', bg: 'bg-blue-50' },
+        CLEAR_ALL: { label: 'सारा डेटा मिटाया', icon: 'fa-bomb', color: 'text-red-700', bg: 'bg-red-50' },
+        LOGO_UPLOAD: { label: 'लोगो अपलोड', icon: 'fa-image', color: 'text-blue-600', bg: 'bg-blue-50' },
+        LOGO_REMOVE: { label: 'लोगो हटाया', icon: 'fa-image', color: 'text-slate-500', bg: 'bg-slate-50' },
+        UNDO: { label: 'अनडू', icon: 'fa-rotate-left', color: 'text-amber-500', bg: 'bg-amber-50' },
+        PASSWORD_CHANGE: { label: 'पासवर्ड बदला', icon: 'fa-key', color: 'text-purple-600', bg: 'bg-purple-50' },
+        PASSWORD_RESET: { label: 'पासवर्ड रीसेट', icon: 'fa-key', color: 'text-purple-700', bg: 'bg-purple-50' },
+        OTP_SENT: { label: 'OTP भेजा', icon: 'fa-envelope-circle-check', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        OTP_FAIL: { label: 'OTP असफल', icon: 'fa-envelope', color: 'text-red-600', bg: 'bg-red-50' },
+        EMAIL_SETTINGS_SAVE: { label: 'ईमेल सेटिंग सेव', icon: 'fa-envelope', color: 'text-amber-600', bg: 'bg-amber-50' },
+        EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
+        CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
+    };
+}
+function renderAuditRow(l, actionLabels) {
+    let dt = '--';
+    try {
+        dt = new Date(l.timestamp).toLocaleString('hi-IN', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+    } catch (e) {}
+    
+    const info = actionLabels[l.action] || { label: l.action || 'Unknown', icon: 'fa-circle-info', color: 'text-slate-500', bg: 'bg-slate-50' };
+    const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+    const dev = l.device || {};
+    const deviceIcon = dev.type === 'Mobile' ? 'fa-mobile-screen' : dev.type === 'Tablet' ? 'fa-tablet-screen-button' : 'fa-desktop';
+    
+    return `
+        <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
+            <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg flex-shrink-0"></i>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-bold ${info.color}">${info.label}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">
+                        ${l.user || '?'} (${l.role || '?'})
+                    </span>
+                </div>
+                ${l.details ? `<div class="text-xs text-slate-600 mt-1 break-words">${l.details}</div>` : ''}
+                <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[10px] text-slate-500">
+                    <span><i class="fa-solid fa-clock"></i> ${dt}</span>
+                    <span><i class="fa-solid ${deviceIcon}"></i> ${dev.type || '?'} • ${dev.browser || '?'} • ${dev.os || '?'}</span>
+                </div>
+            </div>
+        </div>`;
 }
 function closeAuditLog() { document.getElementById("auditModal").classList.remove("show"); }
 async function clearAuditLog() {
@@ -3557,17 +3724,120 @@ async function clearAuditLog() {
     showToast('लॉग साफ़', "success");
 }
 
+/* DEVICES PANEL */
+async function openDevicesPanel() {
+    if (!session || session.role !== 'admin') return;
+    document.getElementById("userDropdown").style.display = 'none';
+    document.getElementById("devicesModal").classList.add("show");
+    await refreshDevicesPanel();
+}
+function closeDevicesPanel() { document.getElementById("devicesModal").classList.remove("show"); }
+async function refreshDevicesPanel() {
+    const list = document.getElementById("devicesList");
+    list.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="text-xs mt-2">Cloud से लोड हो रहा...</p></div>`;
+    
+    const logs = await cloudGetAuditLog(500);
+    
+    // Stats
+    const logins = logs.filter(l => l.action === 'LOGIN_SUCCESS');
+    const uniqueDevices = new Set(logs.map(l => `${l.device?.type}-${l.device?.browser}-${l.device?.os}`));
+    const uniqueUsers = new Set(logs.map(l => l.user));
+    
+    document.getElementById('statTotalLogins').textContent = logins.length;
+    document.getElementById('statUniqueDevices').textContent = uniqueDevices.size;
+    document.getElementById('statActiveUsers').textContent = uniqueUsers.size;
+    document.getElementById('statTotalActivities').textContent = logs.length;
+    
+    renderDeviceList(logs);
+}
+function applyDeviceFilters() {
+    const userF = document.getElementById('deviceFilterUser').value;
+    const actionF = document.getElementById('deviceFilterAction').value;
+    const dateF = document.getElementById('deviceFilterDate').value;
+    
+    cloudGetAuditLog(500).then(logs => {
+        let filtered = logs;
+        if (userF) filtered = filtered.filter(l => l.user === userF);
+        if (actionF) filtered = filtered.filter(l => l.action === actionF);
+        if (dateF) {
+            const target = new Date(dateF).toDateString();
+            filtered = filtered.filter(l => new Date(l.timestamp).toDateString() === target);
+        }
+        renderDeviceList(filtered);
+    });
+}
+function clearDeviceFilters() {
+    document.getElementById('deviceFilterUser').value = '';
+    document.getElementById('deviceFilterAction').value = '';
+    document.getElementById('deviceFilterDate').value = '';
+    refreshDevicesPanel();
+}
+function renderDeviceList(logs) {
+    const list = document.getElementById("devicesList");
+    if (!logs || logs.length === 0) {
+        list.innerHTML = `<div class="text-center py-10 text-slate-400">
+            <i class="fa-solid fa-inbox text-3xl mb-2 block opacity-40"></i>
+            <p class="text-sm">कोई activity नहीं मिली</p>
+        </div>`;
+        return;
+    }
+    
+    const actionLabels = getActionLabels();
+    list.innerHTML = logs.map(l => {
+        const dt = new Date(l.timestamp).toLocaleString('hi-IN', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        const info = actionLabels[l.action] || { label: l.action, icon: 'fa-circle-info', color: 'text-slate-500', bg: 'bg-slate-50' };
+        const dev = l.device || {};
+        const deviceIcon = dev.type === 'Mobile' ? 'fa-mobile-screen' : dev.type === 'Tablet' ? 'fa-tablet-screen-button' : 'fa-desktop';
+        const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+        
+        return `
+            <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
+                <div class="flex-shrink-0 w-9 h-9 rounded-full bg-white border border-slate-300 flex items-center justify-center">
+                    <i class="fa-solid ${deviceIcon} text-slate-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-bold ${info.color}">${info.label}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">${l.user} (${l.role})</span>
+                    </div>
+                    ${l.details ? `<div class="text-xs text-slate-600 mt-1">${l.details}</div>` : ''}
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-600">
+                        <div><i class="fa-solid fa-clock text-slate-400"></i> ${dt}</div>
+                        <div><i class="fa-solid ${deviceIcon} text-slate-400"></i> ${dev.type || '?'}</div>
+                        <div><i class="fa-brands fa-chrome text-slate-400"></i> ${dev.browser || '?'}</div>
+                        <div><i class="fa-solid fa-microchip text-slate-400"></i> ${dev.os || '?'}</div>
+                        <div><i class="fa-solid fa-tv text-slate-400"></i> ${dev.screen || '?'}</div>
+                        <div><i class="fa-solid fa-globe text-slate-400"></i> ${dev.timezone || '?'}</div>
+                    </div>
+                </div>
+            </div>`;
+    }).join("");
+}
+
 /* BOOT */
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await openDB();
         dbReady = true;
+        // Wait for firebase init
+        if (!firebaseReady) {
+            await new Promise(resolve => {
+                const t = setTimeout(resolve, 3000);
+                window.addEventListener('firebase-ready', () => { clearTimeout(t); resolve(); }, { once: true });
+            });
+        }
         await ensureDefaultUsers();
     } catch (err) { console.error(err); return; }
 
     let existing = null;
     try { existing = JSON.parse(localStorage.getItem('jalkal_session') || 'null'); } catch (e) {}
-    if (existing && existing.username) { session = existing; enterApp(); }
+    if (existing && existing.username) { 
+        session = existing; 
+        enterApp(); 
+    }
 });
 </script>
 </body>
