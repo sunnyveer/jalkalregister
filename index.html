@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
@@ -311,7 +311,7 @@ input[type=number] { -moz-appearance: textfield; }
 #printArea { display: none; }
 
 /* ============================================================
-   DATE PICKER — with calendar icon (VISIBLE)
+   DATE PICKER — with calendar icon
    ============================================================ */
 .date-picker-wrap {
     position: relative;
@@ -369,7 +369,6 @@ input[type=number] { -moz-appearance: textfield; }
     visibility: visible !important;
     opacity: 1 !important;
 }
-/* Small variant for top bar */
 .date-picker-wrap.small { border-width: 1px; border-color: #cbd5e1; border-radius: 6px; }
 .date-picker-wrap.small .date-picker-display { font-size: 12px; padding: 5px 8px; letter-spacing: 1px; }
 .date-picker-wrap.small .date-picker-cal-icon { 
@@ -553,9 +552,6 @@ input[type=number] { -moz-appearance: textfield; }
 
 #registerSheetWrapper { display: none; }
 
-/* ============================================================
-   SIGNATURE — "केमिस्ट" right-bottom only
-   ============================================================ */
 .register-sig-block {
     display: flex;
     justify-content: flex-end;
@@ -952,7 +948,6 @@ input[type=number] { -moz-appearance: textfield; }
             </table>
         </div>
 
-        <!-- Signature - Sirf "केमिस्ट" right-bottom -->
         <div class="register-sig-block">
             <div>केमिस्ट</div>
         </div>
@@ -1099,8 +1094,7 @@ input[type=number] { -moz-appearance: textfield; }
                         <option value="LTR">Letter</option>
                     </select>
                     <span id="pageDimBadge" style="margin-left:auto; font-size:11px; color:#1e40af; font-weight:800; padding:3px 10px; background:#eff6ff; border:1px solid #3b82f6; border-radius:20px;">
-                        --×-- mm
-                    </span>
+                        --×-- mm                    </span>
                 </div>
 
                 <div class="slider-grid">
@@ -1465,10 +1459,22 @@ function dbClearSettings() {
 function dbAddAudit(action, details) {
     return new Promise((resolve) => {
         try {
-            const rec = { timestamp: Date.now(), user: session ? session.username : 'unknown', role: session ? session.role : 'unknown', action, details: details || '' };
-            db.transaction(STORE_AUDIT, 'readwrite').objectStore(STORE_AUDIT).add(rec);
-            resolve();
-        } catch (e) { resolve(); }
+            const rec = {
+                timestamp: Date.now(),
+                user: session ? session.username : 'unknown',
+                role: session ? session.role : 'unknown',
+                action: action || 'UNKNOWN',
+                details: details || ''
+            };
+            const tx = db.transaction(STORE_AUDIT, 'readwrite');
+            const store = tx.objectStore(STORE_AUDIT);
+            const req = store.add(rec);
+            req.onsuccess = () => resolve(true);
+            req.onerror = (e) => { console.error('Audit add failed:', e); resolve(false); };
+        } catch (e) {
+            console.error('Audit exception:', e);
+            resolve(false);
+        }
     });
 }
 function dbGetAuditLog(limit = 200) {
@@ -1550,9 +1556,9 @@ const AUTO_LOCK_MS = 15 * 60 * 1000;
 
 function resetAutoLock() {
     if (autoLockTimer) clearTimeout(autoLockTimer);
-    autoLockTimer = setTimeout(() => {
+    autoLockTimer = setTimeout(async () => {
         if (session) {
-            dbAddAudit('AUTO_LOCK', 'Auto-lock');
+            await dbAddAudit('AUTO_LOCK', 'Auto-lock after 15 minutes');
             showToast('सुरक्षा: 15 मिनट बाद ऑटो-लॉक', "warning");
             logout(true);
         }
@@ -1612,6 +1618,7 @@ async function performUndo() {
             const { year, month, day, data } = snap.snapshot;
             if (data) await dbPutRecord(year, month, day, data);
             else await dbDeleteRecord(year, month, day);
+            await dbAddAudit('UNDO', `Undo ${snap.type} — ${formatDateLongDDMMYYYY(year,month,day)}`);
         } else if (snap.type === 'month') {
             const { year, month, records } = snap.snapshot;
             const allRecs = await dbGetAllRecords();
@@ -1622,22 +1629,26 @@ async function performUndo() {
                 const d = records[day];
                 if (d && (d.col1 || d.col2 || d.col3 || d.col4)) await dbPutRecord(year, month, parseInt(day), d);
             }
+            await dbAddAudit('UNDO', `Undo month ${year}-${month}`);
         } else if (snap.type === 'restore') {
             await dbClearRecords();
             const tx = db.transaction(STORE_RECORDS, 'readwrite');
             const st = tx.objectStore(STORE_RECORDS);
             snap.snapshot.records.forEach(r => st.put(r));
             await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+            await dbAddAudit('UNDO', 'Undo restore');
         } else if (snap.type === 'clearall') {
             const tx = db.transaction(STORE_RECORDS, 'readwrite');
             const st = tx.objectStore(STORE_RECORDS);
             snap.snapshot.records.forEach(r => st.put(r));
             await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+            await dbAddAudit('UNDO', 'Undo clear all');
         } else if (snap.type === 'logopos') {
             const p = snap.snapshot.position;
             logoPosition = { x: p.x, y: p.y, width: p.width, height: p.height };
             applyLogoPosition();
             await saveLogoPosition();
+            await dbAddAudit('UNDO', 'Undo logo position');
         }
         if (document.getElementById("searchModal").classList.contains("show")) runSearch();
         await renderTable();
@@ -1720,9 +1731,13 @@ async function requestOTP() {
     activeOTPExpiry = Date.now() + 10 * 60 * 1000;
     try {
         await sendOTPEmail(registeredEmail, username, otp, cfg);
+        await dbAddAudit('OTP_SENT', `OTP sent to ${registeredEmail}`);
         showToast('✓ OTP भेज दिया गया (OTP: ' + otp + ')', "success");
         document.getElementById("otpSection").style.display = "block";
-    } catch (err) { showToast("OTP Error", "danger"); }
+    } catch (err) {
+        await dbAddAudit('OTP_FAIL', `Send failed to ${registeredEmail}`);
+        showToast("OTP Error", "danger");
+    }
 }
 async function verifyOTPAndReset() {
     const entered = document.getElementById("otpInput").value.trim();
@@ -1734,6 +1749,7 @@ async function verifyOTPAndReset() {
     if (!np || np.length < 6) { showToast('पासवर्ड कम से कम 6 अक्षर', "warning"); return; }
     if (np !== np2) { showToast('दोनों पासवर्ड मेल नहीं', "warning"); return; }
     await setUserPassword(activeOTPUser, np);
+    await dbAddAudit('PASSWORD_RESET', `${activeOTPUser} password reset via OTP`);
     activeOTP = null; activeOTPUser = null;
     showToast('✓ पासवर्ड रीसेट हो गया!', "success");
     backToLogin();
@@ -1742,14 +1758,22 @@ async function attemptLogin() {
     const username = document.getElementById("loginUsername").value.trim().toLowerCase();
     const password = document.getElementById("loginPassword").value;
     if (!username || !password) { showToast('दोनों फ़ील्ड भरें', "warning"); return; }
-    if (username !== 'admin' && username !== 'user') { showToast('गलत username या password', "danger"); return; }
+    if (username !== 'admin' && username !== 'user') {
+        showToast('गलत username या password', "danger");
+        return;
+    }
     const ok = await verifyPassword(username, password);
-    if (!ok) { showToast('गलत username या password', "danger"); return; }
+    if (!ok) {
+        showToast('गलत username या password', "danger");
+        return;
+    }
     session = { username, role: username === 'admin' ? 'admin' : 'user', loginTime: Date.now() };
     try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
+    await dbAddAudit('LOGIN_SUCCESS', `${username} logged in`);
     enterApp();
 }
-function logout(silent) {
+async function logout(silent) {
+    if (session) await dbAddAudit('LOGOUT', `${session.username} logged out`);
     session = null;
     try { localStorage.removeItem('jalkal_session'); } catch (e) {}
     if (autoLockTimer) clearTimeout(autoLockTimer);
@@ -2040,6 +2064,7 @@ async function addNewEntry() {
     const before = { ...dayData };
     dayData[firm] = String(qty);
     await dbPutRecord(y, m, d, dayData);
+    await dbAddAudit('ENTRY_ADD', `${formatDateLongDDMMYYYY(y,m,d)} — ${FIRM_LABELS[firm].short} = ${qty} ली०`);
     showToast('✓ एंट्री जोड़ दी!', "success");
     pushUndo('entryAdd', { year: y, month: m, day: d, data: before }, 'एंट्री जोड़ी — वापस लाएँ?');
     document.getElementById('entryQty').value = '';
@@ -2212,6 +2237,7 @@ async function handleLogoFile(e) {
         cachedLogo = url;
         await dbSetSetting('logo_main', url);
         applyLogo(url);
+        await dbAddAudit('LOGO_UPLOAD', 'Logo uploaded');
         showToast('✓ लोगो लगा दिया', "success");
     };
     reader.readAsDataURL(file);
@@ -2233,6 +2259,7 @@ async function removeLogo(event) {
     await dbSetSetting('logo_main', null);
     const el = document.getElementById('logoMovable');
     if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
+    await dbAddAudit('LOGO_REMOVE', 'Logo removed');
     showToast('लोगो हटा दिया', "info");
 }
 function getLogoData() { return cachedLogo; }
@@ -2277,10 +2304,6 @@ function applyFontScale() {
         document.querySelectorAll('.grid-input').forEach(el => {
             el.style.fontSize = (17 * scale) + 'px';
         });
-        document.querySelectorAll('.dash-stat-value').forEach(el => el.style.fontSize = (18 * scale) + 'px');
-        document.querySelectorAll('.recent-row .rdate').forEach(el => el.style.fontSize = (12 * scale) + 'px');
-        document.querySelectorAll('.recent-row .rfirm').forEach(el => el.style.fontSize = (12 * scale) + 'px');
-        document.querySelectorAll('.recent-row .rqty').forEach(el => el.style.fontSize = (13 * scale) + 'px');
     }, 100);
 }
 function changeFontSize(dir) {
@@ -2299,7 +2322,6 @@ function setupDateInputConstraints() {
     const maxDate = `${currentYear}-${mm}-${String(daysInMonth).padStart(2, '0')}`;
     const fromInput = document.getElementById("fromDate");
     const toInput = document.getElementById("toDate");
-    // Remove min/max so user can pick ANY date across ANY month
     fromInput.removeAttribute("min");
     fromInput.removeAttribute("max");
     toInput.removeAttribute("min");
@@ -2324,7 +2346,6 @@ async function applyDateFilter() {
     const fromY = fromD.getFullYear(), fromM = fromD.getMonth() + 1, fromDay = fromD.getDate();
     const toY = toD.getFullYear(), toM = toD.getMonth() + 1, toDay = toD.getDate();
 
-    // Same month?
     if (fromY === toY && fromM === toM) {
         currentYear = fromY;
         currentMonth = fromM;
@@ -2335,7 +2356,6 @@ async function applyDateFilter() {
         renderEntryView();
         showToast(`फ़िल्टर लागू: ${formatDateShortDDMMYY(fromY, fromM, fromDay)} - ${formatDateShortDDMMYY(toY, toM, toDay)}`, "info");
     } else {
-        // Cross-month range — open Report modal with dates
         document.getElementById("reportFromDate").value = fv;
         document.getElementById("reportToDate").value = tv;
         syncDateDisplay('reportFromDate', 'reportFromDateDisplay');
@@ -2442,7 +2462,10 @@ async function saveData(silent = false) {
             if (c1||c2||c3||c4) await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
             else await dbDeleteRecord(currentYear, currentMonth, day);
         }
-        if (!silent) showToast('✓ डेटा सेव हो गया!', "success");
+        if (!silent) {
+            await dbAddAudit('SAVE_DATA', `${currentYear}-${currentMonth} month saved`);
+            showToast('✓ डेटा सेव हो गया!', "success");
+        }
         pushUndo('month', { year: currentYear, month: currentMonth, records: beforeSave }, 'ग्रिड में बदलाव वापस लाएँ?');
         renderEntryView();
     } catch (err) { showToast("Save error", "danger"); }
@@ -2551,6 +2574,7 @@ async function deleteRecord(y, m, d) {
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec3 = (await dbGetMonthRecords(y, m))[d] || null;
     await dbDeleteRecord(y, m, d);
+    await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(y,m,d)} deleted`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year: y, month: m, day: d, data: oldRec3 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
     runSearch();
@@ -2593,6 +2617,7 @@ async function saveFromEdit() {
     const c4 = document.getElementById("editCol4").value;
     if (c1||c2||c3||c4) await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
     else await dbDeleteRecord(year, month, day);
+    await dbAddAudit('EDIT_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} updated`);
     showToast('✓ रिकॉर्ड अपडेट!', "success");
     pushUndo('edit', { year, month, day, data: oldRec }, 'रिकॉर्ड संपादित — वापस लाएँ?');
     closeEdit(); runSearch();
@@ -2605,6 +2630,7 @@ async function deleteFromEdit() {
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec2 = (await dbGetMonthRecords(year, month))[day] || null;
     await dbDeleteRecord(year, month, day);
+    await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} deleted via edit`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year, month, day, data: oldRec2 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
     closeEdit(); runSearch();
@@ -2612,7 +2638,7 @@ async function deleteFromEdit() {
 }
 
 /* EXCEL */
-function exportToExcel() {
+async function exportToExcel() {
     const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
     const startDay = activeFilter ? activeFilter.startDay : 1;
     const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
@@ -2637,6 +2663,7 @@ function exportToExcel() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Register");
     XLSX.writeFile(wb, `Jalkal_Register_${String(currentMonth).padStart(2,'0')}_${currentYear}.xlsx`);
+    await dbAddAudit('EXPORT_EXCEL', `${currentYear}-${currentMonth} Excel`);
     showToast('Excel फ़ाइल डाउनलोड!', "success");
 }
 
@@ -2679,7 +2706,6 @@ function printHtmlViaIframe(htmlContent, onDone) {
         th, td { border:1px solid #000; padding:${L.rowPad}px 4px; font-size:${L.fontSize}px; text-align:center; vertical-align:middle; line-height:1.3; color:#000; background:#fff; font-weight:600; word-wrap:break-word; }
         thead th { font-weight:700; background:#f5f5f5; }
         .grand-total-row td { background:#f0f0f0 !important; font-weight:800; }
-        /* Signature — sirf keemist right-bottom */
         .signature-block { display:flex; justify-content:flex-end; margin-top:${L.sigTop}px; padding:0 40px 0 0; font-size:${L.fontSize}px; font-weight:700; page-break-inside:avoid; }
         .signature-block > div { text-align:right; min-height:${L.sigHeight}px; display:flex; flex-direction:column; justify-content:flex-end; padding-top:${Math.max(0, L.sigHeight-30)}px; border-top:1px solid #000; padding-right:20px; padding-left:20px; }
     `;
@@ -2747,10 +2773,11 @@ function buildCloneHtml() {
         </div>`;
 }
 
-function printPDF() {
+async function printPDF() {
     ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     const htmlContent = buildCloneHtml();
+    await dbAddAudit('PRINT_PDF', `${currentYear}-${currentMonth} PDF`);
     printHtmlViaIframe(htmlContent);
 }
 
@@ -2986,7 +3013,7 @@ function autoFitOnePage() {
     showToast('✓ 1 page में fit हो गया', "success");
 }
 
-function exportReportExcel() {
+async function exportReportExcel() {
     if (!currentReportData) return;
     const { fromDate, toDate, firm, format, dateRangeText, filtered, totals } = currentReportData;
     const data = [['JAL KAL VIBHAG NAGER NIGAM VARANASI'],['जलकल विभाग केमिकल हाउस से प्रतिदिन निर्गत सोडियम हाइपोक्लोराइंट का विवरण'],[],[dateRangeText],[]];
@@ -3012,10 +3039,11 @@ function exportReportExcel() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Report");
     XLSX.writeFile(wb, `Report_${firm}_${fromDate}_to_${toDate}.xlsx`);
+    await dbAddAudit('REPORT_EXCEL', `${firm} ${fromDate} to ${toDate}`);
     showToast('✓ रिपोर्ट Excel में सेव', "success");
 }
 
-function exportReportPDF() {
+async function exportReportPDF() {
     if (!currentReportData) return;
     const { firm, format, dateRangeText, filtered, totals } = currentReportData;
     const pages = buildReportPages(filtered);
@@ -3052,6 +3080,7 @@ function exportReportPDF() {
         pagesHtml += `<div class="print-page">${pageLabel}${headerBar}<table>${colg}${thead}<tbody>${rowsHtml}</tbody><tfoot>${grandRow}</tfoot></table>${sigBlock}</div>`;
     });
     closeReportModal();
+    await dbAddAudit('REPORT_PDF', `${firm} ${currentReportData.fromDate} to ${currentReportData.toDate}`);
     printHtmlViaIframe(pagesHtml);
 }
 
@@ -3076,6 +3105,7 @@ async function downloadBackup() {
         a.href = url; a.download = `jalkal_backup_${new Date().toISOString().slice(0,10)}.json`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        await dbAddAudit('BACKUP', `${records.length} records backed up`);
         showToast(`✓ बैकअप डाउनलोड: ${records.length}`, "success");
     } catch (e) { showToast("Backup error", "danger"); }
 }
@@ -3116,6 +3146,7 @@ async function confirmRestore() {
         cachedLogo = await dbGetSetting('logo_main');
         await loadLogoPosition();
         if (cachedLogo) applyLogo(cachedLogo);
+        await dbAddAudit('RESTORE', `${pendingRestore.records.length} records restored`);
         pushUndo('restore', { records: beforeRestoreRecords }, 'रीस्टोर — वापस लाएँ?');
         cancelRestore(); closeBackupModal();
         await renderTable(); await renderEntryView();
@@ -3133,6 +3164,7 @@ async function clearAllData() {
     const el = document.getElementById('logoMovable');
     if (el) { const img = el.querySelector('img'); if (img) img.remove(); el.classList.remove('has-logo'); }
     fontScale = 100; applyFontScale();
+    await dbAddAudit('CLEAR_ALL', 'All data cleared');
     pushUndo('clearall', { records: beforeRecs, settings: beforeSettings }, 'डेटा मिटाया — वापस लाएँ?');
     await renderTable(); await renderEntryView(); closeBackupModal();
     showToast('सारा डेटा मिटा', "danger");
@@ -3165,6 +3197,7 @@ async function changePassword() {
     if (np !== np2) { showToast('दोनों पासवर्ड मेल नहीं', "warning"); return; }
     if (!await verifyPassword(session.username, op)) { showToast('पुराना पासवर्ड गलत', "danger"); return; }
     await setUserPassword(session.username, np);
+    await dbAddAudit('PASSWORD_CHANGE', `${session.username} password changed`);
     closeChangePassword();
     showToast('✓ पासवर्ड बदल दिया', "success");
 }
@@ -3189,6 +3222,7 @@ async function saveEmailSettings() {
     await dbSetSetting('ejs_templateId', document.getElementById("ejsTemplateId").value.trim());
     await dbSetSetting('ejs_adminEmail', document.getElementById("ejsAdminEmail").value.trim());
     await dbSetSetting('ejs_userEmail', document.getElementById("ejsUserEmail").value.trim());
+    await dbAddAudit('EMAIL_SETTINGS_SAVE', 'EmailJS config updated');
     showToast("✓ सेव", "success");
 }
 async function testEmailSettings() {
@@ -3200,6 +3234,7 @@ async function testEmailSettings() {
         const testOTP = Math.floor(100000 + Math.random() * 900000).toString();
         await sendOTPEmail(cfg.adminEmail, "Test Admin", testOTP, cfg);
         resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — OTP: <strong>${testOTP}</strong></div>`;
+        await dbAddAudit('EMAIL_TEST', `Test OTP sent to ${cfg.adminEmail}`);
     } catch (err) {
         resultDiv.innerHTML = `<div class="text-red-600">✗ ${err.text || err.message || 'Error'}</div>`;
     }
@@ -3211,22 +3246,58 @@ async function openAuditLog() {
     document.getElementById("userDropdown").style.display = 'none';
     const logs = await dbGetAuditLog(200);
     const list = document.getElementById("auditList");
-    if (logs.length === 0) list.innerHTML = `<div class="text-center py-10 text-slate-400">कोई गतिविधि नहीं</div>`;
-    else {
+    
+    if (logs.length === 0) {
+        list.innerHTML = `<div class="text-center py-10 text-slate-400">
+            <i class="fa-solid fa-inbox text-3xl mb-2 block opacity-40"></i>
+            अभी कोई गतिविधि नहीं है। कुछ actions करें (login, save, entry) तो यहाँ दिखेंगे।
+        </div>`;
+    } else {
+        const actionLabels = {
+            LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
+            LOGIN_FAIL: { label: 'लॉगिन असफल', icon: 'fa-times-circle', color: 'text-red-600', bg: 'bg-red-50' },
+            LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
+            AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
+            SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
+            EDIT_RECORD: { label: 'रिकॉर्ड संपादित', icon: 'fa-pen', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            DELETE_RECORD: { label: 'रिकॉर्ड हटाया', icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-50' },
+            ENTRY_ADD: { label: 'नई एंट्री', icon: 'fa-plus-circle', color: 'text-emerald-700', bg: 'bg-emerald-50' },
+            EXPORT_EXCEL: { label: 'Excel निर्यात', icon: 'fa-file-excel', color: 'text-green-700', bg: 'bg-green-50' },
+            PRINT_PDF: { label: 'PDF बनाया', icon: 'fa-file-pdf', color: 'text-red-700', bg: 'bg-red-50' },
+            REPORT_EXCEL: { label: 'रिपोर्ट Excel', icon: 'fa-file-excel', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+            REPORT_PDF: { label: 'रिपोर्ट PDF', icon: 'fa-file-pdf', color: 'text-indigo-700', bg: 'bg-indigo-50' },
+            BACKUP: { label: 'बैकअप डाउनलोड', icon: 'fa-download', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            RESTORE: { label: 'रीस्टोर', icon: 'fa-upload', color: 'text-blue-600', bg: 'bg-blue-50' },
+            CLEAR_ALL: { label: 'सारा डेटा मिटाया', icon: 'fa-bomb', color: 'text-red-700', bg: 'bg-red-50' },
+            LOGO_UPLOAD: { label: 'लोगो अपलोड', icon: 'fa-image', color: 'text-blue-600', bg: 'bg-blue-50' },
+            LOGO_REMOVE: { label: 'लोगो हटाया', icon: 'fa-image', color: 'text-slate-500', bg: 'bg-slate-50' },
+            UNDO: { label: 'अनडू', icon: 'fa-rotate-left', color: 'text-amber-500', bg: 'bg-amber-50' },
+            PASSWORD_CHANGE: { label: 'पासवर्ड बदला', icon: 'fa-key', color: 'text-purple-600', bg: 'bg-purple-50' },
+            PASSWORD_RESET: { label: 'पासवर्ड रीसेट', icon: 'fa-key', color: 'text-purple-700', bg: 'bg-purple-50' },
+            OTP_SENT: { label: 'OTP भेजा', icon: 'fa-envelope-circle-check', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            OTP_FAIL: { label: 'OTP असफल', icon: 'fa-envelope', color: 'text-red-600', bg: 'bg-red-50' },
+            EMAIL_SETTINGS_SAVE: { label: 'ईमेल सेटिंग सेव', icon: 'fa-envelope', color: 'text-amber-600', bg: 'bg-amber-50' },
+            EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
+            CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
+        };
         list.innerHTML = logs.map(l => {
             const dt = new Date(l.timestamp).toLocaleString('hi-IN');
+            const info = actionLabels[l.action] || { label: l.action, icon: 'fa-circle-info', color: 'text-slate-500', bg: 'bg-slate-50' };
             const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
-            return `<div class="flex items-start gap-3 p-2.5 border border-slate-200 rounded-lg bg-slate-50">
-                <i class="fa-solid fa-circle-info text-slate-500 mt-0.5"></i>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="text-xs font-bold">${l.action}</span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${badge}">${l.user} (${l.role})</span>
+            return `
+                <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
+                    <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-sm font-bold ${info.color}">${info.label}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">${l.user} (${l.role})</span>
+                        </div>
+                        ${l.details ? `<div class="text-xs text-slate-600 mt-1">${l.details}</div>` : ''}
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            <i class="fa-solid fa-clock mr-1"></i>${dt}
+                        </div>
                     </div>
-                    <div class="text-xs text-slate-600 mt-0.5">${l.details || ''}</div>
-                    <div class="text-[10px] text-slate-400 mt-1">${dt}</div>
-                </div>
-            </div>`;
+                </div>`;
         }).join("");
     }
     document.getElementById("auditModal").classList.add("show");
@@ -3235,6 +3306,7 @@ function closeAuditLog() { document.getElementById("auditModal").classList.remov
 async function clearAuditLog() {
     if (!confirm("लॉग साफ़ करें?")) return;
     await dbClearAudit();
+    await dbAddAudit('CLEAR_AUDIT', 'Audit log cleared by admin');
     openAuditLog();
     showToast('लॉग साफ़', "success");
 }
