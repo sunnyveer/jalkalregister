@@ -9,10 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, deleteDoc, writeBatch, serverTimestamp, addDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit as fsLimit, addDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBJx1Gv5KYHzJrz95svVLhfdr0Eax_Ig8o",
@@ -23,17 +22,23 @@
     appId: "1:716078078560:web:df35750578ea648b3d8105"
   };
 
-  const fbApp = initializeApp(firebaseConfig);
-  const fsdb = getFirestore(fbApp);
-
-  // Expose to global scope for non-module scripts
-  window.fsdb = fsdb;
-  window.fsFuncs = {
-    doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot,
-    deleteDoc, writeBatch, serverTimestamp, addDoc, orderBy, limit
-  };
-  window.firebaseReady = true;
-  window.dispatchEvent(new Event('firebase-ready'));
+  try {
+    const fbApp = initializeApp(firebaseConfig);
+    const fsdb = getFirestore(fbApp);
+    window.fsdb = fsdb;
+    window.fsFuncs = {
+      doc, setDoc, getDoc, getDocs, collection, query, orderBy,
+      limit: fsLimit, addDoc, deleteDoc, writeBatch
+    };
+    window.firebaseReady = true;
+    console.log('✓ Firebase initialized');
+    window.dispatchEvent(new Event('firebase-ready'));
+  } catch (e) {
+    console.error('✗ Firebase init error:', e);
+    window.firebaseReady = false;
+    window.firebaseError = e.message;
+    window.dispatchEvent(new Event('firebase-ready'));
+  }
 </script>
 
 <style>
@@ -42,7 +47,6 @@
     --input-font: 17px;
     --dev-font: 'Nirmala UI', 'Mangal', 'Noto Sans Devanagari', 'Noto Serif Devanagari', 'Devanagari Sangam MN', 'Arial Unicode MS', Arial, sans-serif;
 }
-
 html, body, * {
     font-kerning: normal !important;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
@@ -50,32 +54,26 @@ html, body, * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
 body {
     font-family: var(--dev-font);
     background-color: #f1f5f9;
     color: #000;
     font-size: var(--base-font);
-    letter-spacing: normal !important;
-    word-spacing: normal !important;
 }
 * { font-family: inherit; }
 p, span, div, h1, h2, h3, h4, h5, h6, label, a, button, input, select, option, textarea, td, th, li {
-    letter-spacing: normal !important;
     font-family: var(--dev-font) !important;
 }
 .header-with-logos .title-block h1,
 .login-title h1 {
     font-family: 'Times New Roman', 'Liberation Serif', serif !important;
 }
-
 .topbar {
     background: #ffffff;
     border: 1px solid #cbd5e1;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-
 .register-sheet table { border-collapse: collapse; width: 100%; table-layout: fixed; }
 .register-sheet th, .register-sheet td {
     border: 1.5px solid #000 !important;
@@ -90,11 +88,9 @@ p, span, div, h1, h2, h3, h4, h5, h6, label, a, button, input, select, option, t
     color: #000;
 }
 .register-sheet th { font-weight: 700; background-color: #fff; }
-
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
-
 .grid-input {
     width: 100%; height: 100%; border: none; outline: none;
     background: transparent; text-align: center;
@@ -107,7 +103,6 @@ input[type=number] { -moz-appearance: textfield; }
 .grid-input:disabled { background: transparent !important; cursor: not-allowed; color: #000; }
 .register-sheet tr.active-row td { background-color: #fef3c7 !important; }
 .font-badge { font-size: 12px; font-weight: 700; min-width: 42px; text-align: center; color: #334155; }
-
 .header-row-1 {
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: nowrap; gap: 12px; min-width: 0;
@@ -128,7 +123,6 @@ input[type=number] { -moz-appearance: textfield; }
     gap: 8px; flex-wrap: nowrap;
 }
 .header-row-1 .right-part > div { flex-shrink: 0; }
-
 .header-row-2 {
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px;
@@ -138,7 +132,6 @@ input[type=number] { -moz-appearance: textfield; }
 .header-row-2 .right-actions button,
 .header-row-2 .left-filters button { font-size: 12px !important; white-space: nowrap; }
 .header-row-2 .left-filters > span { font-size: 12px !important; }
-
 .font-controls {
     display: inline-flex; align-items: center; gap: 4px;
     background: #f1f5f9; padding: 4px 6px; border-radius: 6px;
@@ -152,7 +145,6 @@ input[type=number] { -moz-appearance: textfield; }
     flex-shrink: 0;
 }
 .font-controls .font-btn:hover { background: #cbd5e1; }
-
 .month-block {
     display: inline-flex; align-items: center; gap: 6px;
     background: #f1f5f9; padding: 4px 8px; border-radius: 6px;
@@ -170,7 +162,6 @@ input[type=number] { -moz-appearance: textfield; }
     font-size: 10px; font-weight: 700; cursor: pointer;
     white-space: nowrap;
 }
-
 .header-with-logos {
     position: relative;
     display: flex; align-items: center; justify-content: center;
@@ -188,7 +179,6 @@ input[type=number] { -moz-appearance: textfield; }
     font-size: 12px; font-weight: 700; margin: 4px 0 0; line-height: 1.5;
     color: #000;
 }
-
 #logoMovable {
     position: absolute; top: 8px; left: 10px;
     width: 90px; height: 70px;
@@ -220,7 +210,6 @@ input[type=number] { -moz-appearance: textfield; }
     cursor: nwse-resize; display: none; z-index: 8;
 }
 #logoMovable.has-logo .resize-handle { display: block; }
-
 .modal-backdrop {
     position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
     display: none; align-items: center; justify-content: center;
@@ -239,7 +228,6 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .modal-header h2 { color: #0f172a; }
 .modal-body { padding: 14px 18px; overflow-y: auto; background: #fff; }
-
 .search-result-row {
     border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;
     margin-bottom: 8px; background: #f8fafc;
@@ -270,7 +258,6 @@ input[type=number] { -moz-appearance: textfield; }
     background: #fff; color: #0f172a;
 }
 .edit-input:focus { outline: none; border-color: #3b82f6; background: #eff6ff; }
-
 #loginScreen {
     position: fixed; inset: 0;
     background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #f0f9ff 100%);
@@ -300,11 +287,22 @@ input[type=number] { -moz-appearance: textfield; }
     background: #fff;
 }
 .login-input:focus { outline: none; border-color: #3b82f6; background: #eff6ff; }
+.login-input.error { border-color: #dc2626; background: #fef2f2; }
 .login-label {
     display: block; font-size: 12px;
     font-weight: 700; color: #475569; margin-bottom: 6px;
 }
-
+.login-message {
+    padding: 10px 14px; border-radius: 8px; font-size: 13px;
+    font-weight: 600; margin-bottom: 14px;
+    display: flex; align-items: flex-start; gap: 8px;
+    line-height: 1.4;
+}
+.login-message.error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.login-message.success { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+.login-message.info { background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; }
+.login-message.warning { background: #fffbeb; color: #78350f; border: 1px solid #fcd34d; }
+.login-message i { margin-top: 2px; flex-shrink: 0; }
 .user-menu-badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: #f1f5f9;
@@ -314,7 +312,6 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .user-menu-badge.admin { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 .user-menu-badge.user { background: #dcfce7; border-color: #86efac; color: #166534; }
-
 #userDropdown {
     display: none; position: absolute; top: 50px; right: 20px;
     background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;
@@ -333,11 +330,8 @@ input[type=number] { -moz-appearance: textfield; }
 }
 #userDropdown button:hover { background: #f1f5f9; }
 #userDropdown button.logout-btn { color: #dc2626; border-bottom: none; }
-
 .otp-input-box { letter-spacing: 8px !important; font-size: 20px; text-align: center; font-weight: 700; }
-
 #printArea { display: none; }
-
 .date-picker-wrap {
     position: relative;
     display: flex;
@@ -391,8 +385,6 @@ input[type=number] { -moz-appearance: textfield; }
     display: flex !important;
     align-items: center;
     justify-content: center;
-    visibility: visible !important;
-    opacity: 1 !important;
 }
 .date-picker-wrap.small { border-width: 1px; border-color: #cbd5e1; border-radius: 6px; }
 .date-picker-wrap.small .date-picker-display { font-size: 12px; padding: 5px 8px; letter-spacing: 1px; }
@@ -405,11 +397,7 @@ input[type=number] { -moz-appearance: textfield; }
     background: #eff6ff;
     color: #2563eb;
     border-left: 1px solid #bfdbfe;
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
 }
-
 .view-toggle-bar { display: flex; justify-content: center; margin-bottom: 10px; }
 .view-toggle {
     display: inline-flex; background: #ffffff; border-radius: 25px; padding: 4px;
@@ -423,7 +411,6 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .view-toggle button.active { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
 .view-toggle button:not(.active):hover { background: #f1f5f9; color: #334155; }
-
 #entryView {
     background: #fff; border-radius: 12px; padding: 16px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -457,7 +444,6 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .entry-field input:focus,
 .entry-field select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-
 .add-btn {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff; border: none; border-radius: 8px;
@@ -467,7 +453,6 @@ input[type=number] { -moz-appearance: textfield; }
     transition: all 0.15s; white-space: nowrap;
 }
 .add-btn:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
-
 .dashboard-card {
     background: #fff; border: 1px solid #e2e8f0;
     border-radius: 12px; overflow: hidden; margin-bottom: 16px;
@@ -508,7 +493,6 @@ input[type=number] { -moz-appearance: textfield; }
     text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px;
 }
 .dash-stat-value { font-size: 18px; font-weight: 900; color: #0f172a; }
-
 .dash-firms {
     padding: 0 14px 14px;
     display: flex; flex-direction: column; gap: 8px;
@@ -533,7 +517,6 @@ input[type=number] { -moz-appearance: textfield; }
     font-size: 13px; font-weight: 800; color: #0f172a;
     text-align: right; white-space: nowrap;
 }
-
 .recent-card {
     background: #fff; border: 1px solid #e2e8f0;
     border-radius: 12px; overflow: hidden; margin-bottom: 16px;
@@ -565,9 +548,7 @@ input[type=number] { -moz-appearance: textfield; }
 .recent-row .rfirm { font-size: 12px; font-weight: 700; color: #1e293b; flex: 1; min-width: 0; }
 .recent-row .rqty { font-size: 13px; font-weight: 900; color: #166534; }
 .recent-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 12px; }
-
 #registerSheetWrapper { display: none; }
-
 .register-sig-block {
     display: flex;
     justify-content: flex-end;
@@ -582,7 +563,6 @@ input[type=number] { -moz-appearance: textfield; }
     padding: 6px 20px 0;
     min-width: 120px;
 }
-
 .layout-editor { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 12px; color: #0f172a; }
 .layout-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .layout-editor-header h3 { font-size: 14px; font-weight: 800; color: #1e40af; display: flex; align-items: center; gap: 6px; }
@@ -601,14 +581,12 @@ input[type=number] { -moz-appearance: textfield; }
 .slider-item input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 .page-count-badge { background: #eff6ff; border: 1px solid #3b82f6; color: #1e40af; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; }
 .page-count-badge.ok { background: #dcfce7; border-color: #16a34a; color: #166534; }
-
 #reportPreviewContainer {
     border: 1px solid #cbd5e1; border-radius: 8px;
     max-height: 620px; overflow: auto; background: #f1f5f9;
     padding: 16px; display: flex; flex-direction: column;
     align-items: center; gap: 12px;
 }
-
 #undoBar {
     position: fixed; bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(140px);
@@ -626,8 +604,6 @@ input[type=number] { -moz-appearance: textfield; }
 #undoBar .undo-timer { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 900; color: #78350f; min-width: 60px; text-align: center; }
 #undoBar .undo-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: 14px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 #undoBar .undo-close { background: transparent; color: #64748b; border: none; font-size: 18px; cursor: pointer; padding: 4px 8px; }
-
-/* Cloud sync indicator */
 .sync-indicator {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 3px 10px; border-radius: 20px;
@@ -637,14 +613,12 @@ input[type=number] { -moz-appearance: textfield; }
 .sync-indicator.online { background: #dcfce7; color: #166534; border-color: #86efac; }
 .sync-indicator.offline { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
 .sync-indicator.syncing { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.sync-indicator.error { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 @media (max-width: 1024px) {
     .header-row-1 { flex-wrap: wrap; gap: 8px; }
-    .header-row-1 .left-part { flex: 1 1 100%; justify-content: flex-start; }
-    .header-row-1 .right-part { flex: 1 1 100%; justify-content: flex-start; flex-wrap: wrap; }
+    .header-row-1 .left-part { flex: 1 1 100%; }
+    .header-row-1 .right-part { flex: 1 1 100%; flex-wrap: wrap; }
     .header-row-1 .left-part .header-title { white-space: normal; font-size: 13px !important; }
     .header-row-2 { flex-direction: column; align-items: stretch; }
     .header-row-2 .left-filters,
@@ -769,6 +743,8 @@ input[type=number] { -moz-appearance: textfield; }
         </div>
 
         <div id="loginForm">
+            <div id="loginMessage" class="login-message" style="display:none;"></div>
+
             <div class="mb-4">
                 <label class="login-label">उपयोगकर्ता नाम</label>
                 <input type="text" id="loginUsername" class="login-input" placeholder="admin या user" autocomplete="username">
@@ -777,8 +753,8 @@ input[type=number] { -moz-appearance: textfield; }
                 <label class="login-label">पासवर्ड</label>
                 <input type="password" id="loginPassword" class="login-input" placeholder="पासवर्ड" autocomplete="current-password">
             </div>
-            <button onclick="attemptLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
-                <i class="fa-solid fa-right-to-bracket mr-1"></i> लॉगिन
+            <button onclick="attemptLogin()" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+                <i class="fa-solid fa-right-to-bracket mr-1"></i> <span id="loginBtnText">लॉगिन</span>
             </button>
             <div class="text-center mt-4">
                 <button onclick="showForgotPassword()" class="text-blue-600 hover:text-blue-800 text-xs font-bold">
@@ -793,6 +769,8 @@ input[type=number] { -moz-appearance: textfield; }
         </div>
 
         <div id="forgotPasswordForm" style="display:none;">
+            <div id="forgotMessage" class="login-message" style="display:none;"></div>
+
             <div class="mb-4">
                 <label class="login-label">उपयोगकर्ता नाम</label>
                 <input type="text" id="resetUsername" class="login-input" placeholder="admin / user">
@@ -802,7 +780,7 @@ input[type=number] { -moz-appearance: textfield; }
                 <input type="email" id="resetEmail" class="login-input" placeholder="OTP कहाँ भेजना है">
             </div>
             <button onclick="requestOTP()" id="sendOtpBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition mb-3">
-                <i class="fa-solid fa-paper-plane mr-1"></i> OTP भेजें
+                <i class="fa-solid fa-paper-plane mr-1"></i> <span id="sendOtpText">OTP भेजें</span>
             </button>
             <div id="otpSection" style="display:none;">
                 <div class="mb-4">
@@ -1101,7 +1079,7 @@ input[type=number] { -moz-appearance: textfield; }
 
 </div>
 
-<!-- DEVICES PANEL MODAL -->
+<!-- DEVICES PANEL -->
 <div id="devicesModal" class="modal-backdrop no-print">
     <div class="modal-box" style="max-width: 1100px;">
         <div class="modal-header">
@@ -1130,7 +1108,6 @@ input[type=number] { -moz-appearance: textfield; }
                     <option value="REPORT_EXCEL">Report Excel</option>
                     <option value="REPORT_PDF">Report PDF</option>
                     <option value="BACKUP">Backup</option>
-                    <option value="RESTORE">Restore</option>
                 </select>
                 <input type="date" id="deviceFilterDate" class="border border-slate-300 rounded px-2 py-1.5 text-sm bg-white">
                 <button onclick="applyDeviceFilters()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-3 py-1.5 rounded text-sm">
@@ -1485,14 +1462,14 @@ input[type=number] { -moz-appearance: textfield; }
 <div id="auditModal" class="modal-backdrop no-print">
     <div class="modal-box" style="max-width: 900px;">
         <div class="modal-header">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग (सभी Devices से)</h2></div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग</h2></div>
             <button onclick="closeAuditLog()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
         </div>
         <div class="modal-body">
             <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
                 <div class="text-xs text-slate-600">
                     <i class="fa-solid fa-list mr-1"></i>
-                    अंतिम 200 गतिविधियाँ (Cloud से)
+                    अंतिम 200 गतिविधियाँ
                 </div>
                 <div class="flex gap-2">
                     <button onclick="refreshAuditLog()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold px-3 py-1.5 rounded">
@@ -1546,14 +1523,20 @@ input[type=number] { -moz-appearance: textfield; }
 
 <script>
 /* ============================================================
-   FIREBASE CLOUD SYNC WRAPPER
+   FIREBASE READY LISTENER
    ============================================================ */
 let fsdb = null, fsFuncs = null, firebaseReady = false;
 window.addEventListener('firebase-ready', () => {
     fsdb = window.fsdb;
     fsFuncs = window.fsFuncs;
-    firebaseReady = true;
-    updateCloudStatus('online', 'Cloud: जुड़ गया');
+    firebaseReady = window.firebaseReady === true;
+    if (firebaseReady) {
+        console.log('✓ Cloud sync ready');
+        updateCloudStatus('online', 'Cloud: जुड़ गया');
+    } else {
+        console.warn('✗ Cloud sync unavailable, running in local mode');
+        updateCloudStatus('offline', 'Cloud: ऑफलाइन');
+    }
 });
 
 function updateCloudStatus(status, text) {
@@ -1614,7 +1597,7 @@ function detectDevice() {
 }
 
 /* ============================================================
-   FIRESTORE - RECORDS SYNC
+   FIRESTORE - RECORDS
    ============================================================ */
 async function cloudPutRecord(y, m, d, data) {
     if (!firebaseReady || !fsdb) return false;
@@ -1650,44 +1633,29 @@ async function cloudGetAllRecords() {
         return out;
     } catch (e) { console.error('Cloud get error:', e); return []; }
 }
-async function cloudGetMonthRecords(y, m) {
-    if (!firebaseReady || !fsdb) return {};
-    try {
-        const all = await cloudGetAllRecords();
-        const r = {};
-        all.forEach(rec => {
-            if (rec.year === y && rec.month === m) {
-                r[rec.day] = { col1: rec.col1, col2: rec.col2, col3: rec.col3, col4: rec.col4 };
-            }
-        });
-        return r;
-    } catch (e) { return {}; }
-}
 
 /* ============================================================
-   FIRESTORE - AUDIT LOG (with device info)
+   FIRESTORE - AUDIT
    ============================================================ */
 async function dbAddAudit(action, details) {
     const dev = detectDevice();
     const rec = {
         timestamp: Date.now(),
-        serverTime: new Date().toISOString(),
         user: session ? session.username : 'unknown',
         role: session ? session.role : 'unknown',
         action: action || 'UNKNOWN',
         details: details || '',
         device: dev,
-        pageUrl: location.href,
         sessionId: session ? session.sessionId : null
     };
     
-    // Local IndexedDB
+    // Local
     try {
         const tx = db.transaction(STORE_AUDIT, 'readwrite');
         tx.objectStore(STORE_AUDIT).add(rec);
     } catch (e) {}
     
-    // Cloud Firestore
+    // Cloud
     if (firebaseReady && fsdb) {
         try {
             const { addDoc, collection } = fsFuncs;
@@ -1695,16 +1663,16 @@ async function dbAddAudit(action, details) {
             updateCloudStatus('online', 'Cloud: सिंक ✓');
         } catch (e) {
             console.error('Cloud audit error:', e);
-            updateCloudStatus('offline', 'Cloud: ऑफलाइन');
+            updateCloudStatus('error', 'Cloud: त्रुटि');
         }
     }
     return true;
 }
-async function cloudGetAuditLog(limit = 200) {
+async function cloudGetAuditLog(limitCount = 200) {
     if (!firebaseReady || !fsdb) return [];
     try {
-        const { collection, query, orderBy, limit: lim, getDocs } = fsFuncs;
-        const q = query(collection(fsdb, 'audit'), orderBy('timestamp', 'desc'), lim(limit));
+        const { collection, query, orderBy, limit, getDocs } = fsFuncs;
+        const q = query(collection(fsdb, 'audit'), orderBy('timestamp', 'desc'), limit(limitCount));
         const snap = await getDocs(q);
         const out = [];
         snap.forEach(d => out.push({ id: d.id, ...d.data() }));
@@ -1716,7 +1684,7 @@ async function cloudGetAuditLog(limit = 200) {
 }
 
 /* ============================================================
-   FIRESTORE - USER PASSWORDS SYNC
+   FIRESTORE - SETTINGS
    ============================================================ */
 async function cloudGetSetting(key) {
     if (!firebaseReady || !fsdb) return null;
@@ -1735,9 +1703,7 @@ async function cloudSetSetting(key, value) {
     } catch (e) { return false; }
 }
 
-/* ============================================================
-   FIRM LABELS
-   ============================================================ */
+/* FIRM LABELS */
 const FIRM_LABELS = {
     col1: { short: 'मे० ओम साँई', zone: 'वरूणा/सारनाथ', full: 'मे० ओम साँई (वरूणा/सारनाथ जोन)' },
     col2: { short: 'मे० संकेत कन्स्ट्रक्शन', zone: 'रामनगर/आदमपुर', full: 'मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)' },
@@ -1885,18 +1851,25 @@ async function hashPassword(password, salt) {
     const buf = await crypto.subtle.digest('SHA-256', data);
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
 async function ensureDefaultUsers() {
-    // Try cloud first
+    console.log('→ Ensuring default users...');
     let adminHash = await cloudGetSetting('user_admin_hash');
     let adminSalt = await cloudGetSetting('user_admin_salt');
+    
+    // If not in cloud, generate defaults and save
     if (!adminHash) {
+        console.log('  Creating default admin credentials');
         const salt = 'admin_salt_' + Math.random().toString(36).slice(2);
         const hash = await hashPassword('jalkal@admin', salt);
         await dbSetSetting('user_admin_hash', hash);
         await dbSetSetting('user_admin_salt', salt);
-        await cloudSetSetting('user_admin_hash', hash);
-        await cloudSetSetting('user_admin_salt', salt);
+        if (firebaseReady) {
+            await cloudSetSetting('user_admin_hash', hash);
+            await cloudSetSetting('user_admin_salt', salt);
+        }
     } else {
+        // Sync from cloud to local
         await dbSetSetting('user_admin_hash', adminHash);
         await dbSetSetting('user_admin_salt', adminSalt);
     }
@@ -1904,34 +1877,50 @@ async function ensureDefaultUsers() {
     let userHash = await cloudGetSetting('user_user_hash');
     let userSalt = await cloudGetSetting('user_user_salt');
     if (!userHash) {
+        console.log('  Creating default user credentials');
         const salt = 'user_salt_' + Math.random().toString(36).slice(2);
         const hash = await hashPassword('jalkal@user', salt);
         await dbSetSetting('user_user_hash', hash);
         await dbSetSetting('user_user_salt', salt);
-        await cloudSetSetting('user_user_hash', hash);
-        await cloudSetSetting('user_user_salt', salt);
+        if (firebaseReady) {
+            await cloudSetSetting('user_user_hash', hash);
+            await cloudSetSetting('user_user_salt', salt);
+        }
     } else {
         await dbSetSetting('user_user_hash', userHash);
         await dbSetSetting('user_user_salt', userSalt);
     }
+    console.log('✓ Default users ready');
 }
+
 async function verifyPassword(username, password) {
-    let h = await cloudGetSetting(`user_${username}_hash`);
-    let s = await cloudGetSetting(`user_${username}_salt`);
+    // Try cloud first, then local
+    let h = null, s = null;
+    if (firebaseReady) {
+        h = await cloudGetSetting(`user_${username}_hash`);
+        s = await cloudGetSetting(`user_${username}_salt`);
+    }
     if (!h) {
         h = await dbGetSetting(`user_${username}_hash`);
         s = await dbGetSetting(`user_${username}_salt`);
     }
-    if (!h || !s) return false;
-    return (await hashPassword(password, s)) === h;
+    if (!h || !s) {
+        console.warn('No password hash found for', username);
+        return false;
+    }
+    const test = await hashPassword(password, s);
+    return test === h;
 }
+
 async function setUserPassword(username, newPassword) {
     const s = 'salt_' + Math.random().toString(36).slice(2);
     const hash = await hashPassword(newPassword, s);
     await dbSetSetting(`user_${username}_salt`, s);
     await dbSetSetting(`user_${username}_hash`, hash);
-    await cloudSetSetting(`user_${username}_salt`, s);
-    await cloudSetSetting(`user_${username}_hash`, hash);
+    if (firebaseReady) {
+        await cloudSetSetting(`user_${username}_salt`, s);
+        await cloudSetSetting(`user_${username}_hash`, hash);
+    }
 }
 
 /* EMAIL */
@@ -1975,7 +1964,7 @@ function resetAutoLock() {
     document.addEventListener(evt, resetAutoLock, { passive: true });
 });
 
-/* UNDO SYSTEM */
+/* UNDO */
 const UNDO_TIMEOUT_MS = 15000;
 let undoStack = null;
 let undoTimerInterval = null;
@@ -2101,82 +2090,259 @@ function renderRegisterTableHeaders() {
     }
 }
 
+/* ============================================================
+   LOGIN HELPERS - MESSAGE DISPLAY
+   ============================================================ */
+function showLoginMessage(msg, type = 'error') {
+    const el = document.getElementById('loginMessage');
+    if (!el) return;
+    const icons = {
+        error: 'fa-circle-exclamation',
+        success: 'fa-circle-check',
+        info: 'fa-circle-info',
+        warning: 'fa-triangle-exclamation'
+    };
+    el.className = `login-message ${type}`;
+    el.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-circle-info'}"></i><span>${msg}</span>`;
+    el.style.display = 'flex';
+}
+function clearLoginMessage() {
+    const el = document.getElementById('loginMessage');
+    if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+    document.getElementById('loginUsername')?.classList.remove('error');
+    document.getElementById('loginPassword')?.classList.remove('error');
+}
+function showForgotMessage(msg, type = 'error') {
+    const el = document.getElementById('forgotMessage');
+    if (!el) return;
+    const icons = {
+        error: 'fa-circle-exclamation',
+        success: 'fa-circle-check',
+        info: 'fa-circle-info',
+        warning: 'fa-triangle-exclamation'
+    };
+    el.className = `login-message ${type}`;
+    el.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-circle-info'}"></i><span>${msg}</span>`;
+    el.style.display = 'flex';
+}
+function clearForgotMessage() {
+    const el = document.getElementById('forgotMessage');
+    if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+function setLoginLoading(on) {
+    const btn = document.getElementById('loginBtn');
+    const txt = document.getElementById('loginBtnText');
+    if (!btn || !txt) return;
+    btn.disabled = on;
+    if (on) {
+        btn.classList.add('opacity-70', 'cursor-wait');
+        txt.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> जाँच हो रही...';
+    } else {
+        btn.classList.remove('opacity-70', 'cursor-wait');
+        txt.innerHTML = 'लॉगिन';
+    }
+}
+function setOtpLoading(on) {
+    const btn = document.getElementById('sendOtpBtn');
+    const txt = document.getElementById('sendOtpText');
+    if (!btn || !txt) return;
+    btn.disabled = on;
+    if (on) {
+        btn.classList.add('opacity-70', 'cursor-wait');
+        txt.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> भेजा जा रहा...';
+    } else {
+        btn.classList.remove('opacity-70', 'cursor-wait');
+        txt.innerHTML = 'OTP भेजें';
+    }
+}
+
 /* LOGIN */
 function showForgotPassword() {
     document.getElementById("loginForm").style.display = "none";
     document.getElementById("forgotPasswordForm").style.display = "block";
     document.getElementById("otpSection").style.display = "none";
-    ["resetUsername","resetEmail","otpInput","newPassword","newPassword2"].forEach(id => document.getElementById(id).value = "");
+    clearForgotMessage();
+    ["resetUsername","resetEmail","otpInput","newPassword","newPassword2"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ''; el.classList.remove('error'); }
+    });
 }
 function backToLogin() {
     document.getElementById("loginForm").style.display = "block";
     document.getElementById("forgotPasswordForm").style.display = "none";
     document.getElementById("otpSection").style.display = "none";
+    clearLoginMessage();
+    clearForgotMessage();
 }
 let activeOTP = null, activeOTPUser = null, activeOTPExpiry = 0;
 
 async function requestOTP() {
-    const username = document.getElementById("resetUsername").value.trim().toLowerCase();
-    const enteredEmail = document.getElementById("resetEmail").value.trim().toLowerCase();
-    if (!username || !enteredEmail) { showToast('दोनों फ़ील्ड भरें', "warning"); return; }
-    if (username !== 'admin' && username !== 'user') { showToast('यह username मौजूद नहीं', "danger"); return; }
+    clearForgotMessage();
+    const usernameEl = document.getElementById("resetUsername");
+    const emailEl = document.getElementById("resetEmail");
+    const username = usernameEl.value.trim().toLowerCase();
+    const enteredEmail = emailEl.value.trim().toLowerCase();
+    
+    usernameEl.classList.remove('error');
+    emailEl.classList.remove('error');
+    
+    if (!username && !enteredEmail) {
+        usernameEl.classList.add('error');
+        emailEl.classList.add('error');
+        showForgotMessage('कृपया दोनों फ़ील्ड भरें — उपयोगकर्ता नाम और ईमेल', 'error');
+        return;
+    }
+    if (!username) {
+        usernameEl.classList.add('error');
+        showForgotMessage('उपयोगकर्ता नाम डालें (admin या user)', 'error');
+        return;
+    }
+    if (!enteredEmail) {
+        emailEl.classList.add('error');
+        showForgotMessage('ईमेल डालें', 'error');
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enteredEmail)) {
+        emailEl.classList.add('error');
+        showForgotMessage('ईमेल का format सही नहीं है (उदाहरण: name@example.com)', 'error');
+        return;
+    }
+    if (username !== 'admin' && username !== 'user') {
+        usernameEl.classList.add('error');
+        showForgotMessage(`"${username}" नाम का कोई उपयोगकर्ता नहीं है। सिर्फ "admin" या "user" मान्य है।`, 'error');
+        return;
+    }
+    
     const cfg = await getEmailConfig();
     const registeredEmail = username === 'admin' ? cfg.adminEmail : cfg.userEmail;
-    if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) { showToast('पहले Admin panel से EmailJS IDs सेट करें', "warning"); return; }
-    if (!registeredEmail) { showToast(username + " का ईमेल सेट नहीं है", "warning"); return; }
-    if (enteredEmail !== registeredEmail.toLowerCase()) { showToast('यह ईमेल रजिस्टर्ड ईमेल से मेल नहीं', "danger"); return; }
+    
+    if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) {
+        showForgotMessage('EmailJS settings अभी सेट नहीं हैं। पहले Admin → ईमेल सेटिंग खोलें।', 'warning');
+        return;
+    }
+    if (!registeredEmail) {
+        showForgotMessage(`${username} का ईमेल सेट नहीं है। Admin → ईमेल सेटिंग में ${username} का ईमेल डालें।`, 'warning');
+        return;
+    }
+    if (enteredEmail !== registeredEmail.toLowerCase()) {
+        emailEl.classList.add('error');
+        showForgotMessage(`यह ईमेल रजिस्टर्ड ईमेल से मेल नहीं खाता। ${username} का रजिस्टर्ड ईमेल check करें।`, 'error');
+        return;
+    }
+    
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     activeOTP = otp; activeOTPUser = username;
     activeOTPExpiry = Date.now() + 10 * 60 * 1000;
+    
+    setOtpLoading(true);
     try {
         await sendOTPEmail(registeredEmail, username, otp, cfg);
         await dbAddAudit('OTP_SENT', `OTP sent to ${registeredEmail}`);
-        showToast('✓ OTP भेज दिया गया (OTP: ' + otp + ')', "success");
+        showForgotMessage(`✓ OTP भेज दिया गया ${registeredEmail} पर। 10 मिनट में valid है। (Debug: ${otp})`, 'success');
         document.getElementById("otpSection").style.display = "block";
+        setOtpLoading(false);
     } catch (err) {
+        console.error('OTP error:', err);
         await dbAddAudit('OTP_FAIL', `Send failed to ${registeredEmail}`);
-        showToast("OTP Error", "danger");
+        const msg = err?.text || err?.message || 'अज्ञात error';
+        showForgotMessage(`OTP भेजने में error: ${msg}. EmailJS settings check करें।`, 'error');
+        setOtpLoading(false);
     }
 }
+
 async function verifyOTPAndReset() {
+    clearForgotMessage();
     const entered = document.getElementById("otpInput").value.trim();
     const np = document.getElementById("newPassword").value;
     const np2 = document.getElementById("newPassword2").value;
-    if (!entered) { showToast('OTP डालें', "warning"); return; }
-    if (Date.now() > activeOTPExpiry) { showToast('OTP की अवधि खत्म', "warning"); return; }
-    if (entered !== activeOTP) { showToast('गलत OTP', "danger"); return; }
-    if (!np || np.length < 6) { showToast('पासवर्ड कम से कम 6 अक्षर', "warning"); return; }
-    if (np !== np2) { showToast('दोनों पासवर्ड मेल नहीं', "warning"); return; }
+    
+    if (!entered) { showForgotMessage('OTP डालें', 'error'); return; }
+    if (entered.length !== 6) { showForgotMessage('OTP 6 अंकों का होना चाहिए', 'error'); return; }
+    if (Date.now() > activeOTPExpiry) { showForgotMessage('OTP की अवधि (10 मिनट) खत्म हो गई। नया OTP मँगवाएँ।', 'warning'); return; }
+    if (entered !== activeOTP) { showForgotMessage('गलत OTP। दोबारा check करें।', 'error'); return; }
+    if (!np || np.length < 6) { showForgotMessage('नया पासवर्ड कम से कम 6 अक्षर', 'error'); return; }
+    if (np !== np2) { showForgotMessage('दोनों पासवर्ड मेल नहीं खाते', 'error'); return; }
+    
     await setUserPassword(activeOTPUser, np);
     await dbAddAudit('PASSWORD_RESET', `${activeOTPUser} password reset via OTP`);
     activeOTP = null; activeOTPUser = null;
-    showToast('✓ पासवर्ड रीसेट हो गया!', "success");
-    backToLogin();
+    showForgotMessage('✓ पासवर्ड रीसेट हो गया! अब लॉगिन करें।', 'success');
+    setTimeout(() => backToLogin(), 2000);
 }
+
 async function attemptLogin() {
-    const username = document.getElementById("loginUsername").value.trim().toLowerCase();
-    const password = document.getElementById("loginPassword").value;
-    if (!username || !password) { showToast('दोनों फ़ील्ड भरें', "warning"); return; }
+    clearLoginMessage();
+    const usernameEl = document.getElementById("loginUsername");
+    const passwordEl = document.getElementById("loginPassword");
+    const username = usernameEl.value.trim().toLowerCase();
+    const password = passwordEl.value;
+    
+    usernameEl.classList.remove('error');
+    passwordEl.classList.remove('error');
+    
+    if (!username && !password) {
+        usernameEl.classList.add('error');
+        passwordEl.classList.add('error');
+        showLoginMessage('कृपया उपयोगकर्ता नाम और पासवर्ड दोनों भरें', 'error');
+        return;
+    }
+    if (!username) {
+        usernameEl.classList.add('error');
+        showLoginMessage('उपयोगकर्ता नाम डालें', 'error');
+        usernameEl.focus();
+        return;
+    }
+    if (!password) {
+        passwordEl.classList.add('error');
+        showLoginMessage('पासवर्ड डालें', 'error');
+        passwordEl.focus();
+        return;
+    }
     if (username !== 'admin' && username !== 'user') {
-        showToast('गलत username या password', "danger");
+        usernameEl.classList.add('error');
+        showLoginMessage(`"${username}" नाम का उपयोगकर्ता नहीं है। सिर्फ "admin" या "user" मान्य है।`, 'error');
+        usernameEl.focus();
         return;
     }
-    const ok = await verifyPassword(username, password);
-    if (!ok) {
-        showToast('गलत username या password', "danger");
-        return;
+    
+    setLoginLoading(true);
+    try {
+        console.log('→ Login attempt for:', username);
+        const ok = await verifyPassword(username, password);
+        console.log('→ Password verify:', ok ? 'SUCCESS' : 'FAILED');
+        
+        if (!ok) {
+            setLoginLoading(false);
+            passwordEl.classList.add('error');
+            showLoginMessage(`गलत पासवर्ड। दोबारा कोशिश करें। (भूल गए तो "पासवर्ड भूल गए?" link use करें)`, 'error');
+            passwordEl.focus();
+            passwordEl.select();
+            return;
+        }
+        
+        session = { 
+            username, 
+            role: username === 'admin' ? 'admin' : 'user', 
+            loginTime: Date.now(),
+            sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9),
+            device: detectDevice()
+        };
+        try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
+        
+        showLoginMessage('✓ लॉगिन सफल! App खुल रहा है...', 'success');
+        await dbAddAudit('LOGIN_SUCCESS', `${username} (${username === 'admin' ? 'Admin' : 'User'}) ने लॉगिन किया`);
+        
+        setTimeout(() => {
+            setLoginLoading(false);
+            enterApp();
+        }, 500);
+    } catch (err) {
+        console.error('Login error:', err);
+        setLoginLoading(false);
+        showLoginMessage('लॉगिन में technical error आया। Page refresh करके दोबारा कोशिश करें। Error: ' + (err.message || 'unknown'), 'error');
     }
-    session = { 
-        username, 
-        role: username === 'admin' ? 'admin' : 'user', 
-        loginTime: Date.now(),
-        sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9),
-        device: detectDevice()
-    };
-    try { localStorage.setItem('jalkal_session', JSON.stringify(session)); } catch (e) {}
-    await dbAddAudit('LOGIN_SUCCESS', `${username} (${username === 'admin' ? 'Admin' : 'User'}) ने लॉगिन किया`);
-    enterApp();
 }
+
 async function logout(silent) {
     if (session) await dbAddAudit('LOGOUT', `${session.username} ने लॉगआउट किया`);
     session = null;
@@ -2186,6 +2352,7 @@ async function logout(silent) {
     document.getElementById("loginScreen").classList.remove("hidden");
     document.getElementById("loginPassword").value = "";
     document.getElementById("loginUsername").value = "";
+    clearLoginMessage();
     if (!silent) showToast('लॉगआउट हो गया', "info");
 }
 function enterApp() {
@@ -2235,7 +2402,7 @@ async function initAppContent() {
     const savedScale = await dbGetSetting('font_scale');
     if (savedScale) fontScale = parseInt(savedScale) || 100;
     cachedLogo = await dbGetSetting('logo_main');
-    if (!cachedLogo) {
+    if (!cachedLogo && firebaseReady) {
         cachedLogo = await cloudGetSetting('logo_main');
         if (cachedLogo) await dbSetSetting('logo_main', cachedLogo);
     }
@@ -2386,7 +2553,7 @@ function switchView(view) {
     }
 }
 
-/* DASHBOARD + RECENT */
+/* DASHBOARD */
 async function renderEntryView() {
     const data = await dbGetMonthRecords(currentYear, currentMonth);
     let c1=0, c2=0, c3=0, c4=0;
@@ -3616,10 +3783,8 @@ async function testEmailSettings() {
     }
 }
 
-/* AUDIT LOG - from Cloud */
-async function refreshAuditLog() {
-    openAuditLog();
-}
+/* AUDIT LOG */
+async function refreshAuditLog() { openAuditLog(); }
 async function openAuditLog() {
     if (!session || session.role !== 'admin') return;
     document.getElementById("userDropdown").style.display = 'none';
@@ -3628,9 +3793,7 @@ async function openAuditLog() {
     document.getElementById("auditModal").classList.add("show");
     
     let logs = await cloudGetAuditLog(200);
-    
     if (!logs || logs.length === 0) {
-        // fallback to local
         logs = await new Promise((resolve) => {
             const out = [];
             const req = db.transaction(STORE_AUDIT, 'readonly').objectStore(STORE_AUDIT).index('timestamp').openCursor(null, 'prev');
@@ -3657,7 +3820,6 @@ async function openAuditLog() {
 function getActionLabels() {
     return {
         LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
-        LOGIN_FAIL: { label: 'लॉगिन असफल', icon: 'fa-times-circle', color: 'text-red-600', bg: 'bg-red-50' },
         LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
         AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
         SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -3737,8 +3899,6 @@ async function refreshDevicesPanel() {
     list.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="text-xs mt-2">Cloud से लोड हो रहा...</p></div>`;
     
     const logs = await cloudGetAuditLog(500);
-    
-    // Stats
     const logins = logs.filter(l => l.action === 'LOGIN_SUCCESS');
     const uniqueDevices = new Set(logs.map(l => `${l.device?.type}-${l.device?.browser}-${l.device?.os}`));
     const uniqueUsers = new Set(logs.map(l => l.user));
@@ -3818,27 +3978,51 @@ function renderDeviceList(logs) {
 }
 
 /* BOOT */
-document.addEventListener("DOMContentLoaded", async () => {
+async function bootApp() {
+    console.log('→ Booting app...');
+    
+    // Wait for IndexedDB
     try {
         await openDB();
         dbReady = true;
-        // Wait for firebase init
-        if (!firebaseReady) {
-            await new Promise(resolve => {
-                const t = setTimeout(resolve, 3000);
-                window.addEventListener('firebase-ready', () => { clearTimeout(t); resolve(); }, { once: true });
-            });
-        }
+        console.log('✓ IndexedDB ready');
+    } catch (err) {
+        console.error('✗ IndexedDB error:', err);
+        alert('Browser storage उपलब्ध नहीं है। कृपया normal mode (incognito नहीं) में खोलें।');
+        return;
+    }
+    
+    // Wait for Firebase
+    if (!firebaseReady) {
+        console.log('→ Waiting for Firebase...');
+        await new Promise(resolve => {
+            const t = setTimeout(() => { console.warn('Firebase timeout'); resolve(); }, 5000);
+            window.addEventListener('firebase-ready', () => { clearTimeout(t); resolve(); }, { once: true });
+        });
+    }
+    console.log('Firebase ready:', firebaseReady);
+    
+    // Ensure default users
+    try {
         await ensureDefaultUsers();
-    } catch (err) { console.error(err); return; }
-
+    } catch (err) {
+        console.error('✗ Default users error:', err);
+    }
+    
+    // Check existing session
     let existing = null;
     try { existing = JSON.parse(localStorage.getItem('jalkal_session') || 'null'); } catch (e) {}
-    if (existing && existing.username) { 
-        session = existing; 
-        enterApp(); 
+    if (existing && existing.username) {
+        session = existing;
+        enterApp();
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", bootApp);
+} else {
+    bootApp();
+}
 </script>
 </body>
 </html>
