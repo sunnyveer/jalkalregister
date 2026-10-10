@@ -550,9 +550,7 @@ input[type=number] { -moz-appearance: textfield; }
 .recent-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 12px; }
 #registerSheetWrapper { display: none; }
 
-/* ═══════════════════════════════════════════════════════════
-   SIGNATURE BLOCK — Chemist (line above text REMOVED)
-   ═══════════════════════════════════════════════════════════ */
+/* SIGNATURE BLOCK — no border-top line above केमिस्ट */
 .register-sig-block {
     display: flex;
     justify-content: flex-end;
@@ -857,10 +855,6 @@ input[type=number] { -moz-appearance: textfield; }
                 <button onclick="openEmailSettings()" id="emailSettingsBtn">
                     <i class="fa-solid fa-envelope" style="color:#d97706;"></i>
                     <span>ईमेल सेटिंग (OTP)</span>
-                </button>
-                <button onclick="openAuditLog()" id="auditLogBtn">
-                    <i class="fa-solid fa-history" style="color:#9333ea;"></i>
-                    <span>गतिविधि लॉग</span>
                 </button>
                 <button onclick="openDevicesPanel()" id="devicesBtn">
                     <i class="fa-solid fa-mobile-screen-button" style="color:#0891b2;"></i>
@@ -1458,33 +1452,6 @@ input[type=number] { -moz-appearance: textfield; }
                 </button>
             </div>
             <div id="testEmailResult" class="mt-3 text-xs"></div>
-        </div>
-    </div>
-</div>
-
-<!-- AUDIT LOG MODAL -->
-<div id="auditModal" class="modal-backdrop no-print">
-    <div class="modal-box" style="max-width: 900px;">
-        <div class="modal-header">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-history text-purple-600"></i><h2 class="font-bold">गतिविधि लॉग</h2></div>
-            <button onclick="closeAuditLog()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded">बंद</button>
-        </div>
-        <div class="modal-body">
-            <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
-                <div class="text-xs text-slate-600">
-                    <i class="fa-solid fa-list mr-1"></i>
-                    अंतिम 200 गतिविधियाँ
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="refreshAuditLog()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold px-3 py-1.5 rounded">
-                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
-                    </button>
-                    <button onclick="clearAuditLog()" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-1.5 rounded">
-                        <i class="fa-solid fa-trash mr-1"></i> साफ़ करें
-                    </button>
-                </div>
-            </div>
-            <div id="auditList" class="space-y-2 max-h-[60vh] overflow-y-auto"></div>
         </div>
     </div>
 </div>
@@ -2235,7 +2202,8 @@ async function requestOTP() {
     try {
         await sendOTPEmail(registeredEmail, username, otp, cfg);
         await dbAddAudit('OTP_SENT', `OTP sent to ${registeredEmail}`);
-        showForgotMessage(`✓ OTP भेज दिया गया ${registeredEmail} पर। 10 मिनट में valid है। (Debug: ${otp})`, 'success');
+        // ═══ OTP अब screen पर नहीं दिखेगा — सिर्फ ईमेल पर ═══
+        showForgotMessage(`✓ OTP भेज दिया गया ${registeredEmail} पर। 10 मिनट में valid है। कृपया अपना ईमेल check करें।`, 'success');
         document.getElementById("otpSection").style.display = "block";
         setOtpLoading(false);
     } catch (err) {
@@ -2362,7 +2330,6 @@ function enterApp() {
     const isAdmin = session.role === 'admin';
     document.getElementById("saveBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("backupBtn").style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById("auditLogBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("devicesBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("emailSettingsBtn").style.display = isAdmin ? 'flex' : 'none';
     document.getElementById("resetLogoBtn").style.display = isAdmin ? 'flex' : 'none';
@@ -2474,13 +2441,13 @@ async function initAppContent() {
         if (el) el.addEventListener('input', onLayoutSliderChange);
     });
 
-    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
+    ["searchModal","editModal","backupModal","changePasswordModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener("click", (e) => { if (e.target.id === id) el.classList.remove("show"); });
     });
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-            ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
+            ["searchModal","editModal","backupModal","changePasswordModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove("show");
             });
@@ -3312,7 +3279,7 @@ function buildCloneHtml() {
 }
 
 async function printPDF() {
-    ["searchModal","editModal","backupModal","changePasswordModal","auditModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
+    ["searchModal","editModal","backupModal","changePasswordModal","emailSettingsModal","restoreConfirmModal","reportModal","devicesModal"].forEach(id => document.getElementById(id)?.classList.remove("show"));
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     const htmlContent = buildCloneHtml();
     await dbAddAudit('PRINT_PDF', `${currentYear}-${currentMonth} PDF`);
@@ -3507,7 +3474,6 @@ async function previewReport() {
         const thead = buildTableHeader(format, firm);
         const headerBar = buildReportHeader(firm, dateRangeText);
         const pageLabel = pages.length > 1 ? `<div style="text-align:right;font-size:${printLayout.fontSize-1}px;font-weight:700;color:#666;margin-bottom:3px;">Page ${pg.pageNum} / ${pg.totalPages}</div>` : '';
-        /* ═══ SIGNATURE BLOCK — no border-top line above केमिस्ट ═══ */
         const sigBlock = isLast ? `<div class="signature-block" style="display:flex;justify-content:flex-end;margin-top:${printLayout.sigTop}px;padding:0 40px 0 0;font-size:${printLayout.fontSize}px;font-weight:700;">
             <div style="text-align:right;min-height:${printLayout.sigHeight}px;display:flex;flex-direction:column;justify-content:flex-end;padding-top:${Math.max(0,printLayout.sigHeight-30)}px;padding-right:20px;padding-left:20px;">केमिस्ट</div>
         </div>` : '';
@@ -3774,114 +3740,11 @@ async function testEmailSettings() {
     try {
         const testOTP = Math.floor(100000 + Math.random() * 900000).toString();
         await sendOTPEmail(cfg.adminEmail, "Test Admin", testOTP, cfg);
-        resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — OTP: <strong>${testOTP}</strong></div>`;
+        resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — ईमेल check करें (OTP ईमेल पर भेजा गया)</div>`;
         await dbAddAudit('EMAIL_TEST', `Test OTP sent to ${cfg.adminEmail}`);
     } catch (err) {
         resultDiv.innerHTML = `<div class="text-red-600">✗ ${err.text || err.message || 'Error'}</div>`;
     }
-}
-
-/* AUDIT LOG */
-async function refreshAuditLog() { openAuditLog(); }
-async function openAuditLog() {
-    if (!session || session.role !== 'admin') return;
-    document.getElementById("userDropdown").style.display = 'none';
-    const list = document.getElementById("auditList");
-    list.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="text-xs mt-2">Cloud से लोड हो रहा...</p></div>`;
-    document.getElementById("auditModal").classList.add("show");
-    
-    let logs = await cloudGetAuditLog(200);
-    if (!logs || logs.length === 0) {
-        logs = await new Promise((resolve) => {
-            const out = [];
-            const req = db.transaction(STORE_AUDIT, 'readonly').objectStore(STORE_AUDIT).index('timestamp').openCursor(null, 'prev');
-            req.onsuccess = (e) => {
-                const c = e.target.result;
-                if (c && out.length < 200) { out.push(c.value); c.continue(); }
-                else resolve(out);
-            };
-            req.onerror = () => resolve([]);
-        });
-    }
-    
-    if (!logs || logs.length === 0) {
-        list.innerHTML = `<div class="text-center py-10 text-slate-400">
-            <i class="fa-solid fa-inbox text-3xl mb-2 block opacity-40"></i>
-            <p class="text-sm">अभी कोई गतिविधि नहीं है।</p>
-        </div>`;
-        return;
-    }
-    
-    const actionLabels = getActionLabels();
-    list.innerHTML = logs.map(l => renderAuditRow(l, actionLabels)).join("");
-}
-function getActionLabels() {
-    return {
-        LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
-        LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
-        AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
-        SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
-        EDIT_RECORD: { label: 'रिकॉर्ड संपादित', icon: 'fa-pen', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        DELETE_RECORD: { label: 'रिकॉर्ड हटाया', icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-50' },
-        ENTRY_ADD: { label: 'नई एंट्री', icon: 'fa-plus-circle', color: 'text-emerald-700', bg: 'bg-emerald-50' },
-        EXPORT_EXCEL: { label: 'Excel निर्यात', icon: 'fa-file-excel', color: 'text-green-700', bg: 'bg-green-50' },
-        PRINT_PDF: { label: 'PDF बनाया', icon: 'fa-file-pdf', color: 'text-red-700', bg: 'bg-red-50' },
-        REPORT_EXCEL: { label: 'रिपोर्ट Excel', icon: 'fa-file-excel', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-        REPORT_PDF: { label: 'रिपोर्ट PDF', icon: 'fa-file-pdf', color: 'text-indigo-700', bg: 'bg-indigo-50' },
-        BACKUP: { label: 'बैकअप डाउनलोड', icon: 'fa-download', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        RESTORE: { label: 'रीस्टोर', icon: 'fa-upload', color: 'text-blue-600', bg: 'bg-blue-50' },
-        CLEAR_ALL: { label: 'सारा डेटा मिटाया', icon: 'fa-bomb', color: 'text-red-700', bg: 'bg-red-50' },
-        LOGO_UPLOAD: { label: 'लोगो अपलोड', icon: 'fa-image', color: 'text-blue-600', bg: 'bg-blue-50' },
-        LOGO_REMOVE: { label: 'लोगो हटाया', icon: 'fa-image', color: 'text-slate-500', bg: 'bg-slate-50' },
-        UNDO: { label: 'अनडू', icon: 'fa-rotate-left', color: 'text-amber-500', bg: 'bg-amber-50' },
-        PASSWORD_CHANGE: { label: 'पासवर्ड बदला', icon: 'fa-key', color: 'text-purple-600', bg: 'bg-purple-50' },
-        PASSWORD_RESET: { label: 'पासवर्ड रीसेट', icon: 'fa-key', color: 'text-purple-700', bg: 'bg-purple-50' },
-        OTP_SENT: { label: 'OTP भेजा', icon: 'fa-envelope-circle-check', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        OTP_FAIL: { label: 'OTP असफल', icon: 'fa-envelope', color: 'text-red-600', bg: 'bg-red-50' },
-        EMAIL_SETTINGS_SAVE: { label: 'ईमेल सेटिंग सेव', icon: 'fa-envelope', color: 'text-amber-600', bg: 'bg-amber-50' },
-        EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
-        CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
-    };
-}
-function renderAuditRow(l, actionLabels) {
-    let dt = '--';
-    try {
-        dt = new Date(l.timestamp).toLocaleString('hi-IN', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-    } catch (e) {}
-    
-    const info = actionLabels[l.action] || { label: l.action || 'Unknown', icon: 'fa-circle-info', color: 'text-slate-500', bg: 'bg-slate-50' };
-    const badge = l.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
-    const dev = l.device || {};
-    const deviceIcon = dev.type === 'Mobile' ? 'fa-mobile-screen' : dev.type === 'Tablet' ? 'fa-tablet-screen-button' : 'fa-desktop';
-    
-    return `
-        <div class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg ${info.bg}">
-            <i class="fa-solid ${info.icon} ${info.color} mt-0.5 text-lg flex-shrink-0"></i>
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-sm font-bold ${info.color}">${info.label}</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}">
-                        ${l.user || '?'} (${l.role || '?'})
-                    </span>
-                </div>
-                ${l.details ? `<div class="text-xs text-slate-600 mt-1 break-words">${l.details}</div>` : ''}
-                <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[10px] text-slate-500">
-                    <span><i class="fa-solid fa-clock"></i> ${dt}</span>
-                    <span><i class="fa-solid ${deviceIcon}"></i> ${dev.type || '?'} • ${dev.browser || '?'} • ${dev.os || '?'}</span>
-                </div>
-            </div>
-        </div>`;
-}
-function closeAuditLog() { document.getElementById("auditModal").classList.remove("show"); }
-async function clearAuditLog() {
-    if (!confirm("लॉग साफ़ करें?")) return;
-    await dbClearAudit();
-    await dbAddAudit('CLEAR_AUDIT', 'Audit log cleared by admin');
-    openAuditLog();
-    showToast('लॉग साफ़', "success");
 }
 
 /* DEVICES PANEL */
@@ -3929,6 +3792,34 @@ function clearDeviceFilters() {
     document.getElementById('deviceFilterAction').value = '';
     document.getElementById('deviceFilterDate').value = '';
     refreshDevicesPanel();
+}
+function getActionLabels() {
+    return {
+        LOGIN_SUCCESS: { label: 'लॉगिन सफल', icon: 'fa-right-to-bracket', color: 'text-green-600', bg: 'bg-green-50' },
+        LOGOUT: { label: 'लॉगआउट', icon: 'fa-right-from-bracket', color: 'text-slate-600', bg: 'bg-slate-50' },
+        AUTO_LOCK: { label: 'ऑटो-लॉक', icon: 'fa-clock', color: 'text-amber-600', bg: 'bg-amber-50' },
+        SAVE_DATA: { label: 'डेटा सेव', icon: 'fa-floppy-disk', color: 'text-blue-600', bg: 'bg-blue-50' },
+        EDIT_RECORD: { label: 'रिकॉर्ड संपादित', icon: 'fa-pen', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        DELETE_RECORD: { label: 'रिकॉर्ड हटाया', icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-50' },
+        ENTRY_ADD: { label: 'नई एंट्री', icon: 'fa-plus-circle', color: 'text-emerald-700', bg: 'bg-emerald-50' },
+        EXPORT_EXCEL: { label: 'Excel निर्यात', icon: 'fa-file-excel', color: 'text-green-700', bg: 'bg-green-50' },
+        PRINT_PDF: { label: 'PDF बनाया', icon: 'fa-file-pdf', color: 'text-red-700', bg: 'bg-red-50' },
+        REPORT_EXCEL: { label: 'रिपोर्ट Excel', icon: 'fa-file-excel', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+        REPORT_PDF: { label: 'रिपोर्ट PDF', icon: 'fa-file-pdf', color: 'text-indigo-700', bg: 'bg-indigo-50' },
+        BACKUP: { label: 'बैकअप डाउनलोड', icon: 'fa-download', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        RESTORE: { label: 'रीस्टोर', icon: 'fa-upload', color: 'text-blue-600', bg: 'bg-blue-50' },
+        CLEAR_ALL: { label: 'सारा डेटा मिटाया', icon: 'fa-bomb', color: 'text-red-700', bg: 'bg-red-50' },
+        LOGO_UPLOAD: { label: 'लोगो अपलोड', icon: 'fa-image', color: 'text-blue-600', bg: 'bg-blue-50' },
+        LOGO_REMOVE: { label: 'लोगो हटाया', icon: 'fa-image', color: 'text-slate-500', bg: 'bg-slate-50' },
+        UNDO: { label: 'अनडू', icon: 'fa-rotate-left', color: 'text-amber-500', bg: 'bg-amber-50' },
+        PASSWORD_CHANGE: { label: 'पासवर्ड बदला', icon: 'fa-key', color: 'text-purple-600', bg: 'bg-purple-50' },
+        PASSWORD_RESET: { label: 'पासवर्ड रीसेट', icon: 'fa-key', color: 'text-purple-700', bg: 'bg-purple-50' },
+        OTP_SENT: { label: 'OTP भेजा', icon: 'fa-envelope-circle-check', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        OTP_FAIL: { label: 'OTP असफल', icon: 'fa-envelope', color: 'text-red-600', bg: 'bg-red-50' },
+        EMAIL_SETTINGS_SAVE: { label: 'ईमेल सेटिंग सेव', icon: 'fa-envelope', color: 'text-amber-600', bg: 'bg-amber-50' },
+        EMAIL_TEST: { label: 'ईमेल टेस्ट', icon: 'fa-paper-plane', color: 'text-blue-600', bg: 'bg-blue-50' },
+        CLEAR_AUDIT: { label: 'लॉग साफ़', icon: 'fa-eraser', color: 'text-slate-500', bg: 'bg-slate-50' }
+    };
 }
 function renderDeviceList(logs) {
     const list = document.getElementById("devicesList");
