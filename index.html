@@ -11,7 +11,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit as fsLimit, addDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit as fsLimit, addDoc, deleteDoc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBJx1Gv5KYHzJrz95svVLhfdr0Eax_Ig8o",
@@ -28,10 +28,10 @@
     window.fsdb = fsdb;
     window.fsFuncs = {
       doc, setDoc, getDoc, getDocs, collection, query, orderBy,
-      limit: fsLimit, addDoc, deleteDoc, writeBatch
+      limit: fsLimit, addDoc, deleteDoc, writeBatch, onSnapshot
     };
     window.firebaseReady = true;
-    console.log('✓ Firebase initialized');
+    console.log('✓ Firebase initialized with real-time support');
     window.dispatchEvent(new Event('firebase-ready'));
   } catch (e) {
     console.error('✗ Firebase init error:', e);
@@ -550,7 +550,6 @@ input[type=number] { -moz-appearance: textfield; }
 .recent-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 12px; }
 #registerSheetWrapper { display: none; }
 
-/* SIGNATURE BLOCK — no border-top line above केमिस्ट */
 .register-sig-block {
     display: flex;
     justify-content: flex-end;
@@ -616,6 +615,11 @@ input[type=number] { -moz-appearance: textfield; }
 .sync-indicator.offline { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
 .sync-indicator.syncing { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
 .sync-indicator.error { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.sync-indicator.live { background: #dcfce7; color: #166534; border-color: #86efac; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
 
 @media (max-width: 1024px) {
     .header-row-1 { flex-wrap: wrap; gap: 8px; }
@@ -844,6 +848,10 @@ input[type=number] { -moz-appearance: textfield; }
                     <div class="dd-label">लॉगिन किया:</div>
                     <div id="userInfoLine" class="dd-user">--</div>
                 </div>
+                <button onclick="manualRefresh()" style="color:#0891b2;">
+                    <i class="fa-solid fa-rotate" style="color:#0891b2;"></i>
+                    <span>अभी Refresh करें</span>
+                </button>
                 <button onclick="resetLogoPosition()" id="resetLogoBtn">
                     <i class="fa-solid fa-arrows-up-down-left-right" style="color:#059669;"></i>
                     <span>लोगो पोज़िशन रीसेट</span>
@@ -1502,7 +1510,7 @@ window.addEventListener('firebase-ready', () => {
     fsFuncs = window.fsFuncs;
     firebaseReady = window.firebaseReady === true;
     if (firebaseReady) {
-        console.log('✓ Cloud sync ready');
+        console.log('✓ Cloud sync ready with real-time');
         updateCloudStatus('online', 'Cloud: जुड़ गया');
     } else {
         console.warn('✗ Cloud sync unavailable, running in local mode');
@@ -1606,6 +1614,139 @@ async function cloudGetAllRecords() {
 }
 
 /* ============================================================
+   REAL-TIME SYNC — दूसरे devices से आने वाले changes
+   ============================================================ */
+let unsubscribeRealtime = null;
+let syncInProgress = false;
+let pendingSync = false;
+
+function startRealtimeSync() {
+    if (unsubscribeRealtime) {
+        try { unsubscribeRealtime(); } catch (e) {}
+        unsubscribeRealtime = null;
+    }
+    
+    if (!firebaseReady || !fsdb || !fsFuncs || !fsFuncs.onSnapshot) {
+        console.warn('Real-time sync unavailable — Firebase not ready');
+        return;
+    }
+    
+    try {
+        const { collection, onSnapshot } = fsFuncs;
+        console.log('→ Starting real-time sync listener...');
+        
+        unsubscribeRealtime = onSnapshot(collection(fsdb, 'records'), (snapshot) => {
+            let changes = 0;
+            snapshot.docChanges().forEach(() => changes++);
+            
+            if (changes === 0) return;
+            
+            console.log('⚡ Real-time update:', changes, 'changes from other device');
+            
+            if (syncInProgress) {
+                pendingSync = true;
+                return;
+            }
+            
+            syncInProgress = true;
+            syncCloudToLocal().then(() => {
+                syncInProgress = false;
+                if (currentView === 'register') {
+                    renderTable();
+                }
+                renderEntryView();
+                if (document.getElementById("searchModal")?.classList.contains("show")) {
+                    runSearch();
+                }
+                showToast('🔄 दूसरे device से नया data आया', "info");
+                updateCloudStatus('live', 'Cloud: लाइव ✓');
+            }).catch(e => {
+                syncInProgress = false;
+                console.error('Sync failed:', e);
+            }).finally(() => {
+                if (pendingSync) {
+                    pendingSync = false;
+                    setTimeout(() => startRealtimeSync(), 500);
+                }
+            });
+        }, (error) => {
+            console.error('Real-time listener error:', error);
+            updateCloudStatus('error', 'Cloud: लाइव बंद');
+        });
+        
+        console.log('✓ Real-time sync started');
+        updateCloudStatus('live', 'Cloud: लाइव ✓');
+    } catch (e) {
+        console.error('Failed to start real-time sync:', e);
+    }
+}
+
+function stopRealtimeSync() {
+    if (unsubscribeRealtime) {
+        try { unsubscribeRealtime(); } catch (e) {}
+        unsubscribeRealtime = null;
+        console.log('→ Real-time sync stopped');
+    }
+}
+
+/* Cloud से सारा data लाकर local IndexedDB में merge करें */
+async function syncCloudToLocal() {
+    if (!firebaseReady || !fsdb) return;
+    try {
+        const cloudRecs = await cloudGetAllRecords();
+        const localRecs = await dbGetAllRecords();
+        const localMap = new Map();
+        localRecs.forEach(r => localMap.set(r.id, r));
+        
+        for (const cr of cloudRecs) {
+            const id = cr.id || recordId(cr.year, cr.month, cr.day);
+            const local = localMap.get(id);
+            const cloudUpdated = cr.updatedAt || 0;
+            const localUpdated = local?.updatedAt || 0;
+            
+            if (!local || cloudUpdated > localUpdated) {
+                await dbPutRecord(cr.year, cr.month, cr.day, {
+                    col1: cr.col1 || '',
+                    col2: cr.col2 || '',
+                    col3: cr.col3 || '',
+                    col4: cr.col4 || ''
+                });
+            }
+            localMap.delete(id);
+        }
+        
+        // Cloud में delete हो चुके records को local से भी हटाएँ
+        for (const [id, rec] of localMap) {
+            await dbDeleteRecord(rec.year, rec.month, rec.day);
+        }
+        
+        console.log('✓ Cloud → Local sync complete');
+    } catch (e) {
+        console.error('Sync cloud to local error:', e);
+    }
+}
+
+/* Manual Refresh — user चाहे तो खुद refresh करे */
+async function manualRefresh() {
+    document.getElementById("userDropdown").style.display = 'none';
+    showToast('Cloud से नया data ला रहे हैं...', 'info');
+    updateCloudStatus('syncing', 'Cloud: सिंक हो रहा...');
+    try {
+        await syncCloudToLocal();
+        await renderTable();
+        await renderEntryView();
+        if (document.getElementById("searchModal")?.classList.contains("show")) {
+            runSearch();
+        }
+        showToast('✓ Data refresh हो गया', 'success');
+        updateCloudStatus('live', 'Cloud: लाइव ✓');
+    } catch (e) {
+        showToast('Refresh में error', 'danger');
+        updateCloudStatus('error', 'Cloud: त्रुटि');
+    }
+}
+
+/* ============================================================
    FIRESTORE - AUDIT
    ============================================================ */
 async function dbAddAudit(action, details) {
@@ -1629,10 +1770,8 @@ async function dbAddAudit(action, details) {
         try {
             const { addDoc, collection } = fsFuncs;
             await addDoc(collection(fsdb, 'audit'), rec);
-            updateCloudStatus('online', 'Cloud: सिंक ✓');
         } catch (e) {
             console.error('Cloud audit error:', e);
-            updateCloudStatus('error', 'Cloud: त्रुटि');
         }
     }
     return true;
@@ -1751,7 +1890,8 @@ function dbPutRecord(y, m, d, data) {
     return new Promise((resolve, reject) => {
         const req = db.transaction(STORE_RECORDS, 'readwrite').objectStore(STORE_RECORDS).put({
             id: recordId(y,m,d), year: y, month: m, day: d,
-            col1: data.col1||'', col2: data.col2||'', col3: data.col3||'', col4: data.col4||''
+            col1: data.col1||'', col2: data.col2||'', col3: data.col3||'', col4: data.col4||'',
+            updatedAt: data.updatedAt || Date.now()
         });
         req.onsuccess = () => resolve();
         req.onerror = () => reject(req.error);
@@ -1827,7 +1967,6 @@ async function ensureDefaultUsers() {
     let adminSalt = await cloudGetSetting('user_admin_salt');
     
     if (!adminHash) {
-        console.log('  Creating default admin credentials');
         const salt = 'admin_salt_' + Math.random().toString(36).slice(2);
         const hash = await hashPassword('jalkal@admin', salt);
         await dbSetSetting('user_admin_hash', hash);
@@ -1844,7 +1983,6 @@ async function ensureDefaultUsers() {
     let userHash = await cloudGetSetting('user_user_hash');
     let userSalt = await cloudGetSetting('user_user_salt');
     if (!userHash) {
-        console.log('  Creating default user credentials');
         const salt = 'user_salt_' + Math.random().toString(36).slice(2);
         const hash = await hashPassword('jalkal@user', salt);
         await dbSetSetting('user_user_hash', hash);
@@ -1870,10 +2008,7 @@ async function verifyPassword(username, password) {
         h = await dbGetSetting(`user_${username}_hash`);
         s = await dbGetSetting(`user_${username}_salt`);
     }
-    if (!h || !s) {
-        console.warn('No password hash found for', username);
-        return false;
-    }
+    if (!h || !s) return false;
     const test = await hashPassword(password, s);
     return test === h;
 }
@@ -2060,12 +2195,7 @@ function renderRegisterTableHeaders() {
 function showLoginMessage(msg, type = 'error') {
     const el = document.getElementById('loginMessage');
     if (!el) return;
-    const icons = {
-        error: 'fa-circle-exclamation',
-        success: 'fa-circle-check',
-        info: 'fa-circle-info',
-        warning: 'fa-triangle-exclamation'
-    };
+    const icons = { error: 'fa-circle-exclamation', success: 'fa-circle-check', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
     el.className = `login-message ${type}`;
     el.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-circle-info'}"></i><span>${msg}</span>`;
     el.style.display = 'flex';
@@ -2079,12 +2209,7 @@ function clearLoginMessage() {
 function showForgotMessage(msg, type = 'error') {
     const el = document.getElementById('forgotMessage');
     if (!el) return;
-    const icons = {
-        error: 'fa-circle-exclamation',
-        success: 'fa-circle-check',
-        info: 'fa-circle-info',
-        warning: 'fa-triangle-exclamation'
-    };
+    const icons = { error: 'fa-circle-exclamation', success: 'fa-circle-check', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
     el.className = `login-message ${type}`;
     el.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-circle-info'}"></i><span>${msg}</span>`;
     el.style.display = 'flex';
@@ -2202,7 +2327,6 @@ async function requestOTP() {
     try {
         await sendOTPEmail(registeredEmail, username, otp, cfg);
         await dbAddAudit('OTP_SENT', `OTP sent to ${registeredEmail}`);
-        // ═══ OTP अब screen पर नहीं दिखेगा — सिर्फ ईमेल पर ═══
         showForgotMessage(`✓ OTP भेज दिया गया ${registeredEmail} पर। 10 मिनट में valid है। कृपया अपना ईमेल check करें।`, 'success');
         document.getElementById("otpSection").style.display = "block";
         setOtpLoading(false);
@@ -2310,6 +2434,10 @@ async function attemptLogin() {
 
 async function logout(silent) {
     if (session) await dbAddAudit('LOGOUT', `${session.username} ने लॉगआउट किया`);
+    
+    // Real-time listener बंद करें
+    stopRealtimeSync();
+    
     session = null;
     try { localStorage.removeItem('jalkal_session'); } catch (e) {}
     if (autoLockTimer) clearTimeout(autoLockTimer);
@@ -2340,6 +2468,15 @@ function enterApp() {
     document.getElementById("userInfoLine").innerText = `${session.username} (${session.role}) • ${new Date(session.loginTime).toLocaleTimeString('hi-IN')}`;
     initAppContent();
     resetAutoLock();
+    
+    // ═══ Real-time sync शुरू करें ═══
+    startRealtimeSync();
+    
+    // ═══ पहले Cloud से latest data लाकर local में merge करें ═══
+    syncCloudToLocal().then(() => {
+        renderTable();
+        renderEntryView();
+    });
 }
 
 /* APP INIT */
@@ -3740,7 +3877,7 @@ async function testEmailSettings() {
     try {
         const testOTP = Math.floor(100000 + Math.random() * 900000).toString();
         await sendOTPEmail(cfg.adminEmail, "Test Admin", testOTP, cfg);
-        resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — ईमेल check करें (OTP ईमेल पर भेजा गया)</div>`;
+        resultDiv.innerHTML = `<div class="text-emerald-600">✓ भेजा — ईमेल check करें</div>`;
         await dbAddAudit('EMAIL_TEST', `Test OTP sent to ${cfg.adminEmail}`);
     } catch (err) {
         resultDiv.innerHTML = `<div class="text-red-600">✗ ${err.text || err.message || 'Error'}</div>`;
