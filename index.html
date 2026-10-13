@@ -453,6 +453,7 @@ input[type=number] { -moz-appearance: textfield; }
     transition: all 0.15s; white-space: nowrap;
 }
 .add-btn:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
+.add-btn:disabled { opacity: 0.7; cursor: wait; transform: none; }
 .dashboard-card {
     background: #fff; border: 1px solid #e2e8f0;
     border-radius: 12px; overflow: hidden; margin-bottom: 16px;
@@ -1576,6 +1577,23 @@ function detectDevice() {
 }
 
 /* ============================================================
+   WRITE LOCK — इससे हमारे खुद के writes पर listener ignore होगा
+   ============================================================ */
+let isWritingLocally = false;
+let pendingCloudWrites = 0;
+
+function lockLocalWrite() {
+    isWritingLocally = true;
+    pendingCloudWrites++;
+}
+function unlockLocalWrite() {
+    pendingCloudWrites = Math.max(0, pendingCloudWrites - 1);
+    if (pendingCloudWrites === 0) {
+        setTimeout(() => { isWritingLocally = false; }, 2000);
+    }
+}
+
+/* ============================================================
    FIRESTORE - RECORDS
    ============================================================ */
 async function cloudPutRecord(y, m, d, data) {
@@ -1614,11 +1632,12 @@ async function cloudGetAllRecords() {
 }
 
 /* ============================================================
-   REAL-TIME SYNC — दूसरे devices से आने वाले changes
+   REAL-TIME SYNC
    ============================================================ */
 let unsubscribeRealtime = null;
 let syncInProgress = false;
 let pendingSync = false;
+let realtimeStarted = false;
 
 function startRealtimeSync() {
     if (unsubscribeRealtime) {
@@ -1636,12 +1655,31 @@ function startRealtimeSync() {
         console.log('→ Starting real-time sync listener...');
         
         unsubscribeRealtime = onSnapshot(collection(fsdb, 'records'), (snapshot) => {
+            // ═══ अगर हम खुद write कर रहे हैं, तो ignore करें ═══
+            if (isWritingLocally) {
+                console.log('⏸ Real-time update ignored (local write in progress)');
+                return;
+            }
+            
             let changes = 0;
-            snapshot.docChanges().forEach(() => changes++);
+            let externalChange = false;
+            snapshot.docChanges().forEach((change) => {
+                changes++;
+                // अगर यह हमारे खुद के session से नहीं आया
+                const data = change.doc.data();
+                if (data.updatedBy !== session?.username) {
+                    externalChange = true;
+                }
+            });
             
             if (changes === 0) return;
             
-            console.log('⚡ Real-time update:', changes, 'changes from other device');
+            // अगर सिर्फ हमारे खुद के changes हैं, तो notification न दिखाएँ
+            if (!externalChange) {
+                console.log('⏭ Real-time update: only our own changes, silent sync');
+            } else {
+                console.log('⚡ Real-time update:', changes, 'changes from OTHER device');
+            }
             
             if (syncInProgress) {
                 pendingSync = true;
@@ -1658,7 +1696,9 @@ function startRealtimeSync() {
                 if (document.getElementById("searchModal")?.classList.contains("show")) {
                     runSearch();
                 }
-                showToast('🔄 दूसरे device से नया data आया', "info");
+                if (externalChange) {
+                    showToast('🔄 दूसरे device से नया data आया', "info");
+                }
                 updateCloudStatus('live', 'Cloud: लाइव ✓');
             }).catch(e => {
                 syncInProgress = false;
@@ -1674,6 +1714,7 @@ function startRealtimeSync() {
             updateCloudStatus('error', 'Cloud: लाइव बंद');
         });
         
+        realtimeStarted = true;
         console.log('✓ Real-time sync started');
         updateCloudStatus('live', 'Cloud: लाइव ✓');
     } catch (e) {
@@ -1685,11 +1726,14 @@ function stopRealtimeSync() {
     if (unsubscribeRealtime) {
         try { unsubscribeRealtime(); } catch (e) {}
         unsubscribeRealtime = null;
+        realtimeStarted = false;
         console.log('→ Real-time sync stopped');
     }
 }
 
-/* Cloud से सारा data लाकर local IndexedDB में merge करें */
+/* Cloud से सारा data लाकर local IndexedDB में merge करें
+   ध्यान: Local data को cloud data से overwrite नहीं करेंगे अगर local newer है
+*/
 async function syncCloudToLocal() {
     if (!firebaseReady || !fsdb) return;
     try {
@@ -1704,18 +1748,20 @@ async function syncCloudToLocal() {
             const cloudUpdated = cr.updatedAt || 0;
             const localUpdated = local?.updatedAt || 0;
             
+            // Cloud newer है तो update करें
             if (!local || cloudUpdated > localUpdated) {
                 await dbPutRecord(cr.year, cr.month, cr.day, {
                     col1: cr.col1 || '',
                     col2: cr.col2 || '',
                     col3: cr.col3 || '',
-                    col4: cr.col4 || ''
+                    col4: cr.col4 || '',
+                    updatedAt: cloudUpdated
                 });
             }
             localMap.delete(id);
         }
         
-        // Cloud में delete हो चुके records को local से भी हटाएँ
+        // जो local में हैं पर cloud में नहीं (delete हो चुके) — हटाएँ
         for (const [id, rec] of localMap) {
             await dbDeleteRecord(rec.year, rec.month, rec.day);
         }
@@ -1726,7 +1772,7 @@ async function syncCloudToLocal() {
     }
 }
 
-/* Manual Refresh — user चाहे तो खुद refresh करे */
+/* Manual Refresh */
 async function manualRefresh() {
     document.getElementById("userDropdown").style.display = 'none';
     showToast('Cloud से नया data ला रहे हैं...', 'info');
@@ -2103,6 +2149,11 @@ function dismissUndo(expired) {
     const bar = document.getElementById("undoBar");
     if (bar) bar.classList.remove("show");
     undoStack = null;
+    // Undo bar बंद होने पर local data से refresh करें
+    if (!expired) {
+        renderTable();
+        renderEntryView();
+    }
 }
 async function performUndo() {
     if (!undoStack) { showToast('अनडू समय खत्म', "warning"); dismissUndo(); return; }
@@ -2111,6 +2162,7 @@ async function performUndo() {
     document.getElementById("undoBar").classList.remove("show");
     undoStack = null;
     try {
+        lockLocalWrite();
         if (snap.type === 'edit' || snap.type === 'delete' || snap.type === 'entryAdd') {
             const { year, month, day, data } = snap.snapshot;
             if (data) {
@@ -2139,11 +2191,15 @@ async function performUndo() {
             }
             await dbAddAudit('UNDO', `Undo month ${year}-${month}`);
         }
+        unlockLocalWrite();
         if (document.getElementById("searchModal").classList.contains("show")) runSearch();
         await renderTable();
         await renderEntryView();
         showToast('✓ बदलाव वापस हो गया', "success");
-    } catch (e) { showToast("Undo error", "danger"); }
+    } catch (e) { 
+        unlockLocalWrite();
+        showToast("Undo error", "danger"); 
+    }
 }
 
 function updateUserNameBadge() {
@@ -2434,10 +2490,7 @@ async function attemptLogin() {
 
 async function logout(silent) {
     if (session) await dbAddAudit('LOGOUT', `${session.username} ने लॉगआउट किया`);
-    
-    // Real-time listener बंद करें
     stopRealtimeSync();
-    
     session = null;
     try { localStorage.removeItem('jalkal_session'); } catch (e) {}
     if (autoLockTimer) clearTimeout(autoLockTimer);
@@ -2468,11 +2521,7 @@ function enterApp() {
     document.getElementById("userInfoLine").innerText = `${session.username} (${session.role}) • ${new Date(session.loginTime).toLocaleTimeString('hi-IN')}`;
     initAppContent();
     resetAutoLock();
-    
-    // ═══ Real-time sync शुरू करें ═══
     startRealtimeSync();
-    
-    // ═══ पहले Cloud से latest data लाकर local में merge करें ═══
     syncCloudToLocal().then(() => {
         renderTable();
         renderEntryView();
@@ -2736,21 +2785,47 @@ async function addNewEntry() {
     if (!firm) { showToast('फर्म चुनें', "warning"); return; }
     if (isNaN(qty) || qty <= 0) { showToast('मात्रा डालें', "warning"); return; }
 
-    const [y, m, d] = dateStr.split('-').map(Number);
-    const allData = await dbGetMonthRecords(y, m);
-    const dayData = allData[d] || { col1: '', col2: '', col3: '', col4: '' };
-    const before = { ...dayData };
-    dayData[firm] = String(qty);
-    await dbPutRecord(y, m, d, dayData);
-    await cloudPutRecord(y, m, d, dayData);
-    await dbAddAudit('ENTRY_ADD', `${formatDateLongDDMMYYYY(y,m,d)} — ${FIRM_LABELS[firm].short} = ${qty} ली०`);
-    showToast('✓ एंट्री जोड़ दी!', "success");
-    pushUndo('entryAdd', { year: y, month: m, day: d, data: before }, 'एंट्री जोड़ी — वापस लाएँ?');
-    document.getElementById('entryQty').value = '';
-    document.getElementById('entryQty').focus();
-    if (y === currentYear && m === currentMonth) {
-        await renderEntryView();
-        await renderTable();
+    // Button disable करें (double-click रोकने के लिए)
+    const btn = document.getElementById('addEntryBtn');
+    if (btn) { btn.disabled = true; }
+
+    try {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const allData = await dbGetMonthRecords(y, m);
+        const dayData = allData[d] || { col1: '', col2: '', col3: '', col4: '' };
+        const before = { ...dayData };
+        dayData[firm] = String(qty);
+        
+        // ═══ महत्वपूर्ण: पहले local write लॉक करें ═══
+        lockLocalWrite();
+        
+        // पहले local में लिखें (UI तुरंत update दिखाने के लिए)
+        await dbPutRecord(y, m, d, { ...dayData, updatedAt: Date.now() });
+        
+        // फिर cloud पर लिखें — wait करें जब तक complete हो
+        await cloudPutRecord(y, m, d, dayData);
+        
+        // अब listener को unlock करें
+        unlockLocalWrite();
+        
+        await dbAddAudit('ENTRY_ADD', `${formatDateLongDDMMYYYY(y,m,d)} — ${FIRM_LABELS[firm].short} = ${qty} ली०`);
+        showToast('✓ एंट्री जोड़ दी!', "success");
+        pushUndo('entryAdd', { year: y, month: m, day: d, data: before }, 'एंट्री जोड़ी — वापस लाएँ?');
+        document.getElementById('entryQty').value = '';
+        
+        if (y === currentYear && m === currentMonth) {
+            await renderEntryView();
+            await renderTable();
+        }
+        
+        // Focus वापस qty पर
+        document.getElementById('entryQty').focus();
+    } catch (err) {
+        unlockLocalWrite();
+        console.error('Add entry error:', err);
+        showToast('Entry जोड़ने में error', 'danger');
+    } finally {
+        if (btn) { btn.disabled = false; }
     }
 }
 
@@ -3095,26 +3170,31 @@ async function saveData(silent = false) {
     const endDay = activeFilter ? activeFilter.endDay : daysInMonth;
     try {
         const beforeSave = await dbGetMonthRecords(currentYear, currentMonth);
+        lockLocalWrite();
         for (let day = startDay; day <= endDay; day++) {
             const c1 = document.querySelector(`input[data-day="${day}"][data-col="1"]`)?.value || '';
             const c2 = document.querySelector(`input[data-day="${day}"][data-col="2"]`)?.value || '';
             const c3 = document.querySelector(`input[data-day="${day}"][data-col="3"]`)?.value || '';
             const c4 = document.querySelector(`input[data-day="${day}"][data-col="4"]`)?.value || '';
             if (c1||c2||c3||c4) {
-                await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+                await dbPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4, updatedAt: Date.now()});
                 await cloudPutRecord(currentYear, currentMonth, day, {col1:c1,col2:c2,col3:c3,col4:c4});
             } else {
                 await dbDeleteRecord(currentYear, currentMonth, day);
                 await cloudDeleteRecord(currentYear, currentMonth, day);
             }
         }
+        unlockLocalWrite();
         if (!silent) {
             await dbAddAudit('SAVE_DATA', `${currentYear}-${currentMonth} month saved`);
             showToast('✓ डेटा सेव हो गया!', "success");
         }
         pushUndo('month', { year: currentYear, month: currentMonth, records: beforeSave }, 'ग्रिड में बदलाव वापस लाएँ?');
         renderEntryView();
-    } catch (err) { showToast("Save error", "danger"); }
+    } catch (err) { 
+        unlockLocalWrite();
+        showToast("Save error", "danger"); 
+    }
 }
 function setupKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
@@ -3219,8 +3299,10 @@ async function deleteRecord(y, m, d) {
     if (!session || session.role !== 'admin') return;
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec3 = (await dbGetMonthRecords(y, m))[d] || null;
+    lockLocalWrite();
     await dbDeleteRecord(y, m, d);
     await cloudDeleteRecord(y, m, d);
+    unlockLocalWrite();
     await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(y,m,d)} deleted`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year: y, month: m, day: d, data: oldRec3 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
@@ -3262,13 +3344,15 @@ async function saveFromEdit() {
     const c2 = document.getElementById("editCol2").value;
     const c3 = document.getElementById("editCol3").value;
     const c4 = document.getElementById("editCol4").value;
+    lockLocalWrite();
     if (c1||c2||c3||c4) {
-        await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
+        await dbPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4, updatedAt: Date.now()});
         await cloudPutRecord(year, month, day, {col1:c1,col2:c2,col3:c3,col4:c4});
     } else {
         await dbDeleteRecord(year, month, day);
         await cloudDeleteRecord(year, month, day);
     }
+    unlockLocalWrite();
     await dbAddAudit('EDIT_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} updated`);
     showToast('✓ रिकॉर्ड अपडेट!', "success");
     pushUndo('edit', { year, month, day, data: oldRec }, 'रिकॉर्ड संपादित — वापस लाएँ?');
@@ -3281,8 +3365,10 @@ async function deleteFromEdit() {
     if (!day) return;
     if (!confirm("पूरे दिन की सारी एंट्री हटाएँ?")) return;
     const oldRec2 = (await dbGetMonthRecords(year, month))[day] || null;
+    lockLocalWrite();
     await dbDeleteRecord(year, month, day);
     await cloudDeleteRecord(year, month, day);
+    unlockLocalWrite();
     await dbAddAudit('DELETE_RECORD', `${formatDateLongDDMMYYYY(year,month,day)} deleted via edit`);
     showToast('✓ रिकॉर्ड डिलीट!', "danger");
     pushUndo('delete', { year, month, day, data: oldRec2 }, 'रिकॉर्ड हटाया — वापस लाएँ?');
@@ -3774,6 +3860,7 @@ async function confirmRestore() {
     if (!pendingRestore) return;
     try {
         await dbClearRecords(); await dbClearSettings();
+        lockLocalWrite();
         for (const r of pendingRestore.records) {
             await dbPutRecord(r.year, r.month, r.day, r);
             await cloudPutRecord(r.year, r.month, r.day, r);
@@ -3786,6 +3873,7 @@ async function confirmRestore() {
                 }
             }
         }
+        unlockLocalWrite();
         cachedLogo = await dbGetSetting('logo_main');
         await loadLogoPosition();
         if (cachedLogo) applyLogo(cachedLogo);
@@ -3793,17 +3881,22 @@ async function confirmRestore() {
         cancelRestore(); closeBackupModal();
         await renderTable(); await renderEntryView();
         showToast(`✓ रिकॉर्ड रीस्टोर: ${pendingRestore.records.length}`, "success");
-    } catch (e) { showToast("Restore error", "danger"); }
+    } catch (e) { 
+        unlockLocalWrite();
+        showToast("Restore error", "danger"); 
+    }
 }
 async function clearAllData() {
     if (!session || session.role !== 'admin') return;
     if (!confirm("सारा डेटा मिटाएँ?")) return;
     if (!confirm("पक्का?")) return;
     const allRecs = await dbGetAllRecords();
+    lockLocalWrite();
     for (const r of allRecs) {
         await dbDeleteRecord(r.year, r.month, r.day);
         await cloudDeleteRecord(r.year, r.month, r.day);
     }
+    unlockLocalWrite();
     await dbClearSettings();
     cachedLogo = null;
     const el = document.getElementById('logoMovable');
