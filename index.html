@@ -31,7 +31,7 @@
       limit: fsLimit, addDoc, deleteDoc, writeBatch, onSnapshot
     };
     window.firebaseReady = true;
-    console.log('✓ Firebase initialized with real-time support');
+    console.log('✓ Firebase initialized');
     window.dispatchEvent(new Event('firebase-ready'));
   } catch (e) {
     console.error('✗ Firebase init error:', e);
@@ -1243,20 +1243,19 @@ input[type=number] { -moz-appearance: textfield; }
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">फर्म</label>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Format</label>
+                    <select id="reportFormat" class="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white" onchange="onReportFormatChange()">
+                        <option value="full">पूरा रजिस्टर (सभी फर्म)</option>
+                        <option value="single">केवल चुनी हुई फर्म</option>
+                    </select>
+                </div>
+                <div id="reportFirmWrap" style="display:none;">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">कौन सी फर्म?</label>
                     <select id="reportFirm" class="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white">
-                        <option value="all">सभी फर्म</option>
                         <option value="col1">मे० ओम साँई (वरूणा/सारनाथ)</option>
                         <option value="col2">मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)</option>
                         <option value="col3">मे० अनन्त कुमार (भेलूपुर/दशाश्वमेध)</option>
                         <option value="col4">मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषी माण्डवी)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">Format</label>
-                    <select id="reportFormat" class="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white">
-                        <option value="full">पूरा रजिस्टर</option>
-                        <option value="single">केवल चुनी फर्म</option>
                     </select>
                 </div>
             </div>
@@ -1577,7 +1576,7 @@ function detectDevice() {
 }
 
 /* ============================================================
-   WRITE LOCK — इससे हमारे खुद के writes पर listener ignore होगा
+   WRITE LOCK
    ============================================================ */
 let isWritingLocally = false;
 let pendingCloudWrites = 0;
@@ -1637,7 +1636,6 @@ async function cloudGetAllRecords() {
 let unsubscribeRealtime = null;
 let syncInProgress = false;
 let pendingSync = false;
-let realtimeStarted = false;
 
 function startRealtimeSync() {
     if (unsubscribeRealtime) {
@@ -1645,17 +1643,13 @@ function startRealtimeSync() {
         unsubscribeRealtime = null;
     }
     
-    if (!firebaseReady || !fsdb || !fsFuncs || !fsFuncs.onSnapshot) {
-        console.warn('Real-time sync unavailable — Firebase not ready');
-        return;
-    }
+    if (!firebaseReady || !fsdb || !fsFuncs || !fsFuncs.onSnapshot) return;
     
     try {
         const { collection, onSnapshot } = fsFuncs;
         console.log('→ Starting real-time sync listener...');
         
         unsubscribeRealtime = onSnapshot(collection(fsdb, 'records'), (snapshot) => {
-            // ═══ अगर हम खुद write कर रहे हैं, तो ignore करें ═══
             if (isWritingLocally) {
                 console.log('⏸ Real-time update ignored (local write in progress)');
                 return;
@@ -1665,21 +1659,11 @@ function startRealtimeSync() {
             let externalChange = false;
             snapshot.docChanges().forEach((change) => {
                 changes++;
-                // अगर यह हमारे खुद के session से नहीं आया
                 const data = change.doc.data();
-                if (data.updatedBy !== session?.username) {
-                    externalChange = true;
-                }
+                if (data.updatedBy !== session?.username) externalChange = true;
             });
             
             if (changes === 0) return;
-            
-            // अगर सिर्फ हमारे खुद के changes हैं, तो notification न दिखाएँ
-            if (!externalChange) {
-                console.log('⏭ Real-time update: only our own changes, silent sync');
-            } else {
-                console.log('⚡ Real-time update:', changes, 'changes from OTHER device');
-            }
             
             if (syncInProgress) {
                 pendingSync = true;
@@ -1689,16 +1673,10 @@ function startRealtimeSync() {
             syncInProgress = true;
             syncCloudToLocal().then(() => {
                 syncInProgress = false;
-                if (currentView === 'register') {
-                    renderTable();
-                }
+                if (currentView === 'register') renderTable();
                 renderEntryView();
-                if (document.getElementById("searchModal")?.classList.contains("show")) {
-                    runSearch();
-                }
-                if (externalChange) {
-                    showToast('🔄 दूसरे device से नया data आया', "info");
-                }
+                if (document.getElementById("searchModal")?.classList.contains("show")) runSearch();
+                if (externalChange) showToast('🔄 दूसरे device से नया data आया', "info");
                 updateCloudStatus('live', 'Cloud: लाइव ✓');
             }).catch(e => {
                 syncInProgress = false;
@@ -1714,7 +1692,6 @@ function startRealtimeSync() {
             updateCloudStatus('error', 'Cloud: लाइव बंद');
         });
         
-        realtimeStarted = true;
         console.log('✓ Real-time sync started');
         updateCloudStatus('live', 'Cloud: लाइव ✓');
     } catch (e) {
@@ -1726,14 +1703,10 @@ function stopRealtimeSync() {
     if (unsubscribeRealtime) {
         try { unsubscribeRealtime(); } catch (e) {}
         unsubscribeRealtime = null;
-        realtimeStarted = false;
         console.log('→ Real-time sync stopped');
     }
 }
 
-/* Cloud से सारा data लाकर local IndexedDB में merge करें
-   ध्यान: Local data को cloud data से overwrite नहीं करेंगे अगर local newer है
-*/
 async function syncCloudToLocal() {
     if (!firebaseReady || !fsdb) return;
     try {
@@ -1748,20 +1721,16 @@ async function syncCloudToLocal() {
             const cloudUpdated = cr.updatedAt || 0;
             const localUpdated = local?.updatedAt || 0;
             
-            // Cloud newer है तो update करें
             if (!local || cloudUpdated > localUpdated) {
                 await dbPutRecord(cr.year, cr.month, cr.day, {
-                    col1: cr.col1 || '',
-                    col2: cr.col2 || '',
-                    col3: cr.col3 || '',
-                    col4: cr.col4 || '',
+                    col1: cr.col1 || '', col2: cr.col2 || '',
+                    col3: cr.col3 || '', col4: cr.col4 || '',
                     updatedAt: cloudUpdated
                 });
             }
             localMap.delete(id);
         }
         
-        // जो local में हैं पर cloud में नहीं (delete हो चुके) — हटाएँ
         for (const [id, rec] of localMap) {
             await dbDeleteRecord(rec.year, rec.month, rec.day);
         }
@@ -1772,7 +1741,6 @@ async function syncCloudToLocal() {
     }
 }
 
-/* Manual Refresh */
 async function manualRefresh() {
     document.getElementById("userDropdown").style.display = 'none';
     showToast('Cloud से नया data ला रहे हैं...', 'info');
@@ -1781,9 +1749,7 @@ async function manualRefresh() {
         await syncCloudToLocal();
         await renderTable();
         await renderEntryView();
-        if (document.getElementById("searchModal")?.classList.contains("show")) {
-            runSearch();
-        }
+        if (document.getElementById("searchModal")?.classList.contains("show")) runSearch();
         showToast('✓ Data refresh हो गया', 'success');
         updateCloudStatus('live', 'Cloud: लाइव ✓');
     } catch (e) {
@@ -2149,7 +2115,6 @@ function dismissUndo(expired) {
     const bar = document.getElementById("undoBar");
     if (bar) bar.classList.remove("show");
     undoStack = null;
-    // Undo bar बंद होने पर local data से refresh करें
     if (!expired) {
         renderTable();
         renderEntryView();
@@ -2349,7 +2314,7 @@ async function requestOTP() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enteredEmail)) {
         emailEl.classList.add('error');
-        showForgotMessage('ईमेल का format सही नहीं है (उदाहरण: name@example.com)', 'error');
+        showForgotMessage('ईमेल का format सही नहीं है', 'error');
         return;
     }
     if (username !== 'admin' && username !== 'user') {
@@ -2362,16 +2327,16 @@ async function requestOTP() {
     const registeredEmail = username === 'admin' ? cfg.adminEmail : cfg.userEmail;
     
     if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) {
-        showForgotMessage('EmailJS settings अभी सेट नहीं हैं। पहले Admin → ईमेल सेटिंग खोलें।', 'warning');
+        showForgotMessage('EmailJS settings अभी सेट नहीं हैं।', 'warning');
         return;
     }
     if (!registeredEmail) {
-        showForgotMessage(`${username} का ईमेल सेट नहीं है। Admin → ईमेल सेटिंग में ${username} का ईमेल डालें।`, 'warning');
+        showForgotMessage(`${username} का ईमेल सेट नहीं है।`, 'warning');
         return;
     }
     if (enteredEmail !== registeredEmail.toLowerCase()) {
         emailEl.classList.add('error');
-        showForgotMessage(`यह ईमेल रजिस्टर्ड ईमेल से मेल नहीं खाता। ${username} का रजिस्टर्ड ईमेल check करें।`, 'error');
+        showForgotMessage(`यह ईमेल रजिस्टर्ड ईमेल से मेल नहीं खाता।`, 'error');
         return;
     }
     
@@ -2390,7 +2355,7 @@ async function requestOTP() {
         console.error('OTP error:', err);
         await dbAddAudit('OTP_FAIL', `Send failed to ${registeredEmail}`);
         const msg = err?.text || err?.message || 'अज्ञात error';
-        showForgotMessage(`OTP भेजने में error: ${msg}. EmailJS settings check करें।`, 'error');
+        showForgotMessage(`OTP भेजने में error: ${msg}`, 'error');
         setOtpLoading(false);
     }
 }
@@ -2403,8 +2368,8 @@ async function verifyOTPAndReset() {
     
     if (!entered) { showForgotMessage('OTP डालें', 'error'); return; }
     if (entered.length !== 6) { showForgotMessage('OTP 6 अंकों का होना चाहिए', 'error'); return; }
-    if (Date.now() > activeOTPExpiry) { showForgotMessage('OTP की अवधि (10 मिनट) खत्म हो गई। नया OTP मँगवाएँ।', 'warning'); return; }
-    if (entered !== activeOTP) { showForgotMessage('गलत OTP। दोबारा check करें।', 'error'); return; }
+    if (Date.now() > activeOTPExpiry) { showForgotMessage('OTP की अवधि खत्म हो गई।', 'warning'); return; }
+    if (entered !== activeOTP) { showForgotMessage('गलत OTP।', 'error'); return; }
     if (!np || np.length < 6) { showForgotMessage('नया पासवर्ड कम से कम 6 अक्षर', 'error'); return; }
     if (np !== np2) { showForgotMessage('दोनों पासवर्ड मेल नहीं खाते', 'error'); return; }
     
@@ -2452,14 +2417,11 @@ async function attemptLogin() {
     
     setLoginLoading(true);
     try {
-        console.log('→ Login attempt for:', username);
         const ok = await verifyPassword(username, password);
-        console.log('→ Password verify:', ok ? 'SUCCESS' : 'FAILED');
-        
         if (!ok) {
             setLoginLoading(false);
             passwordEl.classList.add('error');
-            showLoginMessage(`गलत पासवर्ड। दोबारा कोशिश करें। (भूल गए तो "पासवर्ड भूल गए?" link use करें)`, 'error');
+            showLoginMessage(`गलत पासवर्ड। दोबारा कोशिश करें।`, 'error');
             passwordEl.focus();
             passwordEl.select();
             return;
@@ -2484,7 +2446,7 @@ async function attemptLogin() {
     } catch (err) {
         console.error('Login error:', err);
         setLoginLoading(false);
-        showLoginMessage('लॉगिन में technical error आया। Page refresh करके दोबारा कोशिश करें। Error: ' + (err.message || 'unknown'), 'error');
+        showLoginMessage('लॉगिन में technical error। Error: ' + (err.message || 'unknown'), 'error');
     }
 }
 
@@ -2785,9 +2747,8 @@ async function addNewEntry() {
     if (!firm) { showToast('फर्म चुनें', "warning"); return; }
     if (isNaN(qty) || qty <= 0) { showToast('मात्रा डालें', "warning"); return; }
 
-    // Button disable करें (double-click रोकने के लिए)
     const btn = document.getElementById('addEntryBtn');
-    if (btn) { btn.disabled = true; }
+    if (btn) btn.disabled = true;
 
     try {
         const [y, m, d] = dateStr.split('-').map(Number);
@@ -2796,16 +2757,9 @@ async function addNewEntry() {
         const before = { ...dayData };
         dayData[firm] = String(qty);
         
-        // ═══ महत्वपूर्ण: पहले local write लॉक करें ═══
         lockLocalWrite();
-        
-        // पहले local में लिखें (UI तुरंत update दिखाने के लिए)
         await dbPutRecord(y, m, d, { ...dayData, updatedAt: Date.now() });
-        
-        // फिर cloud पर लिखें — wait करें जब तक complete हो
         await cloudPutRecord(y, m, d, dayData);
-        
-        // अब listener को unlock करें
         unlockLocalWrite();
         
         await dbAddAudit('ENTRY_ADD', `${formatDateLongDDMMYYYY(y,m,d)} — ${FIRM_LABELS[firm].short} = ${qty} ली०`);
@@ -2818,14 +2772,13 @@ async function addNewEntry() {
             await renderTable();
         }
         
-        // Focus वापस qty पर
         document.getElementById('entryQty').focus();
     } catch (err) {
         unlockLocalWrite();
         console.error('Add entry error:', err);
         showToast('Entry जोड़ने में error', 'danger');
     } finally {
-        if (btn) { btn.disabled = false; }
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -3017,27 +2970,214 @@ async function removeLogo(event) {
 }
 function getLogoData() { return cachedLogo; }
 
-/* FONT SCALE */
+/* ============================================================
+   FONT SCALE — FIXED: अब सारे UI elements पर लागू होगा
+   ============================================================ */
 function applyFontScale() {
     const scale = fontScale / 100;
+    
+    // Base CSS variables
     document.documentElement.style.setProperty('--base-font', (15 * scale) + 'px');
     document.documentElement.style.setProperty('--input-font', (17 * scale) + 'px');
     document.body.style.fontSize = (15 * scale) + 'px';
+    
+    // Register sheet table
     document.querySelectorAll('.register-sheet th, .register-sheet td').forEach(el => {
-        el.style.fontSize = (15 * scale) + 'px';
+        el.style.fontSize = (14 * scale) + 'px';
     });
     document.querySelectorAll('.grid-input').forEach(el => {
-        el.style.fontSize = (17 * scale) + 'px';
+        el.style.fontSize = (16 * scale) + 'px';
     });
+    document.querySelectorAll('.register-sig-block').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    
+    // Header with logos
+    document.querySelectorAll('.header-with-logos .title-block h1').forEach(el => {
+        el.style.fontSize = (18 * scale) + 'px';
+    });
+    document.querySelectorAll('.header-with-logos .title-block p').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    
+    // Top bar
+    document.querySelectorAll('.header-title').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    document.querySelectorAll('.font-badge').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.font-controls .font-label').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.font-controls .font-btn').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.month-block label').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.month-block input[type="month"]').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.month-block button').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.user-menu-badge').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.sync-indicator').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    
+    // Header row 2
+    document.querySelectorAll('.header-row-2 .left-filters > span').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.header-row-2 .right-actions button, .header-row-2 .left-filters button').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.date-picker-wrap.small .date-picker-display').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.date-picker-wrap.small .date-picker-cal-icon').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    
+    // View toggle
+    document.querySelectorAll('.view-toggle button').forEach(el => {
+        el.style.fontSize = (13 * scale) + 'px';
+    });
+    
+    // Entry form
+    document.querySelectorAll('.entry-form-title').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    document.querySelectorAll('.entry-field label').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.entry-field input, .entry-field select').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    document.querySelectorAll('.date-picker-wrap .date-picker-display').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    document.querySelectorAll('.date-picker-wrap .date-picker-cal-icon').forEach(el => {
+        el.style.fontSize = (16 * scale) + 'px';
+    });
+    document.querySelectorAll('.add-btn').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    
+    // Dashboard
+    document.querySelectorAll('.dashboard-header h3').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    document.querySelectorAll('.dashboard-updated').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.dash-stat-label').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.dash-stat-value').forEach(el => {
+        el.style.fontSize = (18 * scale) + 'px';
+    });
+    document.querySelectorAll('.dash-firm-name').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.dash-firm-name small').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.dash-firm-val').forEach(el => {
+        el.style.fontSize = (13 * scale) + 'px';
+    });
+    
+    // Recent
+    document.querySelectorAll('.recent-header h3').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.recent-note').forEach(el => {
+        el.style.fontSize = (10 * scale) + 'px';
+    });
+    document.querySelectorAll('.recent-row .rdate').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.recent-row .rfirm').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.recent-row .rqty').forEach(el => {
+        el.style.fontSize = (13 * scale) + 'px';
+    });
+    
+    // Modals
+    document.querySelectorAll('.modal-header h2').forEach(el => {
+        el.style.fontSize = (16 * scale) + 'px';
+    });
+    document.querySelectorAll('.modal-header button').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.layout-editor-header h3').forEach(el => {
+        el.style.fontSize = (14 * scale) + 'px';
+    });
+    document.querySelectorAll('.orient-row span').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.orient-btn-group button').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.psize-select').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.slider-item label').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.slider-item .val').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    document.querySelectorAll('.page-count-badge').forEach(el => {
+        el.style.fontSize = (11 * scale) + 'px';
+    });
+    
+    // Login screen
+    document.querySelectorAll('.login-title p').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.login-label').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    document.querySelectorAll('.login-input').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    document.querySelectorAll('.login-message').forEach(el => {
+        el.style.fontSize = (13 * scale) + 'px';
+    });
+    
+    // Edit inputs
+    document.querySelectorAll('.edit-input').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    
+    // Search
+    document.querySelectorAll('.search-result-row .date-badge').forEach(el => {
+        el.style.fontSize = (15 * scale) + 'px';
+    });
+    document.querySelectorAll('.zone-pill').forEach(el => {
+        el.style.fontSize = (12 * scale) + 'px';
+    });
+    
+    // Font size badge update
     const badge = document.getElementById("fontSizeBadge");
     if (badge) badge.innerText = fontScale + "%";
 }
 function changeFontSize(dir) {
     const ns = fontScale + (dir * 10);
-    if (ns < 70 || ns > 160) return;
+    if (ns < 70 || ns > 160) {
+        showToast(`Font size ${ns < 70 ? '70% से कम' : '160% से ज़्यादा'} नहीं हो सकती`, 'warning');
+        return;
+    }
     fontScale = ns;
     applyFontScale();
     dbSetSetting('font_scale', fontScale);
+    showToast(`Font size: ${fontScale}%`, 'info');
 }
 
 function setupDateInputConstraints() {
@@ -3555,7 +3695,9 @@ function onPageSizeChange() {
     if (currentReportData) previewReport();
 }
 
-/* REPORT */
+/* ============================================================
+   REPORT MODAL — FIXED: अब format change पर firm dropdown दिखेगा
+   ============================================================ */
 function openReportModal() {
     const today = new Date();
     const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -3564,15 +3706,33 @@ function openReportModal() {
     document.getElementById("reportToDate").value = fmt(today);
     syncDateDisplay('reportFromDate', 'reportFromDateDisplay');
     syncDateDisplay('reportToDate', 'reportToDateDisplay');
-    document.getElementById("reportFirm").value = "all";
     document.getElementById("reportFormat").value = "full";
+    document.getElementById("reportFirm").value = "col1";
     document.getElementById("reportPreviewContainer").innerHTML = "";
     document.getElementById("reportPreviewInfo").innerText = "";
     document.getElementById("reportActions").style.display = "none";
     currentReportData = null;
     document.getElementById("reportModal").classList.add("show");
+    // Format change करते समय firm dropdown दिखाएँ/छिपाएँ
+    onReportFormatChange();
     applyLayoutToUI();
 }
+
+function onReportFormatChange() {
+    const format = document.getElementById("reportFormat").value;
+    const firmWrap = document.getElementById("reportFirmWrap");
+    if (format === "single") {
+        firmWrap.style.display = "block";
+    } else {
+        firmWrap.style.display = "none";
+    }
+    // Preview reset करें
+    currentReportData = null;
+    document.getElementById("reportPreviewContainer").innerHTML = "";
+    document.getElementById("reportPreviewInfo").innerText = "";
+    document.getElementById("reportActions").style.display = "none";
+}
+
 function closeReportModal() { document.getElementById("reportModal").classList.remove("show"); }
 function clearReportForm() {
     document.getElementById("reportPreviewContainer").innerHTML = "";
@@ -3629,8 +3789,9 @@ function buildReportHeader(firm, dateRangeText) {
 async function previewReport() {
     const fromStr = document.getElementById("reportFromDate").value;
     const toStr = document.getElementById("reportToDate").value;
-    const firm = document.getElementById("reportFirm").value;
     const format = document.getElementById("reportFormat").value;
+    const firm = format === 'single' ? document.getElementById("reportFirm").value : 'all';
+    
     if (!fromStr || !toStr) { showToast('दोनों तारीख चुनें', "warning"); return; }
     const fromDate = new Date(fromStr);
     const toDate = new Date(toStr);
