@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script type="module">
@@ -736,6 +737,68 @@ input[type=number] { -moz-appearance: textfield; }
     .grid-input { font-size: 12px !important; }
     .user-menu-badge span { max-width: 50px; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* ============================================================
+   FULL WIDTH LAYOUT
+   ============================================================ */
+.max-w-6xl {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+#appContainer {
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+.topbar {
+    max-width: 100% !important;
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+#entryView,
+#registerSheetWrapper,
+.view-toggle-bar {
+    max-width: 100% !important;
+    width: 100%;
+}
+.register-sheet {
+    width: 100%;
+}
+@media (min-width: 1280px) {
+    .register-sheet { padding: 20px 24px !important; }
+    .register-sheet th, .register-sheet td { padding: 8px 6px !important; font-size: 14px !important; }
+    .grid-input { padding: 10px 4px !important; font-size: 16px !important; }
+    .dashboard-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 18px; }
+    .entry-form-grid { gap: 16px; }
+    .dash-firm-row { grid-template-columns: minmax(280px, 1.4fr) 3fr minmax(120px, auto); gap: 14px; }
+    .recent-row { padding: 12px 18px; }
+    .entry-form-card { padding: 20px; }
+    .dashboard-card { margin-bottom: 20px; }
+    .recent-card { margin-bottom: 20px; }
+    .header-with-logos { min-height: 100px; padding: 12px 16px; }
+    .header-with-logos .title-block h1 { font-size: 22px; }
+    .header-with-logos .title-block p { font-size: 14px; }
+    #logoMovable { width: 110px; height: 85px; }
+}
+@media (min-width: 1536px) {
+    .register-sheet { padding: 24px 32px !important; }
+    .topbar { padding: 16px 24px !important; }
+    .register-sheet th, .register-sheet td { padding: 10px 8px !important; font-size: 15px !important; }
+    .grid-input { padding: 12px 6px !important; font-size: 17px !important; }
+    .dashboard-grid { gap: 20px; padding: 22px; }
+    .header-with-logos .title-block h1 { font-size: 24px; }
+    .header-with-logos .title-block p { font-size: 15px; }
+}
+@media (min-width: 1024px) {
+    .modal-box { max-width: 95vw !important; }
+    #reportModal .modal-box, #devicesModal .modal-box { max-width: 1400px !important; }
+    #reportPreviewContainer { max-height: 75vh; }
+}
+@media (min-width: 769px) and (max-width: 1279px) {
+    .register-sheet { padding: 14px 18px !important; }
+    #appContainer { padding: 0 8px; }
+}
 </style>
 </head>
 <body>
@@ -1013,9 +1076,21 @@ input[type=number] { -moz-appearance: textfield; }
             </div>
         </div>
 
+        <!-- ═══ NEW CHART ROW ═══ -->
+        <div class="dashboard-chart-container" style="padding: 0 14px 14px;">
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                <div style="font-size: 13px; font-weight: 800; color: #1e40af; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-chart-bar"></i> फर्म-वार कुल मात्रा (तारीख रेंज के अनुसार)
+                </div>
+                <div style="position: relative; height: 220px;">
+                    <canvas id="firmsBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <div class="dash-firms">
             <div class="dash-firm-row">
-                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#3b82f6;"></span> मे० ओम साँई <small>(वरूणा/सारनाथ)</small></div>
+                <div class="dash-firm-name"><span class="dash-firm-dot" style="background:#3b82f6;"></span> मे० ओम साँई <small>(वरूणा/सारानाथ)</small></div>
                 <div class="dash-firm-bar-wrap"><div class="dash-firm-bar" id="dashBar_col1" style="background:#3b82f6; width:0%"></div></div>
                 <div class="dash-firm-val" id="dashFirm_col1">0 ली०</div>
             </div>
@@ -1255,7 +1330,7 @@ input[type=number] { -moz-appearance: textfield; }
                         <option value="col1">मे० ओम साँई (वरूणा/सारनाथ)</option>
                         <option value="col2">मे० संकेत कन्स्ट्रक्शन (रामनगर/आदमपुर)</option>
                         <option value="col3">मे० अनन्त कुमार (भेलूपुर/दशाश्वमेध)</option>
-                        <option value="col4">मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषि माण्डवी)</option>
+                        <option value="col4">मे० अनूप इण्टरप्राइजेज (कोतवाली/ऋषी माण्डवी)</option>
                     </select>
                 </div>
             </div>
@@ -1524,6 +1599,81 @@ function updateCloudStatus(status, text) {
     if (!el || !txt) return;
     el.className = 'sync-indicator ' + status;
     txt.textContent = text;
+}
+
+/* ============================================================
+   CHART.JS SETUP
+   ============================================================ */
+let firmsChartInstance = null;
+
+function renderChart(c1, c2, c3, c4) {
+    const canvas = document.getElementById('firmsBarChart');
+    if (!canvas) return;
+    
+    if (firmsChartInstance) {
+        firmsChartInstance.destroy();
+    }
+    
+    firmsChartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: ['ओम साँई', 'संकेत', 'अनन्त', 'अनूप'],
+            datasets: [{
+                label: 'मात्रा (ली०)',
+                data: [c1, c2, c3, c4],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',  // Blue
+                    'rgba(16, 185, 129, 0.7)',  // Green
+                    'rgba(245, 158, 11, 0.7)',  // Orange
+                    'rgba(168, 85, 247, 0.7)'   // Purple
+                ],
+                borderColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)',
+                    'rgb(168, 85, 247)'
+                ],
+                borderWidth: 2,
+                borderRadius: 6,
+                barThickness: 'flex',
+                maxBarThickness: 60
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toLocaleString('hi-IN') + ' ली०';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#e2e8f0' },
+                    ticks: {
+                        color: '#475569',
+                        font: { size: 11, weight: '700' },
+                        callback: function(value) {
+                            return value.toLocaleString('hi-IN');
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#1e293b',
+                        font: { size: 12, weight: '700' }
+                    }
+                }
+            }
+        }
+    });
 }
 
 /* ============================================================
@@ -2702,6 +2852,9 @@ async function renderEntryView() {
         : 0;
     const dtd = document.getElementById('dashTodayQty'); if (dtd) dtd.innerText = todayTotal.toLocaleString('hi-IN') + ' ली०';
 
+    // ═══ Chart Update ═══
+    renderChart(c1, c2, c3, c4);
+
     const maxVal = Math.max(c1, c2, c3, c4, 1);
     ['col1','col2','col3','col4'].forEach((firm, idx) => {
         const val = [c1, c2, c3, c4][idx];
@@ -2970,18 +3123,14 @@ async function removeLogo(event) {
 }
 function getLogoData() { return cachedLogo; }
 
-/* ============================================================
-   FONT SCALE — FIXED: अब सारे UI elements पर लागू होगा
-   ============================================================ */
+/* FONT SCALE — FIXED: अब सारे UI elements पर लागू होगा */
 function applyFontScale() {
     const scale = fontScale / 100;
     
-    // Base CSS variables
     document.documentElement.style.setProperty('--base-font', (15 * scale) + 'px');
     document.documentElement.style.setProperty('--input-font', (17 * scale) + 'px');
     document.body.style.fontSize = (15 * scale) + 'px';
     
-    // Register sheet table
     document.querySelectorAll('.register-sheet th, .register-sheet td').forEach(el => {
         el.style.fontSize = (14 * scale) + 'px';
     });
@@ -2992,7 +3141,6 @@ function applyFontScale() {
         el.style.fontSize = (15 * scale) + 'px';
     });
     
-    // Header with logos
     document.querySelectorAll('.header-with-logos .title-block h1').forEach(el => {
         el.style.fontSize = (18 * scale) + 'px';
     });
@@ -3000,7 +3148,6 @@ function applyFontScale() {
         el.style.fontSize = (12 * scale) + 'px';
     });
     
-    // Top bar
     document.querySelectorAll('.header-title').forEach(el => {
         el.style.fontSize = (14 * scale) + 'px';
     });
@@ -3029,7 +3176,6 @@ function applyFontScale() {
         el.style.fontSize = (10 * scale) + 'px';
     });
     
-    // Header row 2
     document.querySelectorAll('.header-row-2 .left-filters > span').forEach(el => {
         el.style.fontSize = (12 * scale) + 'px';
     });
@@ -3043,12 +3189,10 @@ function applyFontScale() {
         el.style.fontSize = (14 * scale) + 'px';
     });
     
-    // View toggle
     document.querySelectorAll('.view-toggle button').forEach(el => {
         el.style.fontSize = (13 * scale) + 'px';
     });
     
-    // Entry form
     document.querySelectorAll('.entry-form-title').forEach(el => {
         el.style.fontSize = (15 * scale) + 'px';
     });
@@ -3068,7 +3212,6 @@ function applyFontScale() {
         el.style.fontSize = (14 * scale) + 'px';
     });
     
-    // Dashboard
     document.querySelectorAll('.dashboard-header h3').forEach(el => {
         el.style.fontSize = (14 * scale) + 'px';
     });
@@ -3091,7 +3234,6 @@ function applyFontScale() {
         el.style.fontSize = (13 * scale) + 'px';
     });
     
-    // Recent
     document.querySelectorAll('.recent-header h3').forEach(el => {
         el.style.fontSize = (12 * scale) + 'px';
     });
@@ -3108,7 +3250,6 @@ function applyFontScale() {
         el.style.fontSize = (13 * scale) + 'px';
     });
     
-    // Modals
     document.querySelectorAll('.modal-header h2').forEach(el => {
         el.style.fontSize = (16 * scale) + 'px';
     });
@@ -3137,7 +3278,6 @@ function applyFontScale() {
         el.style.fontSize = (11 * scale) + 'px';
     });
     
-    // Login screen
     document.querySelectorAll('.login-title p').forEach(el => {
         el.style.fontSize = (12 * scale) + 'px';
     });
@@ -3151,12 +3291,10 @@ function applyFontScale() {
         el.style.fontSize = (13 * scale) + 'px';
     });
     
-    // Edit inputs
     document.querySelectorAll('.edit-input').forEach(el => {
         el.style.fontSize = (15 * scale) + 'px';
     });
     
-    // Search
     document.querySelectorAll('.search-result-row .date-badge').forEach(el => {
         el.style.fontSize = (15 * scale) + 'px';
     });
@@ -3164,7 +3302,6 @@ function applyFontScale() {
         el.style.fontSize = (12 * scale) + 'px';
     });
     
-    // Font size badge update
     const badge = document.getElementById("fontSizeBadge");
     if (badge) badge.innerText = fontScale + "%";
 }
@@ -3695,9 +3832,7 @@ function onPageSizeChange() {
     if (currentReportData) previewReport();
 }
 
-/* ============================================================
-   REPORT MODAL — FIXED: अब format change पर firm dropdown दिखेगा
-   ============================================================ */
+/* REPORT */
 function openReportModal() {
     const today = new Date();
     const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
